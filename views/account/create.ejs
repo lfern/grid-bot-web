@@ -1,0 +1,60 @@
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+            <h1>Account</h1>
+            <form action="/accounts/create" method="post">
+                <div class="formgroup">
+                    <label for="name" class="small mb-1 mt-3">Apikey:</label>
+                    <input placeholder="Please enter account label" class="form-control" type="text" name="name" required=true value="<%= formData.name%>">
+                    <% if (locals.errors && locals.errors.name) { %>
+                     <p class="small text-danger"><%= errors.name %></p>
+                    <% } %>
+
+                    <label for="exchange" class="small mb-1 mt-3">Exchange:</label>
+                    <select class="form-control" name="exchange">
+                        <% exchanges.forEach(exchange => { %>
+                         <option value="<%= exchange.id%>"><%= exchange.exchange_desc %></option>
+                        <% }) %>
+                    </select>
+                    <% if (locals.errors && locals.errors.exchange) { %>
+                        <p class="small text-danger"><%= errors.exchange %></p>
+                    <% } %>
+   
+                    <label for="accounttype" class="small mb-1 mt-3">Account type:</label>
+                    <select class="form-control" name="accounttype">
+                        <% accounttypes.forEach(accounttype => { %>
+                         <option value="<%= accounttype.id%>"><%= accounttype.account_type_name %></option>
+                        <% }) %>
+                    </select>
+                    <% if (locals.errors && locals.errors.accounttype) { %>
+                        <p class="small text-danger"><%= errors.accounttype %></p>
+                    <% } %>
+
+                    <div class="form-check mb-1 mt-3">
+                        <input class="form-check-input" type="checkbox" value="" name="paper">
+                        <label class="form-check-label" for="paper">
+                          Paper account?
+                        </label>
+                    </div>
+                    <% if (locals.errors && locals.errors.paper) { %>
+                        <p class="small text-danger"><%= errors.paper %></p>
+                    <% } %>
+
+                    <label for="apikey" class="small mb-1 mt-3">Apikey:</label>
+                    <input placeholder="Please enter apikey" class="form-control" type="text" name="apikey" required=true value="<%= formData.apikey%>">
+                    <% if (locals.errors && locals.errors.apikey) { %>
+                     <p class="small text-danger"><%= errors.apikey %></p>
+                    <% } %>
+
+                    <label for="secret" class="small mb-1 mt-3">Secret:</label>
+                    <input placeholder="Please enter your secret" class="form-control" type="text" name="secret" required=true value="<%= formData.secret%>">
+                    <% if (locals.errors && locals.errors.secret) { %>
+                     <p class="small text-danger"><%= errors.secret %></p>
+                    <% } %>
+
+                    <button class="mt-3 btn btn-primary" type="submit">Create account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

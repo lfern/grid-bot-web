@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+        <h1>Accounts 
+            <a href="/accounts/create" class="btn btn-primary float-right">New Account</a>
+        </h1>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Account</th>
+              <th scope="col">Exchange</th>
+              <th scope="col">Type</th>
+              <th scope="col">Paper</th>
+              <th scope="col">Valid</th>
+              <th scope="col">Actions</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for( let i = 0; i < locals.accounts.length; i++ ) { %>
+              <% let account = accounts[i]; %>
+              <tr id="<%= account.id%>">
+                <td><span><%= account.account_name %></span></td>
+                <td><span><%= account.exchange.exchange_desc %></span></td>
+                <td><span><%= account.accounttype.account_type_name %></span></td>
+                <td><span><%= account.paper ? 'yes' : 'no' %></span></td>
+                <td><span><%= account.valid ? 'yes' : 'no'%></span></td>
+                <td><a href="/account/<%= account.id%>">Details</a></td>
+                <td><button class="btn btn-primary" onclick="deleteAccount('<%= account.id%>')">Delete</button></td>
+              </tr>
+            <% } %>    
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="/javascripts/accounts.js"></script>

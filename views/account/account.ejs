@@ -1,0 +1,42 @@
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+            <h1>Account</h1>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Name:</label>
+                <span class="form-control col-sm-10"><%= account.account_name %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Exchange:</label>
+                <span class="form-control col-sm-10"><%= account.exchange.exchange_desc %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Account Type:</label>
+                <span class="form-control col-sm-10"><%= account.accounttype.account_type_name %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Paper:</label>
+                <span class="form-control col-sm-10"><%= account.paper?"yes":"no" %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">ApiKey:</label>
+                <span class="form-control col-sm-10"><%= account.api_key %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Secret:</label>
+                <span class="form-control col-sm-10"><%= account.api_secret %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Valid:</label>
+                <span class="form-control col-sm-10"><%= account.valid?"yes":"no" %></span>
+            </div>
+            <div class="form-row">
+                <div class="col-md-3">
+                    <form action="/account/<%=account.id%>/delete" method="post">
+                        <button class="btn btn-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

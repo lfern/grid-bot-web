@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand navbar-light .bg-light">
+    <a href="/" aria-label="Golden Goose" class="navbar-brand mr-0 mr-md-2">
+            <img src="/images/bot36.png" width="36" height="36">
+    </a> 
+    <% if (locals.user) { %>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/accounts">Accounts</a>
+                </li>
+            </ul>
+        </div>
+        <div class="navbar-right">
+            <span class="navbar-ext">Hello <%= user.email %></span>
+        </div>
+        <div class="navbar-right">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    <% } else { %>
+        <div class="collapse navbar-collapse">
+        </div>
+        <div class="navbar-right">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Sign up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+            </ul>
+        </div>
+    <% } %>
+</nav>
