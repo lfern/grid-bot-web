@@ -8,7 +8,11 @@ exports.show_accounts = function(req, res, next) {
     return models.Account.findAll({
         include: [models.Account.Exchange, models.Account.Accounttype]
     }).then(accounts => {
-        res.render('account/accounts', {title: 'Accounts', accounts: accounts});
+        res.render('account/accounts', {
+            title: 'Accounts',
+            accounts: accounts,
+            user: req.user,
+        });
     });
 }
 
@@ -22,7 +26,8 @@ exports.show_create = function(req, res, next) {
             formData: req.body,
             title: 'Add account',
             exchanges: result.exchanges,
-            accounttypes: result.accounttypes
+            accounttypes: result.accounttypes,
+            user: req.user,
         })
     })
 }
@@ -38,7 +43,8 @@ const rerender_create = function(errors, req, res, next) {
             title: 'Add account',
             exchanges: result.exchanges,
             accounttypes: result.accounttypes,
-            errors: errors
+            errors: errors,
+            user: req.user,
         })
     })
 }
@@ -95,34 +101,10 @@ exports.show_account = function(req, res, next) {
         if (account == null) {
             next(createError(404, "Page does not exist"));            
         }
-        res.render('account/account', {account: account})
-    });
-}
-
-
-
-
-
-
-exports.show_edit_account = function(req, res, next) {
-    return models.Lead.findOne({
-        where:{
-            id: req.params.lead_id
-        }
-    }).then(lead => {
-        res.render('lead/edit_lead', {lead: lead})
-    });
-}
-
-exports.edit_account = function(req, res, next) {
-    return models.Lead.update({
-        email: req.body.lead_email
-    },{
-        where:{
-            id: req.params.lead_id
-        }
-    }).then(result => {
-        res.redirect('/lead/' + req.params.lead_id);
+        res.render('account/account', {
+            account: account,
+            user: req.user,
+        })
     });
 }
 
