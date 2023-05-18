@@ -26,7 +26,7 @@ exports.validateAccount = function(errors, req) {
                 errors["exchange"] = "Exchange is not valid now.";
             }
 
-            return models.Accounttype.findOne({
+            return models.AccountType.findOne({
                 where: {
                     id: req.body.accounttype
                 }

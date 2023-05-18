@@ -6,7 +6,7 @@ let createError = require('http-errors');
 
 exports.show_accounts = function(req, res, next) {
     return models.Account.findAll({
-        include: [models.Account.Exchange, models.Account.Accounttype]
+        include: [models.Account.Exchange, models.Account.AccountType]
     }).then(accounts => {
         res.render('account/accounts', {
             title: 'Accounts',
@@ -18,7 +18,7 @@ exports.show_accounts = function(req, res, next) {
 
 exports.show_create = function(req, res, next) {
     return models.Exchange.findAll().then(exchanges => {
-        return models.Accounttype.findAll().then(accounttypes => {
+        return models.AccountType.findAll().then(accounttypes => {
             return {exchanges, accounttypes};
         })
     }).then (result => {
@@ -34,7 +34,7 @@ exports.show_create = function(req, res, next) {
 
 const rerender_create = function(errors, req, res, next) {
     return models.Exchange.findAll().then(exchanges => {
-        return models.Accounttype.findAll().then(accounttypes => {
+        return models.AccountType.findAll().then(accounttypes => {
             return {exchanges, accounttypes};
         })
     }).then (result => {
@@ -96,7 +96,7 @@ exports.show_account = function(req, res, next) {
         where:{
             id: req.params.account_id
         },
-        include: [models.Account.Exchange, models.Account.Accounttype]
+        include: [models.Account.Exchange, models.Account.AccountType]
     }).then(account => {
         if (account == null) {
             next(createError(404, "Page does not exist"));            

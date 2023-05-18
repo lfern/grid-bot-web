@@ -9,7 +9,7 @@ const sequelize  = require("sequelize");
  */
 module.exports = (sequelize, DataTypes) => {
     const Exchange = require('./Exchange')(sequelize, DataTypes);
-    const Accounttype = require('./Accountype')(sequelize, DataTypes);
+    const AccountType = require('./AccountType')(sequelize, DataTypes);
 
     var Account = sequelize.define('Account', {
         id: {
@@ -75,7 +75,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'exchange_id'
     });
 
-    Account.Accounttype = Account.belongsTo(Accounttype, {
+    Account.AccountType = Account.belongsTo(AccountType, {
         as: 'accounttype',
         foreignKey: 'accounttype_id'
     });

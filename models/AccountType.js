@@ -8,7 +8,7 @@ const sequelize  = require("sequelize");
  * @param {sequelize.DataTypes} DataTypes 
  */
 module.exports = (sequelize, DataTypes) => {
-    var Accounttype = sequelize.define('Accounttype', {
+    var AccountType = sequelize.define('AccountType', {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
@@ -28,5 +28,5 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'accounttypes'
     });
 
-    return Accounttype;
+    return AccountType;
 }
