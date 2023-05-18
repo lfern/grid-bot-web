@@ -1,11 +1,12 @@
 'use strict';
 
-const sequelize  = require("sequelize");
+/** @typedef {import('sequelize').Sequelize} Sequelize */
+/** @typedef {import('sequelize').DataTypes} DataTypes */
 
 /**
  * 
- * @param {*} sequelize 
- * @param {sequelize.DataTypes} DataTypes 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
  */
 module.exports = (sequelize, DataTypes) => {
     var Exchange = sequelize.define('Exchange', {

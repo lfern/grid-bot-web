@@ -20,14 +20,14 @@
                         <p class="small text-danger"><%= errors.exchange %></p>
                     <% } %>
    
-                    <label for="accounttype" class="small mb-1 mt-3">Account type:</label>
-                    <select class="form-control" name="accounttype">
-                        <% accounttypes.forEach(accounttype => { %>
-                         <option value="<%= accounttype.id%>"><%= accounttype.account_type_name %></option>
+                    <label for="account_type" class="small mb-1 mt-3">Account type:</label>
+                    <select class="form-control" name="account_type">
+                        <% account_types.forEach(account_type => { %>
+                         <option value="<%= account_type.id%>"><%= account_type.account_type_name %></option>
                         <% }) %>
                     </select>
-                    <% if (locals.errors && locals.errors.accounttype) { %>
-                        <p class="small text-danger"><%= errors.accounttype %></p>
+                    <% if (locals.errors && locals.errors.account_type) { %>
+                        <p class="small text-danger"><%= errors.account_type %></p>
                     <% } %>
 
                     <div class="form-check mb-1 mt-3">

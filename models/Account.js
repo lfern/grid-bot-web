@@ -1,15 +1,20 @@
 'use strict';
 
-const sequelize  = require("sequelize");
+const ExchangeModel = require('./Exchange');
+const AccountTypeModel = require('./AccountType');
+
+/** @typedef {import('sequelize').Sequelize} Sequelize */
+/** @typedef {import('sequelize').DataTypes} DataTypes */
 
 /**
+ * Account model
  * 
- * @param {*} sequelize 
- * @param {sequelize.DataTypes} DataTypes 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
  */
 module.exports = (sequelize, DataTypes) => {
-    const Exchange = require('./Exchange')(sequelize, DataTypes);
-    const AccountType = require('./AccountType')(sequelize, DataTypes);
+    const Exchange = ExchangeModel(sequelize, DataTypes);
+    const AccountType = AccountTypeModel(sequelize, DataTypes);
 
     var Account = sequelize.define('Account', {
         id: {
@@ -28,12 +33,12 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
-        accounttype_id: {
+        account_type_id: {
             allowNull: false,
             type: DataTypes.INTEGER,
             references: {
                 model: {
-                    tableName: 'accounttypes'
+                    tableName: 'account_types'
                 },
                 key: 'id'
             }
@@ -76,8 +81,8 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Account.AccountType = Account.belongsTo(AccountType, {
-        as: 'accounttype',
-        foreignKey: 'accounttype_id'
+        as: 'account_type',
+        foreignKey: 'account_type_id'
     });
 
     return Account;

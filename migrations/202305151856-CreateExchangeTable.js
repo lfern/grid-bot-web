@@ -37,7 +37,7 @@ module.exports = {
                 }
             });
 
-            await queryInterface.createTable('accounttypes', {
+            await queryInterface.createTable('account_types', {
                 id: {
                     allowNull: false,
                     primaryKey: true,
@@ -88,12 +88,12 @@ module.exports = {
                         key: 'id'
                     }
                 },
-                accounttype_id: {
+                account_type_id: {
                     allowNull: false,
                     type: Sequelize.INTEGER,
                     references: {
                         model: {
-                            tableName: 'accounttypes',
+                            tableName: 'account_types',
                         },
                         key: 'id'
                     }
@@ -137,14 +137,14 @@ module.exports = {
                 type: Sequelize.QueryTypes.INSERT,
             });
             
-            await queryInterface.sequelize.query('insert into accounttypes ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
+            await queryInterface.sequelize.query('insert into account_types ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
                 replacements: [
                     'spot',
                     'spot'
                 ],
                 type: Sequelize.QueryTypes.INSERT,
             });
-            await queryInterface.sequelize.query('insert into accounttypes ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
+            await queryInterface.sequelize.query('insert into account_types ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
                 replacements: [
                     'futures',
                     'futures'
@@ -155,11 +155,11 @@ module.exports = {
     },
     
     down: (queryInterface, Sequelize) => {
-        return Promise.allSettled([
-            queryInterface.dropTable('accounts'),
-            queryInterface.dropTable('accounttypes'),
-            queryInterface.dropTable('exchanges')
-        ]);
-        ;
+        return queryInterface.sequelize.transaction(async transaction => {
+            await queryInterface.dropTable('accounts');
+            await queryInterface.dropTable('account_types');
+            await queryInterface.dropTable('exchanges');
+        });
+
     }
 }

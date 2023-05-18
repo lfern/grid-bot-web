@@ -18,15 +18,15 @@ exports.show_accounts = function(req, res, next) {
 
 exports.show_create = function(req, res, next) {
     return models.Exchange.findAll().then(exchanges => {
-        return models.AccountType.findAll().then(accounttypes => {
-            return {exchanges, accounttypes};
+        return models.AccountType.findAll().then(account_types => {
+            return {exchanges, account_types};
         })
     }).then (result => {
         res.render('account/create', {
             formData: req.body,
             title: 'Add account',
             exchanges: result.exchanges,
-            accounttypes: result.accounttypes,
+            account_types: result.account_types,
             user: req.user,
         })
     })
@@ -34,15 +34,15 @@ exports.show_create = function(req, res, next) {
 
 const rerender_create = function(errors, req, res, next) {
     return models.Exchange.findAll().then(exchanges => {
-        return models.AccountType.findAll().then(accounttypes => {
-            return {exchanges, accounttypes};
+        return models.AccountType.findAll().then(account_types => {
+            return {exchanges, account_types};
         })
     }).then (result => {
         res.render('account/create', {
             formData: req.body,
             title: 'Add account',
             exchanges: result.exchanges,
-            accounttypes: result.accounttypes,
+            account_types: result.account_types,
             errors: errors,
             user: req.user,
         })
@@ -62,7 +62,7 @@ exports.submit_account = function(req, res, next) {
                 paper: typeof req.body.paper !== undefined ? true : false,
                 valid: true,
                 exchange_id: req.body.exchange,
-                accounttype_id: req.body.accounttype,
+                account_type_id: req.body.account_type,
                 account_name: req.body.name
             }).then(result => {
                 res.redirect('/accounts');

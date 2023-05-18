@@ -28,12 +28,12 @@ exports.validateAccount = function(errors, req) {
 
             return models.AccountType.findOne({
                 where: {
-                    id: req.body.accounttype
+                    id: req.body.account_type
                 }
             });
         }).then ( u => {
             if (u === null) {
-                errors["accounttype"] = "Account type is not valid.";
+                errors["account_type"] = "Account type is not valid.";
             }
  
             resolve(errors);

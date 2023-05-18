@@ -5,12 +5,12 @@ const Sequelize = require("sequelize");
 module.exports = {
     /**
      * 
-     * @param {*} queryInterface 
+     * @param {Sequelize.QueryInterface} queryInterface 
      * @param {Sequelize} Sequelize 
      * @returns 
      */
     up: (queryInterface, Sequelize) => {
-        return queryInterface.createTable('Users', {
+        return queryInterface.createTable('users', {
             id: {
                 allowNull: false,
                 primaryKey: true,
@@ -51,6 +51,6 @@ module.exports = {
     },
     
     down: (queryInterface, Sequelize) => {
-        return queryInterface.dropTable('Users');
+        return queryInterface.dropTable('users');
     }
 }

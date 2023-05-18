@@ -22,7 +22,7 @@
               <tr id="<%= account.id%>">
                 <td><span><%= account.account_name %></span></td>
                 <td><span><%= account.exchange.exchange_desc %></span></td>
-                <td><span><%= account.accounttype.account_type_name %></span></td>
+                <td><span><%= account.account_type.account_type_name %></span></td>
                 <td><span><%= account.paper ? 'yes' : 'no' %></span></td>
                 <td><span><%= account.valid ? 'yes' : 'no'%></span></td>
                 <td><a href="/account/<%= account.id%>">Details</a></td>
