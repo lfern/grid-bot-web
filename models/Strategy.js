@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
                 key: 'id'
             }
         },
+        strategy_name: {
+            allowNull: false,
+            type: DataTypes.STRING
+        },
         account_id: {
             allowNull: false,
             type: DataTypes.UUID,

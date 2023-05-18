@@ -41,6 +41,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         }
 
+    }, {
+        tableName: 'users'
     });
 
     return User;

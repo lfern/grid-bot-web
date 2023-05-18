@@ -174,9 +174,9 @@ module.exports = {
      */
     down: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
-            await queryInterface.dropTable('accounts', {transaction: t});
-            await queryInterface.dropTable('account_types', {transaction: t});
-            await queryInterface.dropTable('exchanges', {transaction: t});
+            await queryInterface.dropTable('accounts', {transaction});
+            await queryInterface.dropTable('account_types', {transaction});
+            await queryInterface.dropTable('exchanges', {transaction});
         });
 
     }

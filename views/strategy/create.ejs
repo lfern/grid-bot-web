@@ -1,0 +1,86 @@
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+            <h1>Strategy</h1>
+            <form action="/strategies/create" method="post">
+                <div class="formgroup">
+                    <label for="name" class="small mb-1 mt-3">Name:</label>
+                    <input placeholder="Please enter strategy label" class="form-control" type="text" name="name" required=true value="<%= formData.name%>">
+                    <% if (locals.errors && locals.errors.name) { %>
+                     <p class="small text-danger"><%= errors.name %></p>
+                    <% } %>
+
+                    <label for="strategy_type" class="small mb-1 mt-3">Strategy type:</label>
+                    <select class="form-control" name="strategy_type">
+                        <% strategy_types.forEach(strategy_type => { %>
+                         <option value="<%= strategy_type.id%>"><%= strategy_type.strategy_type_name %></option>
+                        <% }) %>
+                    </select>
+                    <% if (locals.errors && locals.errors.strategy_type) { %>
+                        <p class="small text-danger"><%= errors.strategy_type %></p>
+                    <% } %>
+
+                    <label for="account" class="small mb-1 mt-3">Account:</label>
+                    <select class="form-control" name="exchange">
+                        <% accounts.forEach(account => { %>
+                         <option value="<%= account.id%>"><%= account.exchange.exchange_name%>-<%= account.account_name %>-<%= account.account_type.account_type_name%></option>
+                        <% }) %>
+                    </select>
+                    <% if (locals.errors && locals.errors.account) { %>
+                        <p class="small text-danger"><%= errors.account %></p>
+                    <% } %>
+
+                    <label for="symbol" class="small mb-1 mt-3">Symbol:</label>
+                    <input placeholder="Please enter symbol" class="form-control" type="text" name="symbol" required=true value="<%= formData.symbol%>">
+                    <% if (locals.errors && locals.errors.symbol) { %>
+                     <p class="small text-danger"><%= errors.symbol %></p>
+                    <% } %>
+                    
+                    <label for="initial_position" class="small mb-1 mt-3">Initial position:</label>
+                    <input placeholder="Please enter initial position" class="form-control" type="text" name="initial_position" required=true value="<%= formData.initial_position%>">
+                    <% if (locals.errors && locals.errors.initial_position) { %>
+                     <p class="small text-danger"><%= errors.initial_position %></p>
+                    <% } %>
+
+                    <label for="order_qty" class="small mb-1 mt-3">Order Qty:</label>
+                    <input placeholder="Please enter order qty" class="form-control" type="text" name="order_qty" required=true value="<%= formData.order_qty%>">
+                    <% if (locals.errors && locals.errors.order_qty) { %>
+                     <p class="small text-danger"><%= errors.order_qty %></p>
+                    <% } %>
+
+                    <label for="buy_orders" class="small mb-1 mt-3">Buy orders:</label>
+                    <input placeholder="Please enter order qty" class="form-control" type="text" name="buy_orders" required=true value="<%= formData.buy_orders%>">
+                    <% if (locals.errors && locals.errors.buy_orders) { %>
+                     <p class="small text-danger"><%= errors.buy_orders %></p>
+                    <% } %>
+
+                    <label for="sell_orders" class="small mb-1 mt-3">Sell orders:</label>
+                    <input placeholder="Please enter sell orders" class="form-control" type="text" name="sell_orders" required=true value="<%= formData.sell_orders%>">
+                    <% if (locals.errors && locals.errors.sell_orders) { %>
+                     <p class="small text-danger"><%= errors.sell_orders %></p>
+                    <% } %>
+                                        
+                    <label for="active_buys" class="small mb-1 mt-3">Active buys:</label>
+                    <input placeholder="Please enter active buys" class="form-control" type="text" name="active_buys" required=true value="<%= formData.active_buys%>">
+                    <% if (locals.errors && locals.errors.active_buys) { %>
+                     <p class="small text-danger"><%= errors.active_buys %></p>
+                    <% } %>
+                    
+                    <label for="active_sells" class="small mb-1 mt-3">Active sells:</label>
+                    <input placeholder="Please enter active sells" class="form-control" type="text" name="active_sells" required=true value="<%= formData.active_sells%>">
+                    <% if (locals.errors && locals.errors.active_sells) { %>
+                     <p class="small text-danger"><%= errors.active_sells %></p>
+                    <% } %>
+
+                    <label for="step" class="small mb-1 mt-3">Step:</label>
+                    <input placeholder="Please enter step" class="form-control" type="text" name="step" required=true value="<%= formData.step%>">
+                    <% if (locals.errors && locals.errors.step) { %>
+                     <p class="small text-danger"><%= errors.step %></p>
+                    <% } %>
+
+                    <button class="mt-3 btn btn-primary" type="submit">Create strategy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

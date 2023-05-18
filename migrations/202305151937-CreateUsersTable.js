@@ -47,6 +47,11 @@ module.exports = {
                 allowNull: false,
                 unique: true
             },
+            is_admin: {
+                type: Sequelize.BOOLEAN,
+                allowNull: true,
+                defaultValue: false
+            }
     
         });
     },

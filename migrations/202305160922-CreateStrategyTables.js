@@ -47,6 +47,14 @@ module.exports = {
                     allowNull: false,
                     primaryKey: true
                 },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
                 strategy_type_id: {
                     allowNull: false,
                     type: Sequelize.UUID,
@@ -56,6 +64,10 @@ module.exports = {
                         },
                         key: 'id'
                     }
+                },
+                strategy_name: {
+                    allowNull: false,
+                    type: Sequelize.STRING
                 },
                 account_id: {
                     allowNull: false,
@@ -109,6 +121,14 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true
                 },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
                 strategy_id: {
                     allowNull: false,
                     type: Sequelize.UUID,
@@ -133,6 +153,14 @@ module.exports = {
                     allowNull: false,
                     primaryKey: true,
                     autoIncrement: true
+                },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
                 },
                 strategy_instance_id: {
                     allowNull: false,

@@ -20,6 +20,14 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true
                 },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
                 strategy_instance_id: {
                     allowNull: false,
                     type: Sequelize.INTEGER,
@@ -59,6 +67,14 @@ module.exports = {
                     allowNull: false,
                     primaryKey: true,
                     autoIncrement: true
+                },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
                 },
                 strategy_instance_id: {
                     allowNull: false,
@@ -151,6 +167,14 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true
                 },
+                createdAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                updatedAt: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
                 strategy_instance_order_id: {
                     allowNull: false,
                     type: Sequelize.INTEGER,
@@ -229,6 +253,7 @@ module.exports = {
      */
     down: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
+            await queryInterface.dropTable('strategy_instance_trades', {transaction});
             await queryInterface.dropTable('strategy_instance_orders', {transaction});
             await queryInterface.dropTable('strategy_instance_events', {transaction});
         });
