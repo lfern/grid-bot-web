@@ -1,16 +1,18 @@
 'use strict'
 
-const Sequelize = require("sequelize");
+/** @typedef {import('sequelize').QueryInterface} QueryInterface */
+/** @typedef {import('sequelize')} sequelize */
 
 module.exports = {
     /**
      * 
-     * @param {*} queryInterface 
-     * @param {Sequelize} Sequelize 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
      * @returns 
      */
     up: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
+            // Table exchanges
             await queryInterface.createTable('exchanges', {
                 id: {
                     allowNull: false,
@@ -35,8 +37,9 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.STRING,
                 }
-            });
+            }, {transaction});
 
+            // Table account_types
             await queryInterface.createTable('account_types', {
                 id: {
                     allowNull: false,
@@ -61,8 +64,9 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.STRING,
                 }
-            });
+            }, {transaction});
 
+            // Table accounts
             await queryInterface.createTable('accounts', {
                 id: {
                     allowNull: false,
@@ -126,8 +130,9 @@ module.exports = {
                     type: Sequelize.BOOLEAN,
                     defaultValue: false
                 }
-            });
+            }, {transaction});
 
+            // Insert bitfinex exchange
             await queryInterface.sequelize.query('insert into exchanges (id, "createdAt", "updatedAt", exchange_name, exchange_desc) values (?,NOW(),NOW(),?,?)',{
                 replacements: [
                     '2259fc1a-5212-438e-aca9-a4f6cd0bc9dd',
@@ -135,30 +140,43 @@ module.exports = {
                     'Bitfinex'
                 ],
                 type: Sequelize.QueryTypes.INSERT,
+                transaction
             });
             
+            // Insert spot account type
             await queryInterface.sequelize.query('insert into account_types ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
                 replacements: [
                     'spot',
                     'spot'
                 ],
                 type: Sequelize.QueryTypes.INSERT,
+                transaction
             });
+
+            // Insert futures account type
             await queryInterface.sequelize.query('insert into account_types ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
                 replacements: [
                     'futures',
                     'futures'
                 ],
                 type: Sequelize.QueryTypes.INSERT,
+                transaction
             });
+
         });
     },
     
+    /**
+     * 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
+     * @returns 
+     */
     down: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
-            await queryInterface.dropTable('accounts');
-            await queryInterface.dropTable('account_types');
-            await queryInterface.dropTable('exchanges');
+            await queryInterface.dropTable('accounts', {transaction: t});
+            await queryInterface.dropTable('account_types', {transaction: t});
+            await queryInterface.dropTable('exchanges', {transaction: t});
         });
 
     }

@@ -1,16 +1,18 @@
 'use strict'
 
-const Sequelize = require("sequelize");
+/** @typedef {import('sequelize').QueryInterface} QueryInterface */
+/** @typedef {import('sequelize')} sequelize */
 
 module.exports = {
     /**
      * 
-     * @param {Sequelize.QueryInterface} queryInterface 
-     * @param {Sequelize} Sequelize 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
      * @returns 
      */
     up: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
+            // Table strategy_types
             await queryInterface.createTable('strategy_types', {
                 id: {
                     allowNull: false,
@@ -35,7 +37,9 @@ module.exports = {
                     type: Sequelize.STRING,
                     allowNull: false,
                 }
-            });
+            }, {transaction});
+            
+            // Table strategies
             await queryInterface.createTable('strategies', {
                 id: {
                     type: Sequelize.UUID,
@@ -95,7 +99,9 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.DECIMAL(3,2),
                 }
-            });
+            }, {transaction});
+
+            // Table startegy_instances
             await queryInterface.createTable('strategy_instances', {
                 id: {
                     type: Sequelize.INTEGER,
@@ -118,8 +124,10 @@ module.exports = {
                     type: Sequelize.BOOLEAN,
                     defaultValue: false,
                 }
-            });
-            await queryInterface.createTable('strategy_instance_grid', {
+            }, {transaction});
+
+            // Table strategy_instance_grids
+            await queryInterface.createTable('strategy_instance_grids', {
                 id: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
@@ -184,16 +192,34 @@ module.exports = {
                     allowNull: true,
                     type: Sequelize.STRING,
                 }
+            }, {transaction});
+
+            // Insert Grid strategy type
+            await queryInterface.sequelize.query('insert into strategy_types (id, "createdAt", "updatedAt", strategy_type, strategy_type_name) values (?,NOW(),NOW(),?,?)',{
+                replacements: [
+                    'd726ffe7-80ae-4266-8b77-af70bc34daf1',
+                    'grid',
+                    'Grid'
+                ],
+                type: Sequelize.QueryTypes.INSERT,
+                transaction
             });
+            
         });
     },
     
+    /**
+     * 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
+     * @returns 
+     */
     down: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
-            await queryInterface.dropTable('strategy_instance_grid');
-            await queryInterface.dropTable('strategy_instances');
-            await queryInterface.dropTable('strategies');
-            await queryInterface.dropTable('strategy_types');
+            await queryInterface.dropTable('strategy_instance_grids', {transaction});
+            await queryInterface.dropTable('strategy_instances', {transaction});
+            await queryInterface.dropTable('strategies', {transaction});
+            await queryInterface.dropTable('strategy_types', {transaction});
         });
     }
 }

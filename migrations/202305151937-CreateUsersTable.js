@@ -1,12 +1,13 @@
 'use strict'
 
-const Sequelize = require("sequelize");
+/** @typedef {import('sequelize').QueryInterface} QueryInterface */
+/** @typedef {import('sequelize')} sequelize */
 
 module.exports = {
     /**
      * 
-     * @param {Sequelize.QueryInterface} queryInterface 
-     * @param {Sequelize} Sequelize 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
      * @returns 
      */
     up: (queryInterface, Sequelize) => {
@@ -50,6 +51,12 @@ module.exports = {
         });
     },
     
+    /**
+     * 
+     * @param {QueryInterface} queryInterface 
+     * @param {sequelize} Sequelize 
+     * @returns 
+     */
     down: (queryInterface, Sequelize) => {
         return queryInterface.dropTable('users');
     }
