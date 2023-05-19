@@ -4,7 +4,7 @@
             <h1>Account</h1>
             <form action="/accounts/create" method="post">
                 <div class="formgroup">
-                    <label for="name" class="small mb-1 mt-3">Apikey:</label>
+                    <label for="name" class="small mb-1 mt-3">Name:</label>
                     <input placeholder="Please enter account label" class="form-control" type="text" name="name" required=true value="<%= formData.name%>">
                     <% if (locals.errors && locals.errors.name) { %>
                      <p class="small text-danger"><%= errors.name %></p>

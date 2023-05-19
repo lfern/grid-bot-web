@@ -31,9 +31,16 @@ router.get('/account/:account_id', account.show_account);
 /* Strategy related routes */
 router.get('/strategies', strategy.show_strategies);
 router.get('/strategies/create', strategy.show_create);
+router.post('/strategies/create', strategy.submit_strategy);
+router.post('/strategy/:strategy_id/delete', strategy.delete_strategy);
+router.post('/strategy/:strategy_id/delete-json', strategy.delete_strategy_json);
+router.get('/strategy/:strategy_id', strategy.show_strategy);
 
 /* Exchange related routes */
-router.get('/excahnge/:exchange_id/accounts-json', exchange.get_accounts_json);
-router.get('/exchange/:exchange_id/account-types-json', exchange.get_account_types_json);
-router.get('/exchange/:exchange_id/:account_type/markets-json', exchange.get_markets_json);
+router.get('/exchanges/json', exchange.get_exchanges_json);
+router.get('/exchange/:exchange_id/accounts/json', exchange.get_accounts_json);
+router.get('/exchange/:exchange_id/account-types/json', exchange.get_account_types_json);
+router.get('/exchange/:exchange_id/:account_type_id/markets/json', exchange.get_markets_json);
+router.get('/exchange/:exchange_id/:account_type_id/markets/json/paper', exchange.get_markets_json_paper);
+router.get('/account/:account_id/markets/json', exchange.get_markets_account_json);
 module.exports = router;

@@ -20,22 +20,6 @@
                         <p class="small text-danger"><%= errors.strategy_type %></p>
                     <% } %>
 
-                    <label for="account" class="small mb-1 mt-3">Account:</label>
-                    <select class="form-control" name="exchange">
-                        <% accounts.forEach(account => { %>
-                         <option value="<%= account.id%>"><%= account.exchange.exchange_name%>-<%= account.account_name %>-<%= account.account_type.account_type_name%></option>
-                        <% }) %>
-                    </select>
-                    <% if (locals.errors && locals.errors.account) { %>
-                        <p class="small text-danger"><%= errors.account %></p>
-                    <% } %>
-
-                    <label for="symbol" class="small mb-1 mt-3">Symbol:</label>
-                    <input placeholder="Please enter symbol" class="form-control" type="text" name="symbol" required=true value="<%= formData.symbol%>">
-                    <% if (locals.errors && locals.errors.symbol) { %>
-                     <p class="small text-danger"><%= errors.symbol %></p>
-                    <% } %>
-                    
                     <label for="initial_position" class="small mb-1 mt-3">Initial position:</label>
                     <input placeholder="Please enter initial position" class="form-control" type="text" name="initial_position" required=true value="<%= formData.initial_position%>">
                     <% if (locals.errors && locals.errors.initial_position) { %>
@@ -78,9 +62,32 @@
                      <p class="small text-danger"><%= errors.step %></p>
                     <% } %>
 
+                    <label for="exchange" class="small mb-1 mt-3">Exchange:</label>
+                    <select class="form-control" name="exchange" required=true disabled="disabled">
+                    </select>
+                    <% if (locals.errors && locals.errors.exchange) { %>
+                        <p class="small text-danger"><%= errors.exchange %></p>
+                    <% } %>
+
+                    <label for="account" class="small mb-1 mt-3">Account:</label>
+                    <select class="form-control" name="account" required=true disabled="disabled">
+                    </select>
+                    <% if (locals.errors && locals.errors.account) { %>
+                        <p class="small text-danger"><%= errors.account %></p>
+                    <% } %>
+
+                    <label for="symbol" class="small mb-1 mt-3">Symbol:</label>
+                    <select class="form-control" name="symbol" required=true disabled="disabled">
+                    </select>
+                    <% if (locals.errors && locals.errors.symbol) { %>
+                     <p class="small text-danger"><%= errors.symbol %></p>
+                    <% } %>
+ 
                     <button class="mt-3 btn btn-primary" type="submit">Create strategy</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<%- contentFor('scripts') %>
+<script src="/javascripts/strategy.js"></script>

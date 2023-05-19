@@ -85,11 +85,11 @@ module.exports = {
                 },
                 initial_position: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20),
+                    type: Sequelize.DECIMAL(30, 15),
                 },
                 order_qty: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20),
+                    type: Sequelize.DECIMAL(30, 15),
                 },
                 buy_orders: {
                     allowNull: false,
@@ -109,7 +109,7 @@ module.exports = {
                 },
                 step: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(3,2),
+                    type: Sequelize.DECIMAL(5,2),
                 }
             }, {transaction});
 
@@ -174,7 +174,7 @@ module.exports = {
                 },
                 price: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 buy_order_id: {
                     allowNull: false,
@@ -182,11 +182,11 @@ module.exports = {
                 },
                 buy_order_qty: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 buy_order_cost: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 sell_order_id: {
                     allowNull: false,
@@ -194,19 +194,19 @@ module.exports = {
                 },
                 sell_order_qty: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 sell_order_cost: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 position_before_order: {
                     allowNull: true,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 order_qty: {
                     allowNull: true,
-                    type: Sequelize.DECIMAL(20,20),
+                    type: Sequelize.DECIMAL(30,15),
                 },
                 side: {
                     allowNull: true,

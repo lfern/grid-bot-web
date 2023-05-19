@@ -50,7 +50,7 @@ module.exports = {
                 },
                 markets: {
                     allowNull: true,
-                    type: Sequelize.JSON,
+                    type: Sequelize.JSONB,
                 },
                 markets_updated_at: {
                     allowNull: true,

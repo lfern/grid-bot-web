@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         markets: {
             allowNull: true,
-            type: DataTypes.JSON,
+            type: DataTypes.JSONB,
         },
         markets_updated_at: {
             allowNull: true,

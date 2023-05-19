@@ -72,27 +72,27 @@ module.exports = (sequelize, DataTypes) => {
         },
         price: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         },
         amount: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         },
         cost: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         },
         average: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         },
         filled: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         },
         remaining: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20)
+            type: DataTypes.DECIMAL(30, 15)
         }
     }, {
         tableName: 'strategy_instance_orders'

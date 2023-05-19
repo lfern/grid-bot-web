@@ -52,11 +52,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         initial_position: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20),
+            type: DataTypes.DECIMAL(30, 15),
         },
         order_qty: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20, 20),
+            type: DataTypes.DECIMAL(30, 15),
         },
         buy_orders: {
             allowNull: false,
@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         step: {
             allowNull: false,
-            type: DataTypes.DECIMAL(3,2),
+            type: DataTypes.DECIMAL(5,2),
         }
     }, {
         tableName: 'strategies'

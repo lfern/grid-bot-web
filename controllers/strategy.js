@@ -1,5 +1,5 @@
 const models = require('../models');
-//const {validateStrategy} = require('../validators/strategy');
+const {validateStrategy} = require('../validators/strategy');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 
@@ -25,21 +25,94 @@ exports.show_strategies = function(req, res, next) {
 }
 
 exports.show_create = function(req, res, next) {
-
-    return Promise.all([
-        models.Account.findAll({
-            include: [
-                models.Account.Exchange,
-                models.Account.AccountType
-            ]
-        }),
-        models.StrategyType.findAll()
-    ]).then(results => {
+    return models.StrategyType.findAll().then(results => {
         res.render('strategy/create', {
             formData: req.body,
             title: 'Add strategy',
-            accounts: results[0],
-            strategy_types: results[1],
+            strategy_types: results,
+            user: req.user,
+        })
+    });
+}
+
+const rerender_create = function(errors, req, res, next) {
+    return models.StrategyType.findAll().then(results => {
+        res.render('strategy/create', {
+            formData: req.body,
+            title: 'Add strategy',
+            strategy_types: results,
+            user: req.user,
+            errors: errors,
+        })
+    });
+}
+
+
+exports.submit_strategy = function(req, res, next) {
+    let errors = {};
+    return validateStrategy(errors, req).then(errors =>{
+        if (!isEmpty(errors)){
+            rerender_create(errors, req, res, next);
+        } else {
+            return models.Strategy.create({
+                strategy_type_id: req.body.strategy_type,
+                strategy_name: req.body.name,
+                account_id: req.body.account,
+                symbol: req.body.symbol,
+                initial_position: req.body.initial_position,
+                order_qty: req.body.order_qty,
+                buy_orders: req.body.buy_orders,
+                sell_orders: req.body.sell_orders,
+                active_buys: req.body.active_buys,
+                active_sells: req.body.active_sells,
+                step: req.body.step
+            }).then(result => {
+                res.redirect('/strategies');
+            });
+        }
+    });
+}
+
+exports.delete_strategy = function(req, res, next) {
+    return models.Strategy.destroy({
+        where:{
+            id: req.params.strategy_id
+        }
+    }).then(result => {
+        res.redirect('/strategies');
+    });
+}
+
+exports.delete_strategy_json = function(req, res, next) {
+    return models.Strategy.destroy({
+        where:{
+            id: req.params.strategy_id
+        }
+    }).then(result => {
+        res.send({msg: "Success"});
+    });
+}
+
+exports.show_strategy = function(req, res, next) {
+    return models.Strategy.findOne({
+        where:{
+            id: req.params.strategy_id
+        },
+        include: [
+            models.Strategy.StrategyType, {
+                association: models.Strategy.Account,
+                include: [
+                    models.Account.AccountType,
+                    models.Account.Exchange
+                ]
+            },
+        ]
+    }).then(strategy => {
+        if (strategy == null) {
+            next(createError(404, "Page does not exist"));            
+        }
+        res.render('strategy/strategy', {
+            strategy: strategy,
             user: req.user,
         })
     });

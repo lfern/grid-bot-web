@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         price: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         buy_order_id: {
             allowNull: false,
@@ -40,11 +40,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         buy_order_qty: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         buy_order_cost: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         sell_order_id: {
             allowNull: false,
@@ -52,19 +52,19 @@ module.exports = (sequelize, DataTypes) => {
         },
         sell_order_qty: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         sell_order_cost: {
             allowNull: false,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         position_before_order: {
             allowNull: true,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         order_qty: {
             allowNull: true,
-            type: DataTypes.DECIMAL(20,20),
+            type: DataTypes.DECIMAL(30,15),
         },
         side: {
             allowNull: true,

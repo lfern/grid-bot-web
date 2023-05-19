@@ -36,19 +36,19 @@ module.exports = (sequelize, DataTypes) => {
         },
         max_price: {
             allowNull: false,
-            type:DataTypes.DECIMAL(20, 20)
+            type:DataTypes.DECIMAL(30, 15)
         },
         min_price: {
             allowNull: false,
-            type:DataTypes.DECIMAL(20, 20)
+            type:DataTypes.DECIMAL(30, 15)
         },
         price: {
             allowNull: false,
-            type:DataTypes.DECIMAL(20, 20)
+            type:DataTypes.DECIMAL(30, 15)
         },
         position: {
             allowNull: false,
-            type:DataTypes.DECIMAL(20, 20)
+            type:DataTypes.DECIMAL(30, 15)
         }
     }, {
         tableName: 'strategy_instance_events'

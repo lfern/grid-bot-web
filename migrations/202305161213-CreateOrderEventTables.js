@@ -44,19 +44,19 @@ module.exports = {
                 },
                 max_price: {
                     allowNull: false,
-                    type:Sequelize.DECIMAL(20, 20)
+                    type:Sequelize.DECIMAL(30, 15)
                 },
                 min_price: {
                     allowNull: false,
-                    type:Sequelize.DECIMAL(20, 20)
+                    type:Sequelize.DECIMAL(30, 15)
                 },
                 price: {
                     allowNull: false,
-                    type:Sequelize.DECIMAL(20, 20)
+                    type:Sequelize.DECIMAL(30, 15)
                 },
                 position: {
                     allowNull: false,
-                    type:Sequelize.DECIMAL(20, 20)
+                    type:Sequelize.DECIMAL(30, 15)
                 }
             }, {transaction});
 
@@ -126,27 +126,27 @@ module.exports = {
                 },
                 price: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 amount: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 cost: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 average: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 filled: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 remaining: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 }
             },
             {
@@ -214,19 +214,19 @@ module.exports = {
                 },
                 price: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 amount: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 cost: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 fee_cost: {
                     allowNull: false,
-                    type: Sequelize.DECIMAL(20, 20)
+                    type: Sequelize.DECIMAL(30, 15)
                 },
                 fee_coin: {
                     allowNull: false,

@@ -3,7 +3,6 @@ const {validateAccount} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 
-
 exports.show_accounts = function(req, res, next) {
     return models.Account.findAll({
         include: [models.Account.Exchange, models.Account.AccountType]
@@ -59,7 +58,7 @@ exports.submit_account = function(req, res, next) {
             return models.Account.create({
                 api_key: req.body.apikey,
                 api_secret: req.body.secret,
-                paper: typeof req.body.paper !== undefined ? true : false,
+                paper: req.body.paper !== undefined ? true : false,
                 valid: true,
                 exchange_id: req.body.exchange,
                 account_type_id: req.body.account_type,
