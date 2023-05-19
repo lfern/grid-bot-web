@@ -7,3 +7,45 @@ body {
 a {
   color: #00B7FF;
 }
+
+body.grid-body {
+  padding: 0px;
+  font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin-top: 36px;
+}
+
+body.grid-body tbody {
+  display:block;
+/*  max-height:100px;*/
+  overflow-y:auto;
+  overflow-x:auto;
+}
+
+body.grid-body thead, tbody tr {
+  display:table;
+  width:100%;
+  table-layout:fixed;
+}
+
+body.grid-body thead {
+  width: calc( 100% - 1em )
+} 
+
+body.grid-body .navbar-expand .navbar-nav .nav-link {
+  /* padding-right: 0.5rem; */
+  /* padding-right: 0.5rem; */
+  padding-left: 0rem;
+  padding-left: 0rem;
+}
+
+body.grid-body .navbar {
+  /* padding: 0.5rem 1rem; */
+  padding: 0rem 1rem;
+}
+
+body.grid-body .navbar-brand {
+  /* padding-top: 0.3125rem; */
+  /* padding-bottom: 0.3125rem;*/
+  padding-top: 0rem;
+  padding-bottom: 0;
+}

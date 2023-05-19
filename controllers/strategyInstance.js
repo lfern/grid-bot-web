@@ -1,6 +1,4 @@
 const models = require('../models');
-const {validateStrategy} = require('../validators/strategy');
-const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 
 exports.show_instance = function(req, res, next) {
@@ -31,6 +29,7 @@ exports.show_instance = function(req, res, next) {
         res.render('strategy_instance/instance', {
             instance: instance,
             user: req.user,
+            layout: './layouts/grid'
         })
     });
 }

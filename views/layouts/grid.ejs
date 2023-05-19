@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <%- include('../partials/head') %>
+  <body class="grid-body">
+    <%- include('../partials/navbar-grid', {user: locals.user}) %>
+    <%- body %>
+
+    <%- include('../partials/footer') %>
+    <%- defineContent('scripts') %>
+
+  </body>
+</html>
