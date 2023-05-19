@@ -117,3 +117,42 @@ exports.show_strategy = function(req, res, next) {
         })
     });
 }
+
+exports.show_strategy_instances = function(req, res, next) {
+    return Promise.all([
+        models.Strategy.findOne({
+            where: {id: req.params.strategy_id},
+            include: [
+                models.Strategy.StrategyType, {
+                    association: models.Strategy.Account,
+                    include: [
+                        models.Account.AccountType,
+                        models.Account.Exchange
+                    ]
+                },
+            ]
+        }),
+        models.StrategyInstance.findAll({
+            where: { strategy_id: req.params.strategy_id}
+        }),
+    ]).then(result => {
+        if (!result[0]) {
+            next(createError(404, "Page not found"));
+        }
+
+        res.render('strategy/instances', {
+            strategy: result[0],
+            instances: result[1],
+            user: req.user,
+        });
+    });
+}
+
+exports.submit_instance = function(req, res, next) {
+    models.StrategyInstance.create({
+        strategy_id: req.params.strategy_id,
+        running: true
+    }).then(result => {
+        res.redirect('/strategy/'+req.params.strategy_id+'/instances');
+    })
+}

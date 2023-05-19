@@ -143,6 +143,14 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.BOOLEAN,
                     defaultValue: false,
+                },
+                started_at: {
+                    allowNull: true,
+                    type: Sequelize.DATE,
+                },
+                stopped_at: {
+                    allowNull: true,
+                    type: Sequelize.DATE,
                 }
             }, {transaction});
 

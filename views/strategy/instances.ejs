@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+        <h1>Strategy Instances for 
+            <form action="/strategy/<%= strategy.id %>/instance/create" method="post">
+                <button class="btn btn-primary float-right" type="submit">New Instance</button>
+            </form>
+        </h1>
+        <h3><%= strategy.strategy_name%> / <%= strategy.strategy_type.strategy_type_name%></h3>
+        <h4><%= strategy.account.account_name%> /
+            <%= strategy.account.exchange.exchange_desc%>
+            (<%= strategy.account.account_type.account_type_name%>)
+        </h4>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Running</th>
+                <th scope="col">Started at</th>
+                <th scope="col">StopedAt</th>
+                <th scope="col">Actions</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for( let i = 0; i < locals.instances.length; i++ ) { %>
+                <% let instance = instances[i]; %>
+                <tr id="<%= instance.id%>">
+                  <td><span><%= instance.id %></span></td>
+                  <td><span><%= instance.running ? "yes":"no" %></span></td>
+                  <td><span><%= instance.started_at ? instance.started_at : "" %></span></td>
+                  <td><span><%= instance.stopped_at ? instance.stopped_at : "" %></span></td>
+                  <td>
+                    <a href="/strategy-instance/<%= instance.id%>">Details</a>
+                  </td>
+                  <td></td>
+                </tr>
+              <% } %>    
+            </tbody>
+          </table>
+        </div>
+    </div>
+</div>
+<%- contentFor('scripts') %>

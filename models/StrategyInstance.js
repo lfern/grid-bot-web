@@ -34,6 +34,14 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.BOOLEAN,
             defaultValue: false,
+        },
+        started_at: {
+            allowNull: true,
+            type: DataTypes.DATE,
+        },
+        stopped_at: {
+            allowNull: true,
+            type: DataTypes.DATE,
         }
     }, {
         tableName: 'strategy_instances'
