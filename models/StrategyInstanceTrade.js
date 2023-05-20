@@ -82,7 +82,7 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'strategy_instance_trades'
     });
  
-    StrategyInstanceTrade.StrategyInstance = StrategyInstanceTrade.belongsTo(StrategyInstanceOrder, {
+    StrategyInstanceTrade.StrategyInstanceOrder = StrategyInstanceTrade.belongsTo(StrategyInstanceOrder, {
         as: 'strategy_instance_order',
         foreignKey: 'strategy_instance_order_id'
     });

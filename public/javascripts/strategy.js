@@ -15,6 +15,7 @@ function updateExchanges() {
     $("select[name=account]").attr('disabled', 'disabled').empty();
     $("select[name=symbol]").attr('disabled', 'disabled').empty();
     $.ajax({
+        cache: false,
         url:'/exchanges/json',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
@@ -44,6 +45,7 @@ function updateAccounts(exchangeId) {
     $account.attr('disabled', 'disabled').empty();
     $("select[name=symbol]").attr('disabled', 'disabled').empty();
     $.ajax({
+        cache: false,
         url:'/exchange/'+exchangeId+'/accounts/json',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
@@ -68,10 +70,11 @@ function updateAccounts(exchangeId) {
     });
 }
 
-function updateSymbols(accountId,) {
+function updateSymbols(accountId) {
     let $symbol = $("select[name=symbol]");
     $symbol.attr('disabled', 'disabled').empty();
     $.ajax({
+        cache: false,
         url:'/account/'+accountId+'/markets/json',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',

@@ -22,10 +22,12 @@ body.grid-body div.container-fluid > div.row > div.col-md-12 {
 
 body.grid-body > div.container-fluid > div.row > div.col-md-12:first-child {
   /* max-height: 50vh; */
+  min-height: 200px;
 }
 
 body.grid-body > div.container-fluid > div.row > div.col-md-12 {
   /* max-height: 40vh; */
+  min-height: 200px;
 }
 
 body.grid-body div.container-fluid > div.row > div.col-md-12 {
