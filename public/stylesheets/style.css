@@ -11,23 +11,60 @@ a {
 body.grid-body {
   padding: 0px;
   font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
-  margin-top: 36px;
 }
 
-body.grid-body tbody {
+body.grid-body div.container-fluid > div.row > div.col-md-12 {
+  padding-left: 0;
+  padding-right: 0;
+  /* height:30vh; */
+  overflow: auto;
+}
+
+body.grid-body > div.container-fluid > div.row > div.col-md-12:first-child {
+  /* max-height: 50vh; */
+}
+
+body.grid-body > div.container-fluid > div.row > div.col-md-12 {
+  /* max-height: 40vh; */
+}
+
+body.grid-body div.container-fluid > div.row > div.col-md-12 {
+  padding-left: 0;
+  padding-right: 0;
+  overflow: auto;
+}
+
+body.grid-body div.container-fluid > div.row > div {
+  padding-left: 0;
+  padding-right: 0;
+  overflow-x: auto;
+}
+
+.grid-price-col {min-width: 20px;}
+.grid-idbuy-col, .grid-idsell-col {min-width: 10px;}
+.grid-qty-col {min-width: 30px;}
+.grid-position-col {min-width: 30px;}
+.grid-side-col {min-width: 30px;}
+.grid-active-col {min-width: 30px;}
+.grid-exchorder-col {min-width: 30px;}
+.grid-date-col {min-width: 30px;}
+.grid-status-col {min-width: 30px;}
+
+ebody.grid-body tbody {
   display:block;
 /*  max-height:100px;*/
   overflow-y:auto;
   overflow-x:auto;
 }
 
-body.grid-body thead, tbody tr {
+ebody.grid-body thead, 
+ebody.grid-body tbody tr {
   display:table;
   width:100%;
   table-layout:fixed;
 }
 
-body.grid-body thead {
+ebody.grid-body thead {
   width: calc( 100% - 1em )
 } 
 
