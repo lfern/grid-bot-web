@@ -34,20 +34,28 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING
         },
-        max_price: {
+        message: {
             allowNull: false,
+            type: DataTypes.STRING
+        },
+        params: {
+            allowNull: false,
+            type: DataTypes.JSONB,
+        },
+        max_price: {
+            allowNull: true,
             type:DataTypes.DECIMAL(30, 15)
         },
         min_price: {
-            allowNull: false,
+            allowNull: true,
             type:DataTypes.DECIMAL(30, 15)
         },
         price: {
-            allowNull: false,
+            allowNull: true,
             type:DataTypes.DECIMAL(30, 15)
         },
         position: {
-            allowNull: false,
+            allowNull: true,
             type:DataTypes.DECIMAL(30, 15)
         }
     }, {

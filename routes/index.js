@@ -26,7 +26,7 @@ router.get('/accounts', account.show_accounts);
 router.get('/accounts/create', account.show_create);
 router.post('/accounts/create', account.submit_account);
 router.post('/account/:account_id/delete', account.delete_account);
-router.post('/account/:account_id/delete-json', account.delete_account_json);
+router.post('/account/:account_id/delete/json', account.delete_account_json);
 router.get('/account/:account_id', account.show_account);
 
 /* Strategy related routes */
@@ -34,7 +34,7 @@ router.get('/strategies', strategy.show_strategies);
 router.get('/strategies/create', strategy.show_create);
 router.post('/strategies/create', strategy.submit_strategy);
 router.post('/strategy/:strategy_id/delete', strategy.delete_strategy);
-router.post('/strategy/:strategy_id/delete-json', strategy.delete_strategy_json);
+router.post('/strategy/:strategy_id/delete/json', strategy.delete_strategy_json);
 router.get('/strategy/:strategy_id', strategy.show_strategy);
 // Strategy instances
 router.get('/strategy/:strategy_id/instances', strategy.show_strategy_instances);
@@ -47,6 +47,9 @@ router.get('/strategy-instance/:instance_id/position/json', strategyInstance.get
 router.get('/strategy-instance/:instance_id/orders/json', strategyInstance.get_instance_orders_json);
 router.get('/strategy-instance/:instance_id/trades/json', strategyInstance.get_instance_trades_json);
 router.get('/strategy-instance/:instance_id/events/json', strategyInstance.get_instance_events_json);
+router.post('/strategy-instance/:instance_id/stop', strategyInstance.stop_instance);
+router.post('/strategy-instance/:instance_id/delete', strategyInstance.delete_instance);
+router.post('/strategy-instance/:instance_id/delete/json', strategyInstance.delete_instance_json);
 
 /* Exchange related routes */
 router.get('/exchanges/json', exchange.get_exchanges_json);

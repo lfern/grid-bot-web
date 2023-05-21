@@ -42,20 +42,28 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.STRING
                 },
-                max_price: {
+                message: {
                     allowNull: false,
+                    type: Sequelize.STRING
+                },
+                params: {
+                    allowNull: false,
+                    type: Sequelize.JSONB,
+                },
+                max_price: {
+                    allowNull: true,
                     type:Sequelize.DECIMAL(30, 15)
                 },
                 min_price: {
-                    allowNull: false,
+                    allowNull: true,
                     type:Sequelize.DECIMAL(30, 15)
                 },
                 price: {
-                    allowNull: false,
+                    allowNull: true,
                     type:Sequelize.DECIMAL(30, 15)
                 },
                 position: {
-                    allowNull: false,
+                    allowNull: true,
                     type:Sequelize.DECIMAL(30, 15)
                 }
             }, {transaction});

@@ -33,7 +33,7 @@
                   <td>
                     <a href="/strategy-instance/<%= instance.id%>">Details</a>
                   </td>
-                  <td></td>
+                  <td><button class="btn btn-primary" onclick="deleteInstance('<%= instance.id%>')">Delete</button></td>
                 </tr>
               <% } %>    
             </tbody>
@@ -42,3 +42,4 @@
     </div>
 </div>
 <%- contentFor('scripts') %>
+<script src="/javascripts/instances.js"></script>

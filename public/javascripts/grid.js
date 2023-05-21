@@ -206,4 +206,40 @@ function populateTrades() {
 
 }
 
+function genGridEvent(elem) {
+    return $('<tr>').data('event', elem.id)
+    .append('<td>').text(elem.datetime)
+    .append('<td>').text(elem.event)
+    .append('<td>').text(elem.message)
+}
+
+function updateGridEvent(elem, $tr) {
+    let $tds = $tr.find('td');
+    $tds.get(1).text(elem.datetime);
+    $tds.get(2).text(elem.event);
+    $tds.get(3).text(elem.message);
+}
+
+function populateEvents() {
+    let instanceId = $('#grid').data('instance');
+    $.ajax({
+        cache: false,
+        url:'/strategy-instance/' + instanceId + '/events/json',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type:'GET',
+        success: ((res) => {
+            console.log("Result:", res);
+            let $tableTbody = $('#events tbody');
+            res.sort((a, b) => a.id > b.id ? -1 : (a.id < b.id ? 1 : 0));
+            populate(res, $tableTbody, 'event', genGridEvent, updateGridEvent);
+            setTimeout(populateEvents, 60000);
+        }),
+        error: ((error) => {
+            console.log("Error:", error);
+            setTimeout(populateEvents, 60000);
+        })
+    });
+
+}
 

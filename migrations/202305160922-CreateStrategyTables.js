@@ -151,6 +151,10 @@ module.exports = {
                 stopped_at: {
                     allowNull: true,
                     type: Sequelize.DATE,
+                },
+                stop_requested_at: {
+                    allowNull: true,
+                    type: Sequelize.DATE
                 }
             }, {transaction});
 

@@ -1,13 +1,13 @@
-function deleteStrategy(strategyId) {
+function deleteInstance(instanceId) {
     $.ajax({
-        url:'/strategy/' + strategyId + '/delete/json',
+        url:'/strategy-instance/' + instanceId + '/delete/json',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
-        data: JSON.stringify({strategyId}),
+        data: JSON.stringify({instanceId}),
         type:'POST',
         success: ((res) => {
             console.log("Result:", res);
-            $("#"+strategyId).remove();
+            $("#"+instanceId).remove();
         }),
         error: ((error) => {
             console.log("Error:", error);

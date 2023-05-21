@@ -51,6 +51,8 @@ body.grid-body div.container-fluid > div.row > div {
 .grid-exchorder-col {min-width: 30px;}
 .grid-date-col {min-width: 30px;}
 .grid-status-col {min-width: 30px;}
+.grid-event-col {min-width: 40px;}
+.grid-desc-col {min-width: 100px;}
 
 ebody.grid-body tbody {
   display:block;

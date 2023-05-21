@@ -9,14 +9,19 @@
         <%= instance.strategy.account.account_type.account_type_name %>
         <%= instance.strategy.account.paper?"(paper)":"" %>
         <% if (instance.started_at) { %>
-          ( <%= instance.started_at %> 
-          <% if (instance.stopped_at) { %>
-            - <%= instance.stopped_at %>
-          <% } %>
-          )
+          (<%= instance.started_at.toISOString() %> 
+        <% } else { %>
+          (not started
+        <% } %>
+        <% if (instance.stopped_at) { %>
+          - <%= instance.stopped_at.toISOString() %>)
+        <% } else if (instance.running && instance.stop_requested_at != null) { %>
+          - stopping...)
+        <% } else { %>
+          - )
         <% } %>
 
-        <% if (instance.running) { %>
+        <% if (instance.running && instance.stop_requested_at == null) { %>
           <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/stop" method="post">
             <button class="btn btn-danger btn-sm" type="submit">Stop</button>
           </form>             
@@ -41,93 +46,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr>
-          <tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr><tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr><tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr><tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr><tr>
-            <td>Price</td>
-            <td>IdBuy</td>
-            <td>QtyBuy</td>
-            <td>SizeBuy</td>
-            <td>IdSell</td>
-            <td>QtySell</td>
-            <td>SizeSell</td>
-            <td>Position</td>
-            <td>OrderQty</td>
-            <td>Side</td>
-            <td>Active</td>
-            <td>GridOrder</td>
-            <td>OrderExchange</td>
-          </tr>
-
         </tbody>
       </table>
     </div>
@@ -150,73 +68,7 @@
                   <th class="grid-exchorder-col" scope="col">Order</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Side</td>
-                  <td>Status</td>
-                  <td>Date</td>
-                  <td>Filled</td>
-                  <td>Average</td>
-                  <td>OrderExchange</td>
-                </tr>            
+              <tbody>         
               </tbody>
             </table>
           </div>
@@ -236,46 +88,6 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Fee</td>
-                  <td>FeeCoin</td>
-                  <td>Date</td>
-                  <td>Order</td>
-                  <td>Id</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Fee</td>
-                  <td>FeeCoin</td>
-                  <td>Date</td>
-                  <td>Order</td>
-                  <td>Id</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Fee</td>
-                  <td>FeeCoin</td>
-                  <td>Date</td>
-                  <td>Order</td>
-                  <td>Id</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                  <td>Cost</td>
-                  <td>Fee</td>
-                  <td>FeeCoin</td>
-                  <td>Date</td>
-                  <td>Order</td>
-                  <td>Id</td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -287,18 +99,11 @@
               <thead>
                 <tr>
                   <th class="grid-date-col" scope="col">Date</th>
+                  <th class="grid-event-col" scope="col">Event</th>
                   <th class="grid-desc-col" scope="col">Description</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                </tr>
-                <tr>
-                  <td>Price</td>
-                  <td>Amount</td>
-                </tr>
               </tbody>
             </table>
           </div>

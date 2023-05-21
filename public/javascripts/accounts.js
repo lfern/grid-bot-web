@@ -1,6 +1,6 @@
 function deleteAccount(accountId) {
     $.ajax({
-        url:'/account/' + accountId + '/delete-json',
+        url:'/account/' + accountId + '/delete/json',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         data: JSON.stringify({accountId}),

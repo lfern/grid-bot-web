@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
         stopped_at: {
             allowNull: true,
             type: DataTypes.DATE,
+        },
+        stop_requested_at: {
+            allowNull: true,
+            type: DataTypes.DATE
         }
     }, {
         tableName: 'strategy_instances'
