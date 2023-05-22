@@ -3,6 +3,7 @@ const ccxt = require('ccxt');
 const _ = require('lodash');
 const sequelize = require('sequelize');
 let createError = require('http-errors');
+const {getExchangeMarkets} = require('../utils/exchange');
 
 exports.get_exchanges_json = function(req, res, next) {
     models.Exchange.findAll().then(exchanges => {
@@ -66,54 +67,14 @@ exports.get_accounts_json = function(req, res, next) {
 }
 
 const getMarketsJson = function(req, res, next, exchangeId, accountTypeId, paper) {
-    models.ExchangeMarket.findOne({
-        where: {
-            exchange_id: exchangeId,
-            account_type_id: accountTypeId,
-            paper: paper
-        },
-        include: [
-            models.ExchangeMarket.AccountType,
-            models.ExchangeMarket.Exchange
-        ]
-    }).then(exchangeMarket => {
-        if (exchangeMarket == null) {
+
+    getExchangeMarkets(exchangeId, accountTypeId, paper).then(exchange => {
+        if (exchange == null) {
             next(createError(404, "Not found"));
         } else {
-            if (exchangeMarket.markets == null ||
-                exchangeMarket.markets_updated_at == null ||
-                ((new Date().getTime() - exchangeMarket.markets_updated_at.getTime()) > 3600 * 1000)) {
-                let exchangeName = exchangeMarket.exchange.exchange_name;
-                if (!ccxt.hasOwnProperty(exchangeName)) {
-                    next(createError(500, "Ccxt Exchange not valid "+exchangeName));
-                }
-                let ccxtExchange = new ccxt[exchangeName]({
-                    verbose: true,
-                });
-                
-                ccxtExchange.loadMarkets().then(markets => {
-                    var filtered = _.pickBy(markets, function(market) {
-                        return market.type == exchangeMarket.account_type.account_type_name;
-                    });
-
-                    exchangeMarket.markets = filtered;
-                    exchangeMarket.markets_updated_at = sequelize.fn('NOW');
-                    exchangeMarket.save().then(x => {
-
-                        res.json(filtered);
-                    }).catch(err => {
-                        next(createError(500, err));
-                    });
-
-                }).catch(err => {
-                    next(createError(500, err));
-                })
-
-            } else {
-                res.json(exchangeMarket.markets);
-            }
+            res.json(exchange.markets);
         }
-    })
+    });
 }
 
 exports.get_markets_json = function(req, res, next) {

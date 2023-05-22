@@ -1,6 +1,7 @@
 const models = require('../models');
 const db = require('../models/index');
 let createError = require('http-errors');
+let {getExchangeMarkets} = require('../utils/exchange');
 
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
@@ -36,28 +37,66 @@ exports.show_instance = function(req, res, next) {
 }
 
 exports.get_instance_grid_json = function(req, res, next) {
-    return models.StrategyInstanceGrid.findAll({
-        where: {strategy_instance_id: req.params.instance_id}
-    }).then(gridData => {
-        let response = [];
-        gridData.forEach(data => {
-            response.push({
-                price: data.price,
-                buy_order_id: data.buy_order_id,
-                buy_order_qty: data.buy_order_qty,
-                buy_order_cost: data.buy_order_cost,
-                sell_order_id: data.sell_order_id,
-                sell_order_qty: data.sell_order_qty,
-                sell_order_cost: data.sell_order_cost,
-                position_before_order: data.position_before_order,
-                order_qty: data.order_qty,
-                side: data.side,
-                active: data.active,
-                exchange_order_id: data.exchange_order_id,
+    Promise.all([
+        models.StrategyInstanceGrid.findAll({
+            where: {strategy_instance_id: req.params.instance_id}
+        }),
+        models.StrategyInstance.findOne({
+            where:{
+                id: req.params.instance_id
+            },
+            include: [
+                {
+                    association: models.StrategyInstance.Strategy,
+                    include: [ 
+                        {
+                            association: models.Strategy.Account,
+                            include: [
+                                models.Account.Exchange,
+                                models.Account.AccountType
+                            ]
+                        },
+                        models.Strategy.StrategyType
+                    ]
+                },
+            ]
+        })
+    ]).then(result => {
+        let gridData = result[0];
+        let instance = result[1];
+        if (instance == null) {
+            next(createError(404, "Instance not found"));
+        }
+        
+        getExchangeMarkets(
+            instance.strategy.account.exchange.id,
+            instance.strategy.account.account_type.id,
+            instance.strategy.account.paper
+        ).then(exchange => {
+            if (exchange == null) {
+                next(createError(404, "Markets not found"));
+            }
+
+            let response = [];
+            gridData.forEach(data => {
+                response.push({
+                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
+                    buy_order_id: data.buy_order_id,
+                    buy_order_qty: exchange.amountToPrecision(instance.strategy.symbol, data.buy_order_qty),
+                    buy_order_cost: exchange.priceToPrecision(instance.strategy.symbol, data.buy_order_cost),
+                    sell_order_id: data.sell_order_id,
+                    sell_order_qty: exchange.amountToPrecision(instance.strategy.symbol, data.sell_order_qty),
+                    sell_order_cost: exchange.priceToPrecision(instance.strategy.symbol, data.sell_order_cost),
+                    position_before_order: data.position_before_order ? exchange.amountToPrecision(instance.strategy.symbol, data.position_before_order): null,
+                    order_qty: data.order_qty ? exchange.amountToPrecision(instance.strategy.symbol, data.order_qty) : null,
+                    side: data.side,
+                    active: data.active,
+                    exchange_order_id: data.exchange_order_id,
+                });
             });
-        });
-        res.json(response);
-    })
+            res.json(response);
+        }) 
+    });
 }
 
 exports.get_instance_position_json = function(req, res, next) {
@@ -171,6 +210,11 @@ let removeInstance = function(instanceId) {
         });
 
         await models.StrategyInstanceEvent.destroy({
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        await models.StrategyInstanceGrid.destroy({
             where: {strategy_instance_id: instanceId},
             transaction
         });
