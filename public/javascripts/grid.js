@@ -52,36 +52,36 @@ function populate(res, $tableTbody, dataAttr, genFunc, updateFunc) {
 
 function genGridPrice(elem) {
     return $('<tr>').data('price', elem.price)
-    .append('<td>').text(elem.price)
-    .append('<td>').text(elem.buy_order_id)
-    .append('<td>').text(elem.buy_order_qty)
-    .append('<td>').text(elem.buy_order_cost)
-    .append('<td>').text(elem.sell_order_id)
-    .append('<td>').text(elem.sell_order_qty)
-    .append('<td>').text(elem.sell_order_cost)
-    .append('<td>').text(elem.position_before_order)
-    .append('<td>').text(elem.order_qty)
-    .append('<td>').text(elem.side)
-    .append('<td>').text(elem.active)
-    .append('<td>').text(0)
-    .append('<td>').text(elem.exchange_order_id);
+    .append($('<td>').text(elem.price))
+    .append($('<td>').text(elem.buy_order_id))
+    .append($('<td>').text(elem.buy_order_qty))
+    .append($('<td>').text(elem.buy_order_cost))
+    .append($('<td>').text(elem.sell_order_id))
+    .append($('<td>').text(elem.sell_order_qty))
+    .append($('<td>').text(elem.sell_order_cost))
+    .append($('<td>').text(elem.position_before_order))
+    .append($('<td>').text(elem.order_qty))
+    .append($('<td>').text(elem.side))
+    .append($('<td>').text(elem.active))
+    .append($('<td>').text(0))
+    .append($('<td>').text(elem.exchange_order_id));
 }
 
 function updateGridPrice(elem, $tr) {
     let $tds = $tr.find('td');
-    $tds.get(1).text(elem.price)
-    $tds.get(2).text(elem.buy_order_id)
-    $tds.get(3).text(elem.buy_order_qty)
-    $tds.get(4).text(elem.buy_order_cost)
-    $tds.get(5).text(elem.sell_order_id)
-    $tds.get(6).text(elem.sell_order_qty)
-    $tds.get(7).text(elem.sell_order_cost)
-    $tds.get(8).text(elem.position_before_order)
-    $tds.get(9).text(elem.order_qty)
-    $tds.get(10).text(elem.side)
-    $tds.get(11).text(elem.active)
-    $tds.get(12).text(0)
-    $tds.get(13).text(elem.exchange_order_id);
+    $tds.eq(0).text(elem.price)
+    $tds.eq(1).text(elem.buy_order_id)
+    $tds.eq(2).text(elem.buy_order_qty)
+    $tds.eq(3).text(elem.buy_order_cost)
+    $tds.eq(4).text(elem.sell_order_id)
+    $tds.eq(5).text(elem.sell_order_qty)
+    $tds.eq(6).text(elem.sell_order_cost)
+    $tds.eq(7).text(elem.position_before_order)
+    $tds.eq(8).text(elem.order_qty)
+    $tds.eq(9).text(elem.side)
+    $tds.eq(10).text(elem.active)
+    $tds.eq(11).text(0)
+    $tds.eq(12).text(elem.exchange_order_id);
 }
 
 function populateGrid() {
@@ -95,7 +95,7 @@ function populateGrid() {
         success: ((res) => {
             console.log("Result:", res);
             let $tableTbody = $('#grid tbody');
-            res.sort((a, b) => a.price > b.price ? -1 : (a.price < b.price ? 1 : 0));
+            res.sort((a, b) => parseFloat(a.price) > parseFloat(b.price) ? -1 : (parseFloat(a.price) < parseFloat(b.price) ? 1 : 0));
             populate(res, $tableTbody, 'price', genGridPrice, updateGridPrice);
             setTimeout(populateGrid, 60000);
         }),
@@ -109,29 +109,29 @@ function populateGrid() {
 
 function genGridOrder(elem) {
     return $('<tr>').data('order', elem.exchange_order_id)
-    .append('<td>').text(elem.price)
-    .append('<td>').text(elem.amount)
-    .append('<td>').text(elem.cost)
-    .append('<td>').text(elem.side)
-    .append('<td>').text(elem.status)
-    .append('<td>').text(elem.datetime)
-    .append('<td>').text(elem.filled)
-    .append('<td>').text(elem.average)
-    .append('<td>').text(elem.exchange_order_id);
+    .append($('<td>').text(elem.price))
+    .append($('<td>').text(elem.amount))
+    .append($('<td>').text(elem.cost))
+    .append($('<td>').text(elem.side))
+    .append($('<td>').text(elem.status))
+    .append($('<td>').text(elem.datetime))
+    .append($('<td>').text(elem.filled))
+    .append($('<td>').text(elem.average))
+    .append($('<td>').text(elem.exchange_order_id));
 }
 
 
 function updateGridOrder(elem, $tr) {
     let $tds = $tr.find('td');
-    $tds.get(1).text(elem.price)
-    $tds.get(2).text(elem.amount)
-    $tds.get(3).text(elem.cost)
-    $tds.get(4).text(elem.side)
-    $tds.get(5).text(elem.status)
-    $tds.get(6).text(elem.datetime)
-    $tds.get(7).text(elem.filled)
-    $tds.get(8).text(elem.average)
-    $tds.get(9).text(elem.exchange_order_id);
+    $tds.eq(0).text(elem.price)
+    $tds.eq(1).text(elem.amount)
+    $tds.eq(2).text(elem.cost)
+    $tds.eq(3).text(elem.side)
+    $tds.eq(4).text(elem.status)
+    $tds.eq(5).text(elem.datetime)
+    $tds.eq(6).text(elem.filled)
+    $tds.eq(7).text(elem.average)
+    $tds.eq(8).text(elem.exchange_order_id);
 }
 
 function populateOrders() {
@@ -159,28 +159,28 @@ function populateOrders() {
 
 function genGridTrade(elem) {
     return $('<tr>').data('order', elem.exchange_order_id)
-    .append('<td>').text(elem.price)
-    .append('<td>').text(elem.amount)
-    .append('<td>').text(elem.cost)
-    .append('<td>').text(elem.side)
-    .append('<td>').text(elem.status)
-    .append('<td>').text(elem.datetime)
-    .append('<td>').text(elem.filled)
-    .append('<td>').text(elem.average)
-    .append('<td>').text(elem.exchange_order_id);
+    .append($('<td>').text(elem.price))
+    .append($('<td>').text(elem.amount))
+    .append($('<td>').text(elem.cost))
+    .append($('<td>').text(elem.side))
+    .append($('<td>').text(elem.status))
+    .append($('<td>').text(elem.datetime))
+    .append($('<td>').text(elem.filled))
+    .append($('<td>').text(elem.average))
+    .append($('<td>').text(elem.exchange_order_id));
 }
 
 function updateGridTrade(elem, $tr) {
     let $tds = $tr.find('td');
-    $tds.get(1).text(elem.price)
-    $tds.get(2).text(elem.amount)
-    $tds.get(3).text(elem.cost)
-    $tds.get(4).text(elem.side)
-    $tds.get(5).text(elem.status)
-    $tds.get(6).text(elem.datetime)
-    $tds.get(7).text(elem.filled)
-    $tds.get(8).text(elem.average)
-    $tds.get(9).text(elem.exchange_order_id);
+    $tds.eq(0).text(elem.price)
+    $tds.eq(1).text(elem.amount)
+    $tds.eq(2).text(elem.cost)
+    $tds.eq(3).text(elem.side)
+    $tds.eq(4).text(elem.status)
+    $tds.eq(5).text(elem.datetime)
+    $tds.eq(6).text(elem.filled)
+    $tds.eq(7).text(elem.average)
+    $tds.eq(8).text(elem.exchange_order_id);
 }
 
 function populateTrades() {
@@ -208,16 +208,16 @@ function populateTrades() {
 
 function genGridEvent(elem) {
     return $('<tr>').data('event', elem.id)
-    .append('<td>').text(elem.datetime)
-    .append('<td>').text(elem.event)
-    .append('<td>').text(elem.message)
+    .append($('<td>').text(elem.datetime))
+    .append($('<td>').text(elem.event))
+    .append($('<td>').text(elem.message));
 }
 
 function updateGridEvent(elem, $tr) {
     let $tds = $tr.find('td');
-    $tds.get(1).text(elem.datetime);
-    $tds.get(2).text(elem.event);
-    $tds.get(3).text(elem.message);
+    $tds.eq(0).text(elem.datetime);
+    $tds.eq(1).text(elem.event);
+    $tds.eq(2).text(elem.message);
 }
 
 function populateEvents() {
