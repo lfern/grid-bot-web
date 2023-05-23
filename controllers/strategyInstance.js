@@ -66,6 +66,7 @@ exports.get_instance_grid_json = function(req, res, next) {
         let instance = result[1];
         if (instance == null) {
             next(createError(404, "Instance not found"));
+            return;
         }
         
         getExchangeMarkets(
@@ -108,28 +109,66 @@ exports.get_instance_events_json = function(req, res, next) {
 }
 
 exports.get_instance_orders_json = function(req, res, next) {
-    return models.StrategyInstanceOrder.findAll({
-        where: {strategy_instance_id: req.params.instance_id}
-    }).then(gridData => {
+
+    return Promise.all([
+        models.StrategyInstanceOrder.findAll({
+            where: {strategy_instance_id: req.params.instance_id}
+        }),
+        models.StrategyInstance.findOne({
+            where:{
+                id: req.params.instance_id
+            },
+            include: [
+                {
+                    association: models.StrategyInstance.Strategy,
+                    include: [ 
+                        {
+                            association: models.Strategy.Account,
+                            include: [
+                                models.Account.Exchange,
+                                models.Account.AccountType
+                            ]
+                        },
+                        models.Strategy.StrategyType
+                    ]
+                },
+            ]
+        })
+    ]).then(results => {
+        let gridData = results[0];
         let response = [];
-        gridData.forEach(data => {
-            response.push({
-                exchange_order_id: data.exchange_order_id,
-                symbol: data.symbol,
-                order_type: data.order_type,
-                side: data.side,
-                timestamp: data.timestamp,
-                datetime: data.datetime,
-                status: data.status,
-                price: data.price,
-                amount: data.amount,
-                cost: data.cost,
-                average: data.average,
-                filled: data.filled,
-                remaining: data.remaining,
+        let instance = results[1];
+        if (instance == null) {
+            next(createError(404, "Instance not found"));
+        }
+        
+        getExchangeMarkets(
+            instance.strategy.account.exchange.id,
+            instance.strategy.account.account_type.id,
+            instance.strategy.account.paper
+        ).then(exchange => {
+            if (exchange == null) {
+                next(createError(404, "Markets not found"));
+            }
+            gridData.forEach(data => {
+                response.push({
+                    exchange_order_id: data.exchange_order_id,
+                    symbol: data.symbol,
+                    order_type: data.order_type,
+                    side: data.side,
+                    timestamp: data.timestamp,
+                    datetime: data.datetime,
+                    status: data.status,
+                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
+                    amount: exchange.amountToPrecision(instance.strategy.symbol, data.amount),
+                    cost: data.cost ? exchange.priceToPrecision(instance.strategy.symbol, data.cost):null,
+                    average: data.average ? exchange.priceToPrecision(instance.strategy.symbol, data.average):null,
+                    filled: data.filled ? exchange.amountToPrecision(instance.strategy.symbol, data.filled):null,
+                    remaining: data.remaining ? exchange.amountToPrecision(instance.strategy.symbol, data.remaining):null,
+                });
             });
-        });
-        res.json(response);
+            res.json(response);
+        })
     })
 }
 
@@ -199,7 +238,7 @@ let removeInstance = function(instanceId) {
             console.log(toBeDeleted.map(function(d){ return d.id}))
 
             await models.StrategyInstanceTrade.destroy({
-                where:{id:{in:toBeDeleted.map(function(d){ return d.id})}},
+                where:{id:toBeDeleted.map(function(d){ return d.id})},
                 transaction
             });
         }

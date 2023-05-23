@@ -50,6 +50,16 @@ function populate(res, $tableTbody, dataAttr, genFunc, updateFunc) {
     }
 }
 
+function genGridGridOrder(elem) {
+    let gridOrder = '';
+    if (elem.side == 'sell') {
+        gridOrder = elem.sell_order_id;
+    } else if (elem.side == 'buy') {
+        gridOrder = elem.buy_order_id;
+    }
+
+    return gridOrder;
+}
 function genGridPrice(elem) {
     return $('<tr>').data('price', elem.price)
     .append($('<td>').text(elem.price))
@@ -63,7 +73,7 @@ function genGridPrice(elem) {
     .append($('<td>').text(elem.order_qty))
     .append($('<td>').text(elem.side))
     .append($('<td>').text(elem.active))
-    .append($('<td>').text(0))
+    .append($('<td>').text(genGridGridOrder(elem)))
     .append($('<td>').text(elem.exchange_order_id));
 }
 
@@ -80,7 +90,7 @@ function updateGridPrice(elem, $tr) {
     $tds.eq(8).text(elem.order_qty)
     $tds.eq(9).text(elem.side)
     $tds.eq(10).text(elem.active)
-    $tds.eq(11).text(0)
+    $tds.eq(11).text(genGridGridOrder(elem))
     $tds.eq(12).text(elem.exchange_order_id);
 }
 

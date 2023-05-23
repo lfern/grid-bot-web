@@ -65,7 +65,8 @@ exports.submit_strategy = function(req, res, next) {
                 sell_orders: req.body.sell_orders,
                 active_buys: req.body.active_buys,
                 active_sells: req.body.active_sells,
-                step: req.body.step
+                step: req.body.step,
+                step_type: req.body.step_type
             }).then(result => {
                 res.redirect('/strategies');
             });
@@ -153,6 +154,6 @@ exports.submit_instance = function(req, res, next) {
         strategy_id: req.params.strategy_id,
         running: true
     }).then(result => {
-        res.redirect('/strategy/'+req.params.strategy_id+'/instances');
+        res.redirect('/strategy-instance/'+result.id);
     })
 }

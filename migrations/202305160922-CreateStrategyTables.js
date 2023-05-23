@@ -110,7 +110,12 @@ module.exports = {
                 step: {
                     allowNull: false,
                     type: Sequelize.DECIMAL(5,2),
+                },
+                step_type: {
+                    allowNull: false,
+                    type: Sequelize.ENUM('percent', 'absolute'),
                 }
+
             }, {transaction});
 
             // Table startegy_instances

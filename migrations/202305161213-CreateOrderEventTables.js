@@ -133,27 +133,27 @@ module.exports = {
                     type: Sequelize.ENUM('open', 'closed', 'expired', 'canceled', 'rejected')
                 },
                 price: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 amount: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 cost: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 average: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 filled: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 remaining: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 }
             },

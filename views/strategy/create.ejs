@@ -56,6 +56,15 @@
                      <p class="small text-danger"><%= errors.active_sells %></p>
                     <% } %>
 
+                    <label for="step_type" class="small mb-1 mt-3">Step type:</label>
+                    <select class="form-control" name="step_type">
+                        <option value="absolute">absolute</option>
+                        <option value="percent">percent</option>
+                    </select>
+                    <% if (locals.errors && locals.errors.step_type) { %>
+                        <p class="small text-danger"><%= errors.step_type %></p>
+                    <% } %>
+
                     <label for="step" class="small mb-1 mt-3">Step:</label>
                     <input placeholder="Please enter step" class="form-control" type="text" name="step" required=true value="<%= formData.step%>">
                     <% if (locals.errors && locals.errors.step) { %>

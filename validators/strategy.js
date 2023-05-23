@@ -57,6 +57,10 @@ const validateCreateStrategyFields = function(errors, req){
     })){
         errors["step"] = "Please provide a valid step (>0).";
     }
+
+    if (req.body.step_type != 'percent' && req.body.step_type != 'absolute'){
+        errors["step_type"] = "Invalid step type.";
+    }
 }
 
 exports.validateStrategy = function(errors, req) {
