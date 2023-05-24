@@ -233,11 +233,11 @@ module.exports = {
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 fee_cost: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.DECIMAL(30, 15)
                 },
                 fee_coin: {
-                    allowNull: false,
+                    allowNull: true,
                     type: Sequelize.STRING
                 }
             },
