@@ -107,11 +107,11 @@ function populateGrid() {
             let $tableTbody = $('#grid tbody');
             res.sort((a, b) => parseFloat(a.price) > parseFloat(b.price) ? -1 : (parseFloat(a.price) < parseFloat(b.price) ? 1 : 0));
             populate(res, $tableTbody, 'price', genGridPrice, updateGridPrice);
-            setTimeout(populateGrid, 60000);
+            setTimeout(populateGrid, 20000);
         }),
         error: ((error) => {
             console.log("Error:", error);
-            setTimeout(populateGrid, 60000);
+            setTimeout(populateGrid, 20000);
         })
     });
 
@@ -157,11 +157,11 @@ function populateOrders() {
             let $tableTbody = $('#orders tbody');
             res.sort((a, b) => a.exchange_order_id > b.exchange_order_id ? -1 : (a.exchange_order_id < b.exchange_order_id ? 1 : 0));
             populate(res, $tableTbody, 'order', genGridOrder, updateGridOrder);
-            setTimeout(populateOrders, 60000);
+            setTimeout(populateOrders, 20000);
         }),
         error: ((error) => {
             console.log("Error:", error);
-            setTimeout(populateOrders, 60000);
+            setTimeout(populateOrders, 20000);
         })
     });
 
@@ -206,11 +206,11 @@ function populateTrades() {
             let $tableTbody = $('#trades tbody');
             res.sort((a, b) => a.exchange_order_id > b.exchange_order_id ? -1 : (a.exchange_order_id < b.exchange_order_id ? 1 : 0));
             populate(res, $tableTbody, 'trade', genGridTrade, updateGridTrade);
-            setTimeout(populateTrades, 60000);
+            setTimeout(populateTrades, 20000);
         }),
         error: ((error) => {
             console.log("Error:", error);
-            setTimeout(populateTrades, 60000);
+            setTimeout(populateTrades, 20000);
         })
     });
 
@@ -243,11 +243,11 @@ function populateEvents() {
             let $tableTbody = $('#events tbody');
             res.sort((a, b) => a.id > b.id ? -1 : (a.id < b.id ? 1 : 0));
             populate(res, $tableTbody, 'event', genGridEvent, updateGridEvent);
-            setTimeout(populateEvents, 60000);
+            setTimeout(populateEvents, 20000);
         }),
         error: ((error) => {
             console.log("Error:", error);
-            setTimeout(populateEvents, 60000);
+            setTimeout(populateEvents, 20000);
         })
     });
 
