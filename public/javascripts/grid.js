@@ -155,7 +155,7 @@ function populateOrders() {
         success: ((res) => {
             console.log("Result:", res);
             let $tableTbody = $('#orders tbody');
-            res.sort((a, b) => a.exchange_order_id > b.exchange_order_id ? -1 : (a.exchange_order_id < b.exchange_order_id ? 1 : 0));
+            res.sort((a, b) => a.datetime > b.datetime ? -1 : (a.datetime < b.datetime ? 1 : 0));
             populate(res, $tableTbody, 'order', genGridOrder, updateGridOrder);
             setTimeout(populateOrders, 20000);
         }),
@@ -168,16 +168,16 @@ function populateOrders() {
 }
 
 function genGridTrade(elem) {
-    return $('<tr>').data('order', elem.exchange_order_id)
+    return $('<tr>').data('trade', elem.exchange_trade_id)
     .append($('<td>').text(elem.price))
     .append($('<td>').text(elem.amount))
     .append($('<td>').text(elem.cost))
     .append($('<td>').text(elem.side))
-    .append($('<td>').text(elem.status))
+    .append($('<td>').text(elem.fee_cost))
+    .append($('<td>').text(elem.fee_coin))
     .append($('<td>').text(elem.datetime))
-    .append($('<td>').text(elem.filled))
-    .append($('<td>').text(elem.average))
-    .append($('<td>').text(elem.exchange_order_id));
+    .append($('<td>').text(elem.exchange_order_id))
+    .append($('<td>').text(elem.exchange_trade_id));
 }
 
 function updateGridTrade(elem, $tr) {
@@ -186,11 +186,11 @@ function updateGridTrade(elem, $tr) {
     $tds.eq(1).text(elem.amount)
     $tds.eq(2).text(elem.cost)
     $tds.eq(3).text(elem.side)
-    $tds.eq(4).text(elem.status)
+    $tds.eq(4).text(elem.fee_cost)
+    $tds.eq(4).text(elem.fee_coin)
     $tds.eq(5).text(elem.datetime)
-    $tds.eq(6).text(elem.filled)
-    $tds.eq(7).text(elem.average)
-    $tds.eq(8).text(elem.exchange_order_id);
+    $tds.eq(6).text(elem.exchange_order_id)
+    $tds.eq(7).text(elem.exchange_trade_id);
 }
 
 function populateTrades() {
@@ -204,7 +204,7 @@ function populateTrades() {
         success: ((res) => {
             console.log("Result:", res);
             let $tableTbody = $('#trades tbody');
-            res.sort((a, b) => a.exchange_order_id > b.exchange_order_id ? -1 : (a.exchange_order_id < b.exchange_order_id ? 1 : 0));
+            res.sort((a, b) => a.datetime > b.datetime ? -1 : (a.datetime < b.datetime ? 1 : 0));
             populate(res, $tableTbody, 'trade', genGridTrade, updateGridTrade);
             setTimeout(populateTrades, 20000);
         }),

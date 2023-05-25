@@ -151,12 +151,13 @@ exports.get_instance_orders_json = function(req, res, next) {
             }
             gridData.forEach(data => {
                 response.push({
+                    id: data.id,
                     exchange_order_id: data.exchange_order_id,
                     symbol: data.symbol,
                     order_type: data.order_type,
                     side: data.side,
-                    timestamp: data.timestamp,
-                    datetime: data.datetime,
+                    timestamp: data.creation_timestamp,
+                    datetime: data.creation_datetime,
                     status: data.status,
                     price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
                     amount: exchange.amountToPrecision(instance.strategy.symbol, data.amount),
@@ -172,25 +173,64 @@ exports.get_instance_orders_json = function(req, res, next) {
 }
 
 exports.get_instance_trades_json = function(req, res, next) {
-    return models.StrategyInstanceTrade.findAll({
-        where: {'$strategy_instance_order.strategy_instance_id$': req.params.instance_id},
-        include:[models.StrategyInstanceTrade.StrategyInstanceOrder]
-    }).then(gridData => {
-        let response = [];
-        gridData.forEach(data => {
-            response.push({
-                exchange_order_id: data.strategy_instance_order_id.exchange_order_id,
-                exchange_trade_id: data.exchange_trade_id,
-                timestamp: data.timestamp,
-                datetime: data.datetime,
-                price: data.price,
-                amount: data.amount,
-                cost: data.cost,
-                fee_cost: data.fee_cost,
-                fee_coin: data.fee_coin,
+    return Promise.all([
+        models.StrategyInstanceTrade.findAll({
+            where: {'$strategy_instance_order.strategy_instance_id$': req.params.instance_id},
+            include:[models.StrategyInstanceTrade.StrategyInstanceOrder]
+        }),
+        models.StrategyInstance.findOne({
+            where:{
+                id: req.params.instance_id
+            },
+            include: [
+                {
+                    association: models.StrategyInstance.Strategy,
+                    include: [ 
+                        {
+                            association: models.Strategy.Account,
+                            include: [
+                                models.Account.Exchange,
+                                models.Account.AccountType
+                            ]
+                        },
+                        models.Strategy.StrategyType
+                    ]
+                },
+            ]
+        })
+    ]).then(results => {
+        let gridData = results[0];
+        let instance = results[1];
+        if (instance == null) {
+            return next(createError(404, "Instance not found"));
+        }
+        
+        getExchangeMarkets(
+            instance.strategy.account.exchange.id,
+            instance.strategy.account.account_type.id,
+            instance.strategy.account.paper
+        ).then(exchange => {
+            if (exchange == null) {
+                return next(createError(404, "Markets not found"));
+            }
+
+            let response = [];
+            gridData.forEach(data => {
+                response.push({
+                    exchange_order_id: data.strategy_instance_order.exchange_order_id,
+                    exchange_trade_id: data.exchange_trade_id,
+                    timestamp: data.timestamp,
+                    datetime: data.datetime,
+                    side: data.strategy_instance_order.side,
+                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
+                    amount: data.amount ? exchange.amountToPrecision(instance.strategy.symbol, data.amount):null,
+                    cost: data.cost ? exchange.priceToPrecision(instance.strategy.symbol, data.cost):null,
+                    fee_cost: data.fee_cost?exchange.priceToPrecision(instance.strategy.symbol, data.fee_cost):null,
+                    fee_coin: data.fee_coin,
+                });
             });
-        });
-        res.json(response);
+            res.json(response);
+        })
     })
 }
 
