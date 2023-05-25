@@ -54,6 +54,10 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.STRING,
                 },
+                delayed: {
+                    allowNull: false,
+                    type: Sequelize.BOOLEAN
+                }
             },
             {
                 uniqueKeys: {

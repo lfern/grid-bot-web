@@ -120,6 +120,14 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.ENUM('buy', 'sell')
                 },
+                creation_timestamp: {
+                    allowNull: false,
+                    type: Sequelize.DATE
+                },
+                creation_datetime: {
+                    allowNull: false,
+                    type: Sequelize.STRING
+                },
                 timestamp: {
                     allowNull: false,
                     type: Sequelize.DATE
