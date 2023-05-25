@@ -70,10 +70,9 @@ const getMarketsJson = function(req, res, next, exchangeId, accountTypeId, paper
 
     getExchangeMarkets(exchangeId, accountTypeId, paper).then(exchange => {
         if (exchange == null) {
-            next(createError(404, "Not found"));
-        } else {
-            res.json(exchange.markets);
-        }
+            return next(createError(404, "Not found"));
+        } 
+        res.json(exchange.markets);
     });
 }
 
@@ -88,10 +87,11 @@ exports.get_markets_json_paper = function(req, res, next) {
 exports.get_markets_account_json = function(req, res, next) {
     models.Account.findOne({where: {id: req.params.account_id}}).then(account => {
         if (!account) {
-            next(createError(404, "Not found"));
-        } else {
-            getMarketsJson(req, res, next, account.exchange_id, account.account_type_id, account.paper);
+            return next(createError(404, "Not found"));
         }
+        
+        getMarketsJson(req, res, next, account.exchange_id, account.account_type_id, account.paper);
+        
     });
 
 }

@@ -25,7 +25,7 @@ exports.show_instance = function(req, res, next) {
         ]
     }).then(instance => {
         if (instance == null) {
-            next(createError(404, "Page does not exist"));            
+            return next(createError(404, "Page does not exist"));
         }
         
         res.render('strategy_instance/instance', {
@@ -65,8 +65,7 @@ exports.get_instance_grid_json = function(req, res, next) {
         let gridData = result[0];
         let instance = result[1];
         if (instance == null) {
-            next(createError(404, "Instance not found"));
-            return;
+            return next(createError(404, "Instance not found"));
         }
         
         getExchangeMarkets(
@@ -75,7 +74,7 @@ exports.get_instance_grid_json = function(req, res, next) {
             instance.strategy.account.paper
         ).then(exchange => {
             if (exchange == null) {
-                next(createError(404, "Markets not found"));
+                return next(createError(404, "Markets not found"));
             }
 
             let response = [];
@@ -101,11 +100,11 @@ exports.get_instance_grid_json = function(req, res, next) {
 }
 
 exports.get_instance_position_json = function(req, res, next) {
-    next(createError(500, "Not implemented"));
+    return next(createError(500, "Not implemented"));
 }
 
 exports.get_instance_events_json = function(req, res, next) {
-    next(createError(500, "Not implemented"));
+    return next(createError(500, "Not implemented"));
 }
 
 exports.get_instance_orders_json = function(req, res, next) {
@@ -139,7 +138,7 @@ exports.get_instance_orders_json = function(req, res, next) {
         let response = [];
         let instance = results[1];
         if (instance == null) {
-            next(createError(404, "Instance not found"));
+            return next(createError(404, "Instance not found"));
         }
         
         getExchangeMarkets(
@@ -148,7 +147,7 @@ exports.get_instance_orders_json = function(req, res, next) {
             instance.strategy.account.paper
         ).then(exchange => {
             if (exchange == null) {
-                next(createError(404, "Markets not found"));
+                return next(createError(404, "Markets not found"));
             }
             gridData.forEach(data => {
                 response.push({
@@ -231,14 +230,15 @@ let removeInstance = function(instanceId) {
     return db.sequelize.transaction(async (transaction) => {
         let toBeDeleted = await models.StrategyInstanceOrder.findAll({
             attributes:['id'],
-            where: {strategy_instance_id: instanceId}
-        },{transaction});
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
 
         if (toBeDeleted.length > 0) {
             console.log(toBeDeleted.map(function(d){ return d.id}))
 
             await models.StrategyInstanceTrade.destroy({
-                where:{id:toBeDeleted.map(function(d){ return d.id})},
+                where:{strategy_instance_order_id:toBeDeleted.map(function(d){ return d.id})},
                 transaction
             });
         }

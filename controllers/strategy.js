@@ -110,7 +110,7 @@ exports.show_strategy = function(req, res, next) {
         ]
     }).then(strategy => {
         if (strategy == null) {
-            next(createError(404, "Page does not exist"));            
+            return next(createError(404, "Page does not exist"));
         }
         res.render('strategy/strategy', {
             strategy: strategy,
@@ -138,7 +138,7 @@ exports.show_strategy_instances = function(req, res, next) {
         }),
     ]).then(result => {
         if (!result[0]) {
-            next(createError(404, "Page not found"));
+            return next(createError(404, "Page not found"));
         }
 
         res.render('strategy/instances', {

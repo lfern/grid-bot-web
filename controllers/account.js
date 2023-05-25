@@ -98,7 +98,7 @@ exports.show_account = function(req, res, next) {
         include: [models.Account.Exchange, models.Account.AccountType]
     }).then(account => {
         if (account == null) {
-            next(createError(404, "Page does not exist"));            
+            return next(createError(404, "Page does not exist"));    
         }
         res.render('account/account', {
             account: account,
