@@ -1,8 +1,13 @@
+
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var morgan = require('morgan');
+// var morgan = require('morgan');
 var morganMiddleware = require('./middleware/morgan.winston');
 var ejsLayouts = require("express-ejs-layouts");
 var passport = require('passport');
@@ -11,6 +16,7 @@ var flash = require('connect-flash');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const {logger, captureConsoleLog} = require("./utils/logger");
+
 
 captureConsoleLog();
 
