@@ -8,8 +8,11 @@ const levels = {
   warn: 1,
   info: 2,
   http: 3,
-  debug: 4,
+  verbose: 4,
+  debug: 5,
+  silly: 6
 }
+
 
 // This method set the current severity based on
 // the current NODE_ENV: show all the log levels
@@ -29,7 +32,9 @@ const colors = {
   warn: 'yellow',
   info: 'green',
   http: 'magenta',
+  verbose: 'white',
   debug: 'white',
+  silly: 'white'
 }
 
 // Tell winston that you want to link the colors
@@ -108,7 +113,7 @@ const captureConsoleLog = function() {
         };
 
         console.log = function(data, ...meta) {
-            logger.log(data, ...meta);
+            logger.info(data, ...meta);
         };
 
         console.trace = function(data, ...meta) {
