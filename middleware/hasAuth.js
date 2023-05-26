@@ -1,10 +1,11 @@
 let createError = require('http-errors');
 
-exports.isLoggedIn= function(req, res, next){
+exports.isLoggedIn = function(req, res, next){
     if (req.user) {
         return next();
     } else {
-        return next(createError(404, "Page does not exist"));
+        res.redirect('/login');
+        // return next(createError(404, "Page does not exist"));
     }
 }
 

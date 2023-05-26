@@ -7,6 +7,8 @@ exports.get_landing = function(req, res, next) {
             user: req.user,
             exchanges: exchanges
         });
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 

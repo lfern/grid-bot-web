@@ -15,7 +15,9 @@ exports.get_exchanges_json = function(req, res, next) {
             });
         });
         res.json(response);
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 exports.get_account_types_json = function(req, res, next) {
@@ -36,7 +38,9 @@ exports.get_account_types_json = function(req, res, next) {
             });
         });
         res.json(response);
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 exports.get_accounts_json = function(req, res, next) {
@@ -63,7 +67,9 @@ exports.get_accounts_json = function(req, res, next) {
             });
         });
         res.json(response);
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 const getMarketsJson = function(req, res, next, exchangeId, accountTypeId, paper) {
@@ -92,6 +98,8 @@ exports.get_markets_account_json = function(req, res, next) {
         
         getMarketsJson(req, res, next, account.exchange_id, account.account_type_id, account.paper);
         
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 
 }

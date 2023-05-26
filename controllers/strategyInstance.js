@@ -33,6 +33,8 @@ exports.show_instance = function(req, res, next) {
             user: req.user,
             layout: './layouts/grid'
         })
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -96,14 +98,12 @@ exports.get_instance_grid_json = function(req, res, next) {
             });
             res.json(response);
         }) 
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
 exports.get_instance_position_json = function(req, res, next) {
-    return next(createError(500, "Not implemented"));
-}
-
-exports.get_instance_events_json = function(req, res, next) {
     return next(createError(500, "Not implemented"));
 }
 
@@ -169,7 +169,9 @@ exports.get_instance_orders_json = function(req, res, next) {
             });
             res.json(response);
         })
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 exports.get_instance_trades_json = function(req, res, next) {
@@ -231,7 +233,9 @@ exports.get_instance_trades_json = function(req, res, next) {
             });
             res.json(response);
         })
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 exports.get_instance_events_json = function(req, res, next) {
@@ -248,7 +252,9 @@ exports.get_instance_events_json = function(req, res, next) {
             });
         });
         res.json(response);
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 exports.stop_instance = function(req, res, next) {
@@ -262,6 +268,8 @@ exports.stop_instance = function(req, res, next) {
         }
     }).then(result => {
         res.redirect('/strategy-instance/'+req.params.instance_id);
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -308,11 +316,15 @@ let removeInstance = function(instanceId) {
 exports.delete_instance = function(req, res, next) {
     return removeInstance(req.params.instance_id).then(result => {
         res.redirect('/strategies');
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
 exports.delete_instance_json = function(req, res, next) {
     return removeInstance(req.params.instance_id).then(result => {
         res.send({msg: "Success"});
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }

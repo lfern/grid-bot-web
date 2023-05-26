@@ -21,6 +21,8 @@ exports.show_strategies = function(req, res, next) {
             strategies: strategies,
             user: req.user,
         });
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -32,7 +34,9 @@ exports.show_create = function(req, res, next) {
             strategy_types: results,
             user: req.user,
         })
-    });
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });;
 }
 
 const rerender_create = function(errors, req, res, next) {
@@ -44,7 +48,9 @@ const rerender_create = function(errors, req, res, next) {
             user: req.user,
             errors: errors,
         })
-    });
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });;
 }
 
 
@@ -71,6 +77,8 @@ exports.submit_strategy = function(req, res, next) {
                 res.redirect('/strategies');
             });
         }
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -81,6 +89,8 @@ exports.delete_strategy = function(req, res, next) {
         }
     }).then(result => {
         res.redirect('/strategies');
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -91,6 +101,8 @@ exports.delete_strategy_json = function(req, res, next) {
         }
     }).then(result => {
         res.send({msg: "Success"});
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -116,6 +128,8 @@ exports.show_strategy = function(req, res, next) {
             strategy: strategy,
             user: req.user,
         })
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -146,6 +160,8 @@ exports.show_strategy_instances = function(req, res, next) {
             instances: result[1],
             user: req.user,
         });
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -155,5 +171,7 @@ exports.submit_instance = function(req, res, next) {
         running: true
     }).then(result => {
         res.redirect('/strategy-instance/'+result.id);
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }

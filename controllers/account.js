@@ -12,6 +12,8 @@ exports.show_accounts = function(req, res, next) {
             accounts: accounts,
             user: req.user,
         });
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -28,7 +30,9 @@ exports.show_create = function(req, res, next) {
             account_types: result.account_types,
             user: req.user,
         })
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 const rerender_create = function(errors, req, res, next) {
@@ -45,7 +49,9 @@ const rerender_create = function(errors, req, res, next) {
             errors: errors,
             user: req.user,
         })
-    })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
 }
 
 
@@ -67,6 +73,8 @@ exports.submit_account = function(req, res, next) {
                 res.redirect('/accounts');
             });
         }
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -77,6 +85,8 @@ exports.delete_account = function(req, res, next) {
         }
     }).then(result => {
         res.redirect('/accounts');
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -87,6 +97,8 @@ exports.delete_account_json = function(req, res, next) {
         }
     }).then(result => {
         res.send({msg: "Success"});
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
@@ -104,6 +116,8 @@ exports.show_account = function(req, res, next) {
             account: account,
             user: req.user,
         })
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
