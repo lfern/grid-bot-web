@@ -15,7 +15,6 @@ const validateCreateAccountFields = function(errors, req){
 
 exports.validateAccount = function(errors, req) {
     return new Promise(function(resolve, reject){
-        console.log(req.body);
         validateCreateAccountFields(errors, req);
         return models.Exchange.findOne({
             where: {

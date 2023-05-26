@@ -47,7 +47,7 @@ module.exports = function(passport){
                 return done(null, user);
             }
         }).catch (err => {
-            console.log('err');
+            console.log('Error querying db user in password', err);
             done(err, false);
         })
     }));

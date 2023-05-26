@@ -283,8 +283,6 @@ let removeInstance = function(instanceId) {
         });
 
         if (toBeDeleted.length > 0) {
-            console.log(toBeDeleted.map(function(d){ return d.id}))
-
             await models.StrategyInstanceTrade.destroy({
                 where:{strategy_instance_order_id:toBeDeleted.map(function(d){ return d.id})},
                 transaction
