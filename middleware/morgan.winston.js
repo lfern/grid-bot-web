@@ -3,7 +3,8 @@ const {logger} = require("../utils/logger");
 
 const stream = {
   // Use the http severity
-  write: (message) => logger.http(message),
+  write: (message) => logger.http(message.trim()),
+  
 };
 
 const skip = () => {
