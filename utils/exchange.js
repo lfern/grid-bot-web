@@ -33,10 +33,14 @@ let getExchangeMarkets = async function(exchangeId, accountTypeId, paper) {
                 
         let markets = await ccxtExchange.loadMarkets();
         var filtered = _.pickBy(markets, function(market) {
-            return market.type == exchangeMarket.account_type.account_type_name;
+            return market.type == exchangeMarket.account_type.account_type_name && 
+                (
+                    (exchangeMarket.paper && market.symbol.startsWith('TEST')) ||
+                    (!exchangeMarket.paper && !market.symbol.startsWith('TEST'))
+                );
         });
 
-        exchangeMarket.markets = filtered;
+        exchangeMarket.markets = markets;
         exchangeMarket.markets_updated_at = models.Sequelize.fn('NOW');
         await exchangeMarket.save();
 
@@ -44,7 +48,14 @@ let getExchangeMarkets = async function(exchangeId, accountTypeId, paper) {
         return ccxtExchange;
     } else {
         let ccxtExchange = new ccxt[exchangeName]();
-        ccxtExchange.setMarkets(exchangeMarket.markets);
+        var filtered = _.pickBy(exchangeMarket.markets, function(market) {
+            return market.type == exchangeMarket.account_type.account_type_name && 
+            (
+                (exchangeMarket.paper && market.symbol.startsWith('TEST')) ||
+                (!exchangeMarket.paper && !market.symbol.startsWith('TEST'))
+            );
+    });
+        ccxtExchange.setMarkets(filtered);
         return ccxtExchange;
     }
 }
