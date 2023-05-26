@@ -1,0 +1,1 @@
+DEBUG=grid-bot-web:* npm start
