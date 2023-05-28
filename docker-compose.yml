@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  grid-bot-web:
+    build:
+      context: .
+      dockerfile: .docker/node/Dockerfile
+    image: grid-bot-web
+    container_name: grid-got-web
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_HOSTNAME=${POSTGRES_HOSTNAME:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-gridbot}
+      - DEV_POSTGRES_USERNAME=${DEV_POSTGRES_USERNAME:-postgres}
+      - DEV_POSTGRES_PASSWORD=${DEV_POSTGRES_PASSWORD:-postgres}
+      - DEV_POSTGRES_HOSTNAME=${DEV_POSTGRES_HOSTNAME:-postgres}
+      - DEV_POSTGRES_PORT=${DEV_POSTGRES_PORT:-5432}
+      - DEV_POSTGRES_DB=${DEV_POSTGRES_DB:-gridbot}
+      - TEST_POSTGRES_USERNAME=${TEST_POSTGRES_USERNAME:-postgres}
+      - TEST_POSTGRES_PASSWORD=${TEST_POSTGRES_PASSWORD:-postgres}
+      - TEST_POSTGRES_HOSTNAME=${TEST_POSTGRES_HOSTNAME:-postgres}
+      - TEST_POSTGRES_PORT=${TEST_POSTGRES_PORT:-5432}
+      - TEST_POSTGRES_DB=${TEST_POSTGRES_DB:-gridbot-test}
+    volumes:
+      - .:/usr/src/app
+      #- node_modules:/home/node/app/node_modules
+    #command: ./wait-for.sh db:27017 -- /home/node/app/node_modules/.bin/nodemon app.js
+    ports:
+      - "${HTTP_PORT}:3000"
+    command: npm start
+
+networks: 
+  default: 
+    external: true 
+    name: grid-bot_app-network 
