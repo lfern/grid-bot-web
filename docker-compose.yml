@@ -24,6 +24,7 @@ services:
       - TEST_POSTGRES_HOSTNAME=${TEST_POSTGRES_HOSTNAME:-postgres}
       - TEST_POSTGRES_PORT=${TEST_POSTGRES_PORT:-5432}
       - TEST_POSTGRES_DB=${TEST_POSTGRES_DB:-gridbot-test}
+      - NODE_ENV=${NODE_ENV:-}
     volumes:
       - .:/usr/src/app
       #- node_modules:/home/node/app/node_modules
@@ -34,5 +35,6 @@ services:
 
 networks: 
   default: 
-    external: true 
-    name: grid-bot_app-network 
+    external:
+      name: grid-bot_app-network 
+   
