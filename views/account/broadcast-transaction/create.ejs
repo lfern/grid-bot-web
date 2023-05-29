@@ -1,0 +1,18 @@
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+            <h1>Broadcast Transaction for <%= account.name %></h1>
+            <form action="/account/<%= account.id%>/broadcast-transactions/create" method="post">
+                <div class="formgroup">
+                    <label for="address" class="small mb-1 mt-3">Transaction:</label>
+                    <textarea rows="15" class="form-control" name="transaction" required=true><%= formData.transaction%></textarea> 
+                    <% if (locals.errors && locals.errors.transaction) { %>
+                     <p class="small text-danger"><%= errors.transaction %></p>
+                    <% } %>
+
+                    <button class="mt-3 btn btn-primary" type="submit">Create transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

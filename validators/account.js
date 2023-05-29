@@ -40,3 +40,26 @@ exports.validateAccount = function(errors, req) {
     });
     
 }
+
+const validateCreateAddressFields = function(errors, req){
+    if (validator.isEmpty(req.body.address)){
+        errors["address"] = "Please provide a valid address.";
+    }
+}
+
+exports.validateAddress = function(errors, req) {
+    return new Promise(function(resolve, reject){
+        validateCreateAddressFields(errors, req);
+        return models.Account.findOne({
+            where: {
+                id: req.params.account_id
+            }
+        }).then( u => {
+            if (u === null) {
+                errors["account"] = "Account does not longer exists.";
+            }
+            resolve(errors);
+        });
+    });
+    
+}

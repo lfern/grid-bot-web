@@ -7,6 +7,7 @@ let account = require('../controllers/account');
 let strategy = require('../controllers/strategy');
 let exchange = require('../controllers/exchange')
 let strategyInstance = require('../controllers/strategyInstance');
+let accountBroadcast = require('../controllers/accountBroadcast');
 
 let {isLoggedIn, hasAuth} = require('../middleware/hasAuth');
 
@@ -28,6 +29,19 @@ router.post('/accounts/create', isLoggedIn, account.submit_account);
 router.post('/account/:account_id/delete', isLoggedIn, account.delete_account);
 router.post('/account/:account_id/delete/json', isLoggedIn, account.delete_account_json);
 router.get('/account/:account_id', isLoggedIn, account.show_account);
+// Account addresses
+router.get('/account/:account_id/addresses', isLoggedIn, account.show_addresses);
+router.get('/account/:account_id/addresses/create', isLoggedIn, account.show_create_address)
+router.post('/account/:account_id/addresses/create', isLoggedIn, account.submit_address)
+router.post('/account-address/:account_address_id/delete/json', isLoggedIn, account.delete_address_json);
+// Account Broadcast Transactions
+router.get('/account/:account_id/broadcast-transactions', isLoggedIn, accountBroadcast.show_broadcasts);
+router.get('/account/:account_id/broadcast-transactions/create', isLoggedIn, accountBroadcast.show_create);
+router.post('/account/:account_id/broadcast-transactions/create', isLoggedIn, accountBroadcast.submit_broadcast);
+router.get('/account-broadcast-transaction/:transaction_id', isLoggedIn, accountBroadcast.show_broadcast)
+router.post('/account-broadcast-transaction/:transaction_id/delete', isLoggedIn, accountBroadcast.delete_broadcast);
+router.post('/account-broadcast-transaction/:transaction_id/delete/json', isLoggedIn, accountBroadcast.delete_broadcast_json);
+router.post('/account-broadcast-transaction/:transaction_id/send', isLoggedIn, accountBroadcast.send_broadcast);
 
 /* Strategy related routes */
 router.get('/strategies', isLoggedIn, strategy.show_strategies);

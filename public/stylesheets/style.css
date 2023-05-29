@@ -101,3 +101,13 @@ body.grid-body .navbar-brand {
   padding-top: 0rem;
   padding-bottom: 0;
 }
+
+.wrap-anyware {
+  overflow-wrap: anywhere
+}
+
+.form-control.wrap-anyware {
+  max-height: 200px;
+  overflow-y: auto;
+  height: auto;
+}

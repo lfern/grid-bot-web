@@ -1,5 +1,5 @@
 const models = require('../models');
-const {validateAccount} = require('../validators/account');
+const {validateAccount, validateAddress} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 
@@ -121,3 +121,76 @@ exports.show_account = function(req, res, next) {
     });
 }
 
+exports.show_addresses = function(req, res, next) {
+    Promise.all([
+        models.Account.findOne({
+            where:{
+                id: req.params.account_id
+            },
+            include: [models.Account.Exchange, models.Account.AccountType]
+        }),
+        models.AccountAddress.findAll({
+            where:{
+                account_id: req.params.account_id
+            }
+        })
+    ]).then(result => {
+        let account = result[0];
+        let addresses = result[1];
+        if (account == null) {
+            return next(createError(404, "Account does not exist"));    
+        }
+        res.render('account/addresses', {
+            account: account,
+            addresses: addresses,
+            user: req.user,
+        })
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}
+const rerender_create_address = function(errors, req, res, next) {
+    models.Account.findOne({where:{id: req.params.account_id}})
+        .then(account => {
+            if (account == null) {
+                return next(createError(404, "Account does not exist"))
+            }
+            res.render('account/address/create', {
+                account, user: req.user, errors, formData: req.body
+            })
+        }).catch(ex => {
+            return next(createError(500, ex));
+        });
+}
+exports.show_create_address = function(req, res, next) {
+    rerender_create_address([], req, res, next);
+}
+
+exports.submit_address = function(req, res, next) {
+    let errors = {};
+    return validateAddress(errors, req).then(errors =>{
+        if (!isEmpty(errors)){
+            rerender_addresses(errors, req, res, next);
+        } else {
+            return models.AccountAddress.create({
+                account_id: req.params.account_id,
+                address: req.body.address,
+                confidential: req.body.confidential !== undefined,
+            }).then(result => {res.redirect('/account/'+req.params.account_id+'/addresses')});
+        }
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}
+
+exports.delete_address_json = function(req, res, next) {
+    return models.AccountAddress.destroy({
+        where:{
+            id: req.params.account_address_id
+        }
+    }).then(result => {
+        res.send({msg: "Success"});
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}

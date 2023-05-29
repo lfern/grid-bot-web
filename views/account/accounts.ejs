@@ -25,7 +25,11 @@
                 <td><span><%= account.account_type.account_type_name %></span></td>
                 <td><span><%= account.paper ? 'yes' : 'no' %></span></td>
                 <td><span><%= account.valid ? 'yes' : 'no'%></span></td>
-                <td><a href="/account/<%= account.id%>">Details</a></td>
+                <td>
+                  <a href="/account/<%= account.id%>">Details</a>
+                  <a href="/account/<%= account.id%>/addresses">Addresses</a>
+                  <a href="/account/<%= account.id%>/broadcast-transactions">Broadcast</a>
+                </td>
                 <td><button class="btn btn-primary" onclick="deleteAccount('<%= account.id%>')">Delete</button></td>
               </tr>
             <% } %>    
