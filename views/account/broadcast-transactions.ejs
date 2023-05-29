@@ -9,7 +9,7 @@
             <tr>
               <th scope="col">Hash</th>
               <th scope="col">Txid</th>
-              <th scope="col">Confirmed</th>
+              <th scope="col">Status</th>
               <th scope="col">Fee</th>
               <th scope="col">Sent at</th>
               <th scope="col">Valid</th>
@@ -23,7 +23,7 @@
               <tr id="<%= transaction.id%>">
                 <td class="wrap-anyware"><span><%= transaction.transaction_hash%></span></td>
                 <td><span><%= transaction.txid %></span></td>
-                <td><span><%= transaction.confirmed ? 'yes' : 'no' %></span></td>
+                <td><span><%= transaction.status %></span></td>
                 <td><span><%= transaction.fee %></span></td>
                 <td><span><%= transaction.sent_at %></span></td>
                 <td><span><%= transaction.valid ? 'yes' : 'no' %></span></td>

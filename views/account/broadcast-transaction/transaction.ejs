@@ -23,8 +23,8 @@
                 <span class="form-control col-sm-10 wrap-anyware"><%= transaction.txid %></span>
             </div>
             <div class="form-row">
-                <label class="col-sm-2 col-form-label">Confirmed:</label>
-                <span class="form-control col-sm-10"><%= transaction.confirmed ? 'yes': 'no' %></span>
+                <label class="col-sm-2 col-form-label">Status:</label>
+                <span class="form-control col-sm-10"><%= transaction.status %></span>
             </div>
             <div class="form-row">
                 <label class="col-sm-2 col-form-label">Fee:</label>
@@ -49,7 +49,7 @@
                         <button class="btn btn-danger" type="submit">Delete</button>
                     </form>
                 </div>
-                <% if (transaction.send_requested_at == null) { %>
+                <% if (transaction.status == 'created') { %>
                     <div class="col-md-3">
                         <form action="/account-broadcast-transaction/<%=transaction.id%>/send" method="post">
                             <input type="hidden" name="account_id" value="<%= transaction.account_id%>"/>

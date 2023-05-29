@@ -152,11 +152,11 @@ exports.delete_broadcast_json = function(req, res, next) {
 exports.send_broadcast = function(req, res, next) {
     models.BroadcastTransaction.update( {
         send_requested_at: models.sequelize.fn('NOW'),
+        status: 'pending'
     }, {
         where: {
             id: req.params.transaction_id,
-            sent_at: null,
-            send_requested_at: null
+            status: 'created',
         }
     }).then(result => {
         res.redirect('/account-broadcast-transaction/'+req.params.transaction_id);

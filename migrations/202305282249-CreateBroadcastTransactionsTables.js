@@ -47,6 +47,9 @@ module.exports = {
                     type: Sequelize.BOOLEAN,
                     defaultValue: false
                 },
+            },
+            {
+                transaction
             });
 
             // Table broadcast transactions
@@ -91,10 +94,14 @@ module.exports = {
                     allowNull: true,
                     type: Sequelize.JSONB,
                 },
-                confirmed: {
+                status: {
                     allowNull: false,
-                    type: Sequelize.BOOLEAN,
-                    defaultValue: false,
+                    type: Sequelize.ENUM('created', 'pending', 'sent', 'confirmed', 'error'),
+                    defaultValue: 'created'
+                },
+                error: {
+                    allowNull: true,
+                    type: Sequelize.STRING(4096),
                 },
                 fee: {
                     allowNull: true,
@@ -113,7 +120,16 @@ module.exports = {
                     allowNull: true,
                     type: Sequelize.DATE
                 }
+            },
+            {
+                transaction
             });
+
+            await queryInterface.addIndex(
+                'broadcast_transactions',
+                 ['status'],
+                { transaction }
+            );
 
             // Table broadcast transactions addresses
             await queryInterface.createTable('broadcast_addresses', {
@@ -145,6 +161,9 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.STRING,
                 }
+            },
+            {
+                transaction
             });
             
         });
@@ -159,6 +178,11 @@ module.exports = {
     down: (queryInterface, Sequelize) => {
         return queryInterface.sequelize.transaction(async transaction => {
             await queryInterface.dropTable('broadcast_addresses', {transaction});
+            await queryInterface.removeIndex(
+                'broadcast_transactions',
+                 ['status'],
+                { transaction }
+            );
             await queryInterface.dropTable('broadcast_transactions', {transaction});
             await queryInterface.dropTable('account_addresses', {transaction});
         });
