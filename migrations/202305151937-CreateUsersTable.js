@@ -51,6 +51,11 @@ module.exports = {
                 type: Sequelize.BOOLEAN,
                 allowNull: true,
                 defaultValue: false
+            },
+            validated: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: false
             }
     
         });
