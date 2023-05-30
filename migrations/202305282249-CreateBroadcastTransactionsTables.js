@@ -119,6 +119,11 @@ module.exports = {
                 send_requested_at: {
                     allowNull: true,
                     type: Sequelize.DATE
+                },
+                request_status_count: {
+                    allowNull: false,
+                    type: Sequelize.INTEGER,
+                    defaultValue: 0
                 }
             },
             {
