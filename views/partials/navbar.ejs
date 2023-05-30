@@ -14,6 +14,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/strategies">Strategies</a>
                 </li>
+                <% if (locals.user && locals.user.is_admin) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/usermanager">Manage Users</a>
+                    </li>    
+                <% } %>
             </ul>
         </div>
         <div class="navbar-right">

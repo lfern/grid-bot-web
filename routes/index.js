@@ -8,7 +8,7 @@ let strategy = require('../controllers/strategy');
 let exchange = require('../controllers/exchange')
 let strategyInstance = require('../controllers/strategyInstance');
 let accountBroadcast = require('../controllers/accountBroadcast');
-
+let userManager = require('../controllers/userManager');
 let {isLoggedIn, hasAuth} = require('../middleware/hasAuth');
 
 /* Login related routes */
@@ -72,5 +72,12 @@ router.get('/exchange/:exchange_id/account-types/json', isLoggedIn, exchange.get
 router.get('/exchange/:exchange_id/:account_type_id/markets/json', isLoggedIn, exchange.get_markets_json);
 router.get('/exchange/:exchange_id/:account_type_id/markets/paper/json', isLoggedIn, exchange.get_markets_json_paper);
 router.get('/account/:account_id/markets/json', isLoggedIn, exchange.get_markets_account_json);
+
+/* User manager routes */
+router.get('/usermanager', isLoggedIn, hasAuth, userManager.show_users);
+router.get('/usermanager/:user_id', isLoggedIn, hasAuth, userManager.show_user);
+router.post('/usermanager/:user_id/update', isLoggedIn, hasAuth, userManager.update_user);
+router.post('/usermanager/:user_id/delete', isLoggedIn, hasAuth, userManager.delete_user);
+router.post('/usermanager/:user_id/delete/json', isLoggedIn, hasAuth, userManager.delete_user_json);
 
 module.exports = router;

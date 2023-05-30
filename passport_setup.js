@@ -14,7 +14,8 @@ module.exports = function(passport){
     passport.deserializeUser(function(id, done){
         models.User.findOne({
             where:{
-                id: id
+                id: id,
+                validated: true
             }
         }).then(user => {
             if (user == null) {
@@ -36,6 +37,9 @@ module.exports = function(passport){
         }).then(user => {
             if (user == null) {
                 req.flash('message', 'Incorrect credentials.');
+                return done(null, false);
+            } else if (!user.validated) { 
+                req.flash('message', 'Registration is still pending to be accepted!');
                 return done(null, false);
             } else if (user.password == null || user.password == undefined) {
                 req.flash('message', 'You must reset your password');
