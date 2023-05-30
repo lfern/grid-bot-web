@@ -129,6 +129,22 @@ module.exports = {
                     allowNull: false,
                     type: Sequelize.BOOLEAN,
                     defaultValue: false
+                },
+                wallet_balance: {
+                    allowNull: true,
+                    type: Sequelize.JSONB,
+                },
+                wallet_balance_updated_at: {
+                    allowNull: true,
+                    type: Sequelize.DATE,
+                },
+                main_balance: {
+                    allowNull: true,
+                    type: Sequelize.JSONB,
+                },
+                main_balance_updated_at: {
+                    allowNull: true,
+                    type: Sequelize.DATE,
                 }
             }, {transaction});
 
