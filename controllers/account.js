@@ -79,10 +79,22 @@ exports.submit_account = function(req, res, next) {
 }
 
 exports.delete_account = function(req, res, next) {
-    return models.Account.destroy({
-        where:{
-            id: req.params.account_id
-        }
+    return models.sequelize.transaction(async (transaction) => {
+        await models.AccountPendingOrder.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.AccountPendingTrade.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.AccountAddress.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.Account.destroy({
+            where:{id: req.params.account_id}
+        });
     }).then(result => {
         res.redirect('/accounts');
     }).catch(ex => {
@@ -91,10 +103,22 @@ exports.delete_account = function(req, res, next) {
 }
 
 exports.delete_account_json = function(req, res, next) {
-    return models.Account.destroy({
-        where:{
-            id: req.params.account_id
-        }
+    return models.sequelize.transaction(async (transaction) => {
+        await models.AccountPendingOrder.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.AccountPendingTrade.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.AccountAddress.destroy({
+            where: {account_id: req.params.account_id}
+        });
+
+        await models.Account.destroy({
+            where:{id: req.params.account_id}
+        });
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
@@ -193,4 +217,22 @@ exports.delete_address_json = function(req, res, next) {
     }).catch(ex => {
         return next(createError(500, ex));
     });
+}
+
+exports.get_balances_json = function(req, res, next) {
+    return models.Account.findOne({where: {id: req.params.account_id}})
+    .then(account => {
+        if (account == null) {
+            return next(createError(404, "Account does not exist"));
+        }
+
+        res.send({
+            walletBalance: account.wallet_balance,
+            walletBalanceUpdatedAt: account.wallet_balance_updated_at ? account.wallet_balance_updated_at.toISOString() : null,
+            mainBalance: account.main_balance,
+            mainBalanceUpdatedAt: account.main_balance_updated_at ? account.main_balance_updated_at.toISOString() : null,
+        });
+    }).catch (ex => {
+        return next(createError, 500, ex);
+    })
 }

@@ -8,7 +8,7 @@ a {
   color: #00B7FF;
 }
 
-body.grid-body {
+body.grid-body, .grid-container-data {
   padding: 0px;
   font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -42,7 +42,7 @@ body.grid-body div.container-fluid > div.row > div {
   overflow-x: auto;
 }
 
-body.grid-body .orders-container, body.grid-body .trades-container{
+body.grid-body .orders-container, body.grid-body .trades-container .balance-container {
   max-height: 200px;
   overflow-y: auto;
 }
