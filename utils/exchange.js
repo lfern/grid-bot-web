@@ -1,7 +1,16 @@
 const models = require('../models');
-const ccxt = require('ccxt');
-const _ = require('lodash');
+const exchangeMarketsService = require('grid-bot/src/services/ExchangeMarket');
 
+
+/** @typedef {import('grid-bot/src/crypto/exchanges/BaseExchange').BaseExchange} BaseExchange */
+
+/**
+ * 
+ * @param {string} exchangeId 
+ * @param {string} accountTypeId 
+ * @param {boolean} paper 
+ * @returns {BaseExchange}
+ */
 let getExchangeMarkets = async function(exchangeId, accountTypeId, paper) {
     const exchangeMarket = await models.ExchangeMarket.findOne({
         where: {
@@ -18,46 +27,14 @@ let getExchangeMarkets = async function(exchangeId, accountTypeId, paper) {
     if (exchangeMarket == null) {
         return null;
     }
-     
-    let exchangeName = exchangeMarket.exchange.exchange_name;
-    if (exchangeMarket.markets == null ||
-        exchangeMarket.markets_updated_at == null ||
-        ((new Date().getTime() - exchangeMarket.markets_updated_at.getTime()) > 3600 * 1000)) {
-    
-        
-        if (!ccxt.hasOwnProperty(exchangeName)) {
-            throw new Error("Ccxt Exchange not valid "+exchangeName);
+
+    return exchangeMarketsService.exchangeInstanceWithMarkets(
+        exchangeMarket.exchange.exchange_name,
+        {
+            paper,
+            exchangeType: exchangeMarket.account_type.account_type
         }
-        
-        let ccxtExchange = new ccxt[exchangeName]();
-                
-        let markets = await ccxtExchange.loadMarkets();
-        var filtered = _.pickBy(markets, function(market) {
-            return market.type == exchangeMarket.account_type.account_type_name && 
-                (
-                    (exchangeMarket.paper && market.symbol.startsWith('TEST')) ||
-                    (!exchangeMarket.paper && !market.symbol.startsWith('TEST'))
-                );
-        });
-
-        exchangeMarket.markets = markets;
-        exchangeMarket.markets_updated_at = models.Sequelize.fn('NOW');
-        await exchangeMarket.save();
-
-        ccxtExchange.setMarkets(filtered);
-        return ccxtExchange;
-    } else {
-        let ccxtExchange = new ccxt[exchangeName]();
-        var filtered = _.pickBy(exchangeMarket.markets, function(market) {
-            return market.type == exchangeMarket.account_type.account_type_name && 
-            (
-                (exchangeMarket.paper && market.symbol.startsWith('TEST')) ||
-                (!exchangeMarket.paper && !market.symbol.startsWith('TEST'))
-            );
-    });
-        ccxtExchange.setMarkets(filtered);
-        return ccxtExchange;
-    }
+    );
 }
 
 

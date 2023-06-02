@@ -1,7 +1,4 @@
 const models = require('../models');
-const ccxt = require('ccxt');
-const _ = require('lodash');
-const sequelize = require('sequelize');
 let createError = require('http-errors');
 const {getExchangeMarkets} = require('../utils/exchange');
 
@@ -77,8 +74,11 @@ const getMarketsJson = function(req, res, next, exchangeId, accountTypeId, paper
     getExchangeMarkets(exchangeId, accountTypeId, paper).then(exchange => {
         if (exchange == null) {
             return next(createError(404, "Not found"));
-        } 
+        }
         res.json(exchange.markets);
+
+    }).catch(ex => {
+        return next(createError(500, ex));
     });
 }
 
