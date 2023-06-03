@@ -8,6 +8,7 @@
         <thead>
           <tr>
             <th scope="col">Type</th>
+            <th scope="col">Name</th>
             <th scope="col">Exchange</th>
             <th scope="col">Account</th>
             <th scope="col">Paper</th>
@@ -21,6 +22,7 @@
             <% let strategy = strategies[i]; %>
             <tr id="<%= strategy.id%>">
               <td><span><%= strategy.strategy_type.strategy_type_name %></span></td>
+              <td><span><%= strategy.strategy_name %></span></td>
               <td><span><%= strategy.account.exchange.exchange_desc %></span></td>
               <td><span><%= strategy.account.account_name %></span></td>
               <td><span><%= strategy.account.paper ? 'yes' : 'no' %></span></td>
