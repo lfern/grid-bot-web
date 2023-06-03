@@ -42,7 +42,7 @@ body.grid-body div.container-fluid > div.row > div {
   overflow-x: auto;
 }
 
-body.grid-body .orders-container, body.grid-body .trades-container .balance-container {
+body.grid-body .orders-container, body.grid-body .trades-container, .balance-container {
   max-height: 200px;
   overflow-y: auto;
 }
