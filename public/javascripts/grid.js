@@ -17,7 +17,8 @@ function populate(res, $tableTbody, dataAttr, genFunc, updateFunc) {
         //var index = $(this).index();
         //var text = $(this).text();
         let $current = $(this);
-        const price = $current.data(dataAttr) | 0;
+        const price = $current.data(dataAttr);
+        if (price == undefined) return;
         while (true) {
             let elem = res[index];
             if (index >= resLen) {

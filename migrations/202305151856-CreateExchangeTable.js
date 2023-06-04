@@ -172,8 +172,8 @@ module.exports = {
             // Insert futures account type
             await queryInterface.sequelize.query('insert into account_types ("createdAt", "updatedAt", account_type, account_type_name) values (NOW(),NOW(),?,?)',{
                 replacements: [
-                    'futures',
-                    'futures'
+                    'future',
+                    'future'
                 ],
                 type: Sequelize.QueryTypes.INSERT,
                 transaction

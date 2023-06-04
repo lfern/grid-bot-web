@@ -1,6 +1,6 @@
 const models = require('../models');
 let createError = require('http-errors');
-const {getExchangeMarkets} = require('../utils/exchange');
+const {getExchangeMarketsDbData} = require('../utils/exchange');
 
 exports.get_exchanges_json = function(req, res, next) {
     models.Exchange.findAll().then(exchanges => {
@@ -71,7 +71,7 @@ exports.get_accounts_json = function(req, res, next) {
 
 const getMarketsJson = function(req, res, next, exchangeId, accountTypeId, paper) {
 
-    getExchangeMarkets(exchangeId, accountTypeId, paper).then(exchange => {
+    getExchangeMarketsDbData(exchangeId, accountTypeId, paper).then(exchange => {
         if (exchange == null) {
             return next(createError(404, "Not found"));
         }

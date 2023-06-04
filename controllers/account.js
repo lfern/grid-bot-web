@@ -2,6 +2,7 @@ const models = require('../models');
 const {validateAccount, validateAddress} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
+const {getExchange, getExchangeMarkets} = require('../utils/exchange');
 
 exports.show_accounts = function(req, res, next) {
     return models.Account.findAll({
@@ -136,9 +137,16 @@ exports.show_account = function(req, res, next) {
         if (account == null) {
             return next(createError(404, "Page does not exist"));    
         }
+
+        let exchange = getExchange(
+            account.exchange.exchange_name,
+            account.account_type.account_type,
+            account.paper);
+
         res.render('account/account', {
             account: account,
             user: req.user,
+            wallets: exchange.getWalletNames(),
         })
     }).catch(ex => {
         return next(createError(500, ex));
@@ -235,4 +243,45 @@ exports.get_balances_json = function(req, res, next) {
     }).catch (ex => {
         return next(createError, 500, ex);
     })
+}
+
+exports.transfer_json = async function(req, res, next) {
+    try {
+        let account = await models.Account.findOne({
+            where:{
+                id: req.params.account_id
+            },
+            include: [models.Account.Exchange, models.Account.AccountType]
+        });
+
+        if (account == null) {
+            res.status(404).send({ error: "Account does not exist" });
+            return next(new Error("Account does not exist"))
+        }
+        let exchange = await getExchangeMarkets(
+            account.exchange.exchange_name,
+            account.account_type.account_type,
+            account.paper,
+            account.api_key,
+            account.api_secret
+        );
+
+        // exchange.loadMarkets(true);
+        
+        if (account == null) {
+            res.status(404).send({ error: "Exchange does not exist" });
+            return next(new Error("Exchange does not exist"))
+        }
+        await exchange.transfer(
+                req.body.coin,
+                req.body.amount,
+                req.body.from_wallet,
+                req.body.to_wallet
+        );
+
+        res.send({msg: "Success"});
+    } catch (ex) {
+        res.status(500).send({ error: ex.message });
+        return next(ex);
+    }
 }

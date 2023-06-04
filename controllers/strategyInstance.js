@@ -1,7 +1,7 @@
 const models = require('../models');
 const db = require('../models/index');
 let createError = require('http-errors');
-let {getExchangeMarkets} = require('../utils/exchange');
+let {getExchangeMarketsDbData} = require('../utils/exchange');
 
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
@@ -70,7 +70,7 @@ exports.get_instance_grid_json = function(req, res, next) {
             return next(createError(404, "Instance not found"));
         }
         
-        getExchangeMarkets(
+        getExchangeMarketsDbData(
             instance.strategy.account.exchange.id,
             instance.strategy.account.account_type.id,
             instance.strategy.account.paper
@@ -141,7 +141,7 @@ exports.get_instance_orders_json = function(req, res, next) {
             return next(createError(404, "Instance not found"));
         }
         
-        getExchangeMarkets(
+        getExchangeMarketsDbData(
             instance.strategy.account.exchange.id,
             instance.strategy.account.account_type.id,
             instance.strategy.account.paper
@@ -207,7 +207,7 @@ exports.get_instance_trades_json = function(req, res, next) {
             return next(createError(404, "Instance not found"));
         }
         
-        getExchangeMarkets(
+        getExchangeMarketsDbData(
             instance.strategy.account.exchange.id,
             instance.strategy.account.account_type.id,
             instance.strategy.account.paper

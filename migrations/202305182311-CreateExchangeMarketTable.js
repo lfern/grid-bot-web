@@ -81,7 +81,7 @@ module.exports = {
                     type: Sequelize.QueryTypes.SELECT,
                     transaction
                 }),
-                queryInterface.sequelize.query("select id from account_types where account_type = 'futures'", {
+                queryInterface.sequelize.query("select id from account_types where account_type = 'future'", {
                     type: Sequelize.QueryTypes.SELECT,
                     transaction
                 }),

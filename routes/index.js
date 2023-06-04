@@ -35,6 +35,7 @@ router.get('/account/:account_id/addresses/create', isLoggedIn, account.show_cre
 router.post('/account/:account_id/addresses/create', isLoggedIn, account.submit_address)
 router.post('/account-address/:account_address_id/delete/json', isLoggedIn, account.delete_address_json);
 router.get('/account/:account_id/balance/json', isLoggedIn, account.get_balances_json);
+router.post('/account/:account_id/transfer/json', isLoggedIn, account.transfer_json);
 
 // Account Broadcast Transactions
 router.get('/account/:account_id/broadcast-transactions', isLoggedIn, accountBroadcast.show_broadcasts);
