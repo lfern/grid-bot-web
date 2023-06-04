@@ -16,7 +16,7 @@
     "express": "~4.16.1",
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.17.3",
-    "grid-bot": "file:../grid-bot",
+    "grid-bot": "github:lfern/grid-bot",
     "http-errors": "~1.6.3",
     "liquidjs-lib": "^6.0.2-liquid.27",
     "lodash": "^4.17.21",
