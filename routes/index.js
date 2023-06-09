@@ -9,6 +9,7 @@ let exchange = require('../controllers/exchange')
 let strategyInstance = require('../controllers/strategyInstance');
 let accountBroadcast = require('../controllers/accountBroadcast');
 let userManager = require('../controllers/userManager');
+let notificationManager = require('../controllers/notificationManager.js');
 let {isLoggedIn, hasAuth} = require('../middleware/hasAuth');
 
 /* Login related routes */
@@ -82,5 +83,15 @@ router.get('/usermanager/:user_id', isLoggedIn, hasAuth, userManager.show_user);
 router.post('/usermanager/:user_id/update', isLoggedIn, hasAuth, userManager.update_user);
 router.post('/usermanager/:user_id/delete', isLoggedIn, hasAuth, userManager.delete_user);
 router.post('/usermanager/:user_id/delete/json', isLoggedIn, hasAuth, userManager.delete_user_json);
+
+/* Notification manager routes */
+router.get('/notificationmanager', isLoggedIn, hasAuth, notificationManager.show_notifications);
+router.get('/notificationmanager/create-telegram', isLoggedIn, hasAuth, notificationManager.create_telegram);
+router.post('/notificationmanager/create-telegram', isLoggedIn, hasAuth, notificationManager.post_telegram);
+router.get('/notificationmanager/telegram/:telegram_id', isLoggedIn, hasAuth, notificationManager.edit_telegram);
+router.post('/notificationmanager/telegram/:telegram_id/update', isLoggedIn, hasAuth, notificationManager.update_telegram);
+router.post('/notificationmanager/telegram/:telegram_id/delete', isLoggedIn, hasAuth, notificationManager.delete_telegram);
+router.post('/notificationmanager/telegram/:telegram_id/delete/json', isLoggedIn, hasAuth, notificationManager.delete_telegram_json);
+router.post('/notificationmanager/telegram/:telegram_id/test/json', isLoggedIn, hasAuth, notificationManager.test_telegram_json);
 
 module.exports = router;

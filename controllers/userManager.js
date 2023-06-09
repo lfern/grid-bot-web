@@ -73,11 +73,7 @@ exports.update_user = function(req, res, next) {
     }).then(result => {
         res.redirect('/usermanager');
     }).catch(ex => {
-        if (errors) {
-            return rerender_user(errors,req, res, next);
-        } else {
-            return next(createError(500, ex));
-        }
+        return next(createError(500, ex));
     });
 }
 
