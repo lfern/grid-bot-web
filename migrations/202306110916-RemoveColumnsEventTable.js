@@ -17,9 +17,20 @@ module.exports = {
             await queryInterface.removeColumn('strategy_instance_events', 'price', {transaction});
             await queryInterface.removeColumn('strategy_instance_events', 'position', {transaction});    
             await queryInterface.addColumn('strategy_instance_events', 'level', {
+                allowNull: true,
+                type: Sequelize.SMALLINT,
+            }, {transaction});
+            
+
+            await queryInterface.sequelize.query('update strategy_instance_events set level = 0', {
+                type: Sequelize.QueryTypes.UPDATE,
+                transaction
+            });
+
+            await queryInterface.changeColumn('strategy_instance_events', 'level', {
                 allowNull: false,
                 type: Sequelize.SMALLINT,
-            }, {transaction});        
+            }, {transaction});
         });
     },
     
