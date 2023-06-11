@@ -162,8 +162,8 @@ function sendTelegramTest(chatId, telegramId) {
                 });
             resolve(null);
         }).catch(ex => {
-            if (ex.message.includes("HTTP status code 400")|| 
-                ex.message.includes("HTTP status code 403")) {
+            if (ex instanceof telegramService.TelegramForbiddenException || 
+                ex instanceof telegramService.TelegramInvalidParamsError) {
                 models.TelegramChatid.update({is_valid: false},{where:{id: telegramId}})
                 .then(result => {
                 }).catch(ex =>{

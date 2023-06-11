@@ -28,8 +28,8 @@
                 <tr id="<%= instance.id%>">
                   <td><span><%= instance.id %></span></td>
                   <td><span><%= instance.running ? "yes":"no" %></span></td>
-                  <td><span><%= instance.started_at ? instance.started_at : "" %></span></td>
-                  <td><span><%= instance.stopped_at ? instance.stopped_at : "" %></span></td>
+                  <td><span><%= instance.started_at ? instance.started_at.toISOString() : "" %></span></td>
+                  <td><span><%= instance.stopped_at ? instance.stopped_at.toISOString() : "" %></span></td>
                   <td>
                     <a href="/strategy-instance/<%= instance.id%>">Details</a>
                   </td>

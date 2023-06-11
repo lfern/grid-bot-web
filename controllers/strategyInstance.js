@@ -245,6 +245,7 @@ exports.get_instance_events_json = function(req, res, next) {
         let response = [];
         events.forEach(event => {
             response.push({
+                id: event.id,
                 datetime: event.createdAt.toISOString(),
                 event: event.event,
                 message: event.message,

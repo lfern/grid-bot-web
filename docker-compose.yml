@@ -27,7 +27,8 @@ services:
       - NODE_ENV=${NODE_ENV:-}
     volumes:
       - .:/usr/src/app
-      #- node_modules:/home/node/app/node_modules
+      - /dev/null:/usr/src/app/.env
+      - /usr/src/app/node_modules
     #command: ./wait-for.sh db:27017 -- /home/node/app/node_modules/.bin/nodemon app.js
     ports:
       - "${HTTP_PORT:-3000}:3000"

@@ -17,8 +17,8 @@ function populate(res, $tableTbody, dataAttr, genFunc, updateFunc) {
         //var index = $(this).index();
         //var text = $(this).text();
         let $current = $(this);
-        const price = $current.data(dataAttr);
-        if (price == undefined) return;
+        const data = $current.data(dataAttr);
+        if (data == undefined) return;
         while (true) {
             let elem = res[index];
             if (index >= resLen) {
@@ -26,12 +26,12 @@ function populate(res, $tableTbody, dataAttr, genFunc, updateFunc) {
                 $current.remove();
                 // return to next
                 return;
-            } else if (price > elem.price) {
+            } else if (data > elem[dataAttr]) {
                 // current price above got from server, remove this element
                 $current.remove();
                 // return to next
                 return;
-            } else if (price == elem.price) {
+            } else if (data == elem[dataAttr]) {
                 // update this element with new data
                 updateFunc(elem, $current);
                 // increment index
@@ -221,14 +221,16 @@ function genGridEvent(elem) {
     return $('<tr>').data('event', elem.id)
     .append($('<td>').text(elem.datetime))
     .append($('<td>').text(elem.event))
-    .append($('<td>').text(elem.message));
+    .append($('<td>').text(elem.message))
+    .append($('<td>').text(JSON.stringify(elem.params)));
 }
 
 function updateGridEvent(elem, $tr) {
     let $tds = $tr.find('td');
     $tds.eq(0).text(elem.datetime);
     $tds.eq(1).text(elem.event);
-    $tds.eq(2).text(elem.message);
+    $tds.eq(2).text(elem.message)
+    $tds.eq(3).text(JSON.stringify(elem.params));
 }
 
 function populateEvents() {
