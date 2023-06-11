@@ -25,6 +25,8 @@ services:
       - TEST_POSTGRES_PORT=${TEST_POSTGRES_PORT:-5432}
       - TEST_POSTGRES_DB=${TEST_POSTGRES_DB:-gridbot-test}
       - NODE_ENV=${NODE_ENV:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_BOT_URL=${TELEGRAM_BOT_URL:-https://t.me/GridBotTestBot}
     volumes:
       - .:/usr/src/app
       - /dev/null:/usr/src/app/.env
