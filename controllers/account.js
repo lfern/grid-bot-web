@@ -207,7 +207,7 @@ exports.submit_address = function(req, res, next) {
             return models.AccountAddress.create({
                 account_id: req.params.account_id,
                 address: req.body.address,
-                confidential: req.body.confidential !== undefined,
+                confidential: false,
             }).then(result => {res.redirect('/account/'+req.params.account_id+'/addresses')});
         }
     }).catch(ex => {
