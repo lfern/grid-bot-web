@@ -3,6 +3,7 @@ const {validateAccount, validateAddress} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 const {getExchange, getExchangeMarkets} = require('../utils/exchange');
+const { BaseExchange } = require('grid-bot/src/crypto/exchanges/BaseExchange');
 
 exports.show_accounts = function(req, res, next) {
     return models.Account.findAll({
@@ -138,16 +139,24 @@ exports.show_account = function(req, res, next) {
             return next(createError(404, "Page does not exist"));    
         }
 
-        let exchange = getExchange(
+        return getExchangeMarkets(
             account.exchange.exchange_name,
             account.account_type.account_type,
-            account.paper);
-
-        res.render('account/account', {
-            account: account,
-            user: req.user,
-            wallets: exchange.getWalletNames(),
-        })
+            account.paper,
+        ).then(/** @param {BaseExchange} exchange */ exchange => {
+            if (exchange == null) {
+                res.status(404).send({ error: "Exchange does not exist" });
+                return next(new Error("Exchange does not exist"))
+            }
+    
+            res.render('account/account', {
+                account: account,
+                user: req.user,
+                wallets: exchange.getWalletNames(),
+                currencies: exchange.currencies
+            })
+        });
+        
     }).catch(ex => {
         return next(createError(500, ex));
     });
@@ -268,7 +277,7 @@ exports.transfer_json = async function(req, res, next) {
 
         // exchange.loadMarkets(true);
         
-        if (account == null) {
+        if (exchange == null) {
             res.status(404).send({ error: "Exchange does not exist" });
             return next(new Error("Exchange does not exist"))
         }

@@ -42,6 +42,32 @@
                 <label class="col-sm-2 col-form-label">Send requested at:</label>
                 <span class="form-control col-sm-10"><%= transaction.send_requested_at ? transaction.send_requested_at.toISOString() : '' %></span>
             </div>
+
+
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Deposit status:</label>
+                <span class="form-control col-sm-10"><%= transaction.deposit_status %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Deposited At:</label>
+                <span class="form-control col-sm-10"><%= transaction.deposited_at ? transaction.deposited_at.toISOString() : '' %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Deposit id:</label>
+                <span class="form-control col-sm-10"><%= transaction.deposit_id %></span>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Deposit:</label>
+                <% 
+                    let json = transaction.deposit;
+                    if (json) {
+                        delete json['info'];
+                    }
+                %>
+                <span class="form-control col-sm-10 wrap-anyware"><pre><%= json ? JSON.stringify(json, null, 2):'' %></pre></span>
+            </div>
+
+
             <div class="form-row">
                 <div class="col-md-3">
                     <form action="/account-broadcast-transaction/<%=transaction.id%>/delete" method="post">

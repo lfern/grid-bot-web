@@ -85,7 +85,7 @@ function populateBalanceTable($table, $updatedAt, balanceData, updatedAt, update
         walletBalance = typeof balanceData === 'object' ? Object.entries(balanceData).map(([coin, values]) => ({ coin, ...values })) : [];
         walletBalance.sort((a, b) => parseFloat(a.coin) > parseFloat(b.coin) ? -1 : (parseFloat(a.coin) < parseFloat(b.coin) ? 1 : 0));
         if (updateTransferCoins) {
-            populate(walletBalance, $('select[name=coin]'), 'option', 'coin', genTransferCoinEntry, updateTransferCoinEntry);
+            // populate(walletBalance, $('select[name=coin]'), 'option', 'coin', genTransferCoinEntry, updateTransferCoinEntry);
         }
     }
     populate(walletBalance, $table.find('tbody'), 'tr', 'coin', genBalanceEntry, updateBalanceEntry);

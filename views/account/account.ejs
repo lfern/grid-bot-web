@@ -79,7 +79,9 @@
                             <div class="formgroup">
                                 <input placeholder="amount to transfer" class="form-control form-control-sm" type="text" name="amount" required=true>
                                 <select name="coin" class="form-control form-control-sm">
-                                    <option disabled selected>select coin</option>
+                                    <% currencies.forEach((currency, index) => { %>
+                                        <option value="<%= currency %>"><%= currency %></option>
+                                    <% }) %>
                                 </select>
                                 <select name="from_wallet" class="form-control form-control-sm">
                                     <% wallets.forEach((wallet, index) => { %>
