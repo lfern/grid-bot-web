@@ -29,13 +29,17 @@ module.exports = {
 
 
             await queryInterface.addColumn('strategy_instances', 'nofunds_at', {
-                allowNull: false,
-                type: Sequelize.BOOLEAN,
-                defaultValue: false,
+                allowNull: true,
+                type: Sequelize.DATE,
+            }, {transaction});
+
+            await queryInterface.addColumn('strategy_instances', 'nofunds_currency', {
+                allowNull: true,
+                type: Sequelize.STRING,
             }, {transaction});
 
 
-            await queryInterface.addColumn('account', 'transfer_permission', {
+            await queryInterface.addColumn('accounts', 'transfer_permission', {
                 allowNull: false,
                 type: Sequelize.BOOLEAN,
                 defaultValue: true
@@ -84,7 +88,7 @@ module.exports = {
 
             await queryInterface.removeIndex(
                 'strategy_instances',
-                 ['no_funds_at'],
+                 ['nofunds_at'],
                 { transaction }
             );
 
@@ -100,8 +104,9 @@ module.exports = {
                 { transaction }
             );
 
-            await queryInterface.removeColumn('strategy_instances', 'no_funds_at', {transaction});
-            await queryInterface.removeColumn('account', 'transfer_permission', {transaction});
+            await queryInterface.removeColumn('strategy_instances', 'nofunds_at', {transaction});
+            await queryInterface.removeColumn('strategy_instances', 'nofunds_currency', {transaction});
+            await queryInterface.removeColumn('accounts', 'transfer_permission', {transaction});
 
             await queryInterface.removeColumn('broadcast_transactions', 'currency', {transaction});
         });
