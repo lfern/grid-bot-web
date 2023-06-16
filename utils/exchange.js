@@ -98,8 +98,8 @@ let getExchange = function(exchangeId, exchangeType, paper = false, apiKey = und
  * @param {*} secret 
  * @returns {BaseExchange}
  */
-let getExchangeMarkets = function(exchangeId, exchangeType, paper = false, apiKey = undefined, secret = undefined) {
-    return exchangeMarketsService.exchangeInstanceWithMarkets(
+let getExchangeMarkets = async function(exchangeId, exchangeType, paper = false, apiKey = undefined, secret = undefined) {
+    return await exchangeMarketsService.exchangeInstanceWithMarkets(
         exchangeId,
         {
             paper,

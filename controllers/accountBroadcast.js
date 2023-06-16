@@ -2,6 +2,8 @@ const models = require('../models');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 let {validateBroadcastTransaction} = require('../validators/broadcastTransaction');
+const { BaseExchange } = require('grid-bot/src/crypto/exchanges/BaseExchange');
+const { getExchangeMarkets } = require('../utils/exchange');
 
 exports.show_broadcasts = function(req, res, next) {
     Promise.all([
@@ -33,14 +35,36 @@ exports.show_broadcasts = function(req, res, next) {
 }
 
 const rerender_create = function(errors, req, res, next) {
-    models.Account.findOne({where:{id: req.params.account_id}})
+    models.Account.findOne({
+        where:{id: req.params.account_id},
+        include: [models.Account.Exchange, models.Account.AccountType]
+    })
         .then(account => {
             if (account == null) {
                 return next(createError(404, "Account does not exist"))
             }
-            res.render('account/broadcast-transaction/create', {
-                account, user: req.user, errors, formData: req.body
-            })
+
+            return getExchangeMarkets(
+                account.exchange.exchange_name,
+                account.account_type.account_type,
+                account.paper,
+            ).then (exchange => {
+                if (exchange == null) {
+                    res.status(404).send({ error: "Exchange does not exist" });
+                    return next(new Error("Exchange does not exist"))
+                }
+
+                res.render('account/broadcast-transaction/create', {
+                    account,
+                    user: req.user,
+                    errors,
+                    formData: req.body,
+                    currencies: exchange.currencies
+                });
+    
+            });
+            
+            
         }).catch(ex => {
             return next(createError(500, ex));
         });
@@ -62,7 +86,8 @@ exports.submit_broadcast = function(req, res, next) {
                     account_id: req.params.account_id,
                     transaction_raw: req.body.transaction,
                     valid:true,
-                    transaction_hash: data.validatedData.hash
+                    transaction_hash: data.validatedData.hash,
+                    currency: req.body.currency
                 },{transaction});
                 for(let i=0;i<data.validatedData.addresses.length;i++) {
                     await models.BroadcastTransactionAddress.create({

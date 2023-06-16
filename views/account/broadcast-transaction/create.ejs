@@ -4,6 +4,12 @@
             <h1>Broadcast Transaction for <%= account.name %></h1>
             <form action="/account/<%= account.id%>/broadcast-transactions/create" method="post">
                 <div class="formgroup">
+                    <label for="currency">Currency:</label>
+                    <select name="currency">
+                        <% locals.currencies.forEach(c => { %>
+                         <option value="<%= c %>"><%= c %></option>
+                        <% }) %>
+                    </select>
                     <label for="address" class="small mb-1 mt-3">Transaction:</label>
                     <textarea rows="15" class="form-control" name="transaction" required=true><%= formData.transaction%></textarea> 
                     <% if (locals.errors && locals.errors.transaction) { %>

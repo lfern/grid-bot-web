@@ -9,6 +9,7 @@
             <tr>
               <th scope="col">Hash</th>
               <th scope="col">Txid</th>
+              <th scope="col">Currency</th>
               <th scope="col">Status</th>
               <th scope="col">Deposit</th>
               <th scope="col">Fee</th>
@@ -24,6 +25,7 @@
               <tr id="<%= transaction.id%>">
                 <td class="wrap-anyware"><span><%= transaction.transaction_hash%></span></td>
                 <td class="wrap-anyware"><span><%= transaction.txid %></span></td>
+                <td><span><%= transaction.currency %></span></td>
                 <td><span><%= transaction.status %></span></td>
                 <td><span><%= transaction.deposit_status %></span></td>
                 <td><span><%= transaction.fee %></span></td>
