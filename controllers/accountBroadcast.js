@@ -16,7 +16,10 @@ exports.show_broadcasts = function(req, res, next) {
         models.BroadcastTransaction.findAll({
             where:{
                 account_id: req.params.account_id
-            }
+            },
+            order: [
+                ['createdAt', 'DESC']
+            ]
         })
     ]).then(result => {
         let account = result[0];
