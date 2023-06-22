@@ -111,3 +111,18 @@ body.grid-body .navbar-brand {
   overflow-y: auto;
   height: auto;
 }
+
+.all-balance-container {
+  max-height: 600px;
+  overflow: auto;
+}
+
+.all-grids-container {
+  height: 300px;
+  overflow: auto;
+}
+
+.all-events-container {
+  height: 300px;
+  overflow: auto;
+}

@@ -1,24 +1,99 @@
-<div class="container">
-  <div class="row align-items-center">      
-    <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
-      <h1 class="mb-3">GridBot Manager</h1>
-
-      <p class="lead">Alpha version.</p>
-      <p class="lead mb-4">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non elementum arcu. Sed euismod accumsan rhoncus. Nunc in metus accumsan augue rhoncus lobortis. Donec ligula massa, imperdiet sit amet dignissim ultrices, aliquam nec arcu. Donec eros libero, euismod ac venenatis at, feugiat consequat sapien. Donec efficitur scelerisque ante id ullamcorper. Maecenas porta vestibulum laoreet. Vestibulum semper eros sit amet hendrerit convallis. Morbi faucibus magna nec ante iaculis pretium. Suspendisse dapibus nibh velit, id porta mi rutrum a. Phasellus massa sem, ullamcorper sed consectetur a, convallis non nisi. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras quis urna dolor. Morbi auctor aliquet felis, vel hendrerit enim posuere dignissim. In iaculis tincidunt lorem sed lobortis. Cras rhoncus bibendum nibh, nec pellentesque tortor vehicula ut.
-      </p>
-      <p class="lead mb-4">
-        Maecenas sit amet ultricies massa. Praesent mollis tellus imperdiet, faucibus elit nec, viverra urna. Cras id odio elit. Nam sed turpis elit. Mauris nec ante ante. Phasellus sodales augue ac ex efficitur, et dignissim turpis aliquet. Nunc et sem venenatis, feugiat ante vel, finibus tellus. Nunc sit amet justo eu purus ultricies auctor porttitor sed libero. Aliquam erat volutpat.
-      </p>
-      <p class="lead mb-4">
-        Phasellus cursus malesuada tortor sit amet mattis. Nulla ut rhoncus massa. Pellentesque suscipit sollicitudin est sed egestas. Aliquam fermentum interdum posuere. Fusce accumsan dignissim odio, ac rhoncus nibh tempus at. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam vel augue magna. Praesent id efficitur odio. Vestibulum gravida justo blandit massa semper aliquet. Pellentesque et interdum nisi. Phasellus dictum egestas arcu, sed ornare augue gravida in. Proin vestibulum eleifend urna, sed sollicitudin risus euismod eget.
-      </p>
-      <p class="lead mb-4">
-        In hac habitasse platea dictumst. Nullam luctus eu leo a venenatis. Curabitur commodo, justo laoreet auctor volutpat, ligula tellus ullamcorper nisl, nec elementum risus justo eu lorem. Sed nec nulla non dolor semper pretium. Integer quis mi eu felis laoreet mollis at sit amet nibh. Maecenas sit amet libero sit amet lacus varius cursus. Integer bibendum pretium malesuada. Vestibulum sed erat sollicitudin, fermentum turpis vitae, eleifend nunc. Ut in condimentum diam. Morbi ullamcorper porta felis, nec elementum nisl suscipit ac. Duis maximus dolor in nisi suscipit, ut rutrum mi elementum. Nam ex metus, lacinia aliquam ultrices et, finibus vel ipsum. Praesent pretium et sem condimentum gravida.
-      </p>
-      <p class="lead mb-4">
-        Cras magna diam, fringilla sed purus in, dignissim varius augue. Curabitur finibus, mauris eu laoreet vehicula, nulla orci placerat elit, ac porta mauris justo sed tortor. Etiam scelerisque, sapien a efficitur aliquet, augue nunc tempus leo, eu facilisis nunc justo non purus. Integer aliquam neque velit, ut finibus diam efficitur eu. Nulla tempus lorem nec tellus viverra convallis. Nunc id mattis nunc. Donec velit tellus, faucibus ac lectus rhoncus, bibendum semper leo. Proin diam orci, commodo blandit suscipit et, imperdiet id velit. Nullam interdum augue sed nunc pellentesque, eget posuere augue tempus. Nulla enim nisi, ornare eget augue eu, vulputate sollicitudin dui. Proin at vulputate ligula. Fusce mollis ante ac augue interdum, volutpat tempus metus dignissim. Curabitur ante nisi, placerat non quam nec, fringilla pretium risus.
-      </p>
+<div class="container-fluid">
+  <div class="row">      
+    <div class="col-md-9">
+      <div class="row">
+        <div class="col-md-12 all-grids-container">
+          <h5>Live Grids:</h5>
+          <table id="live-grids" class="table table-striped table-sm" class="table table-striped table-bordered table-sm grid-bot-table" cellspacing="0">
+            <thead>
+              <tr>
+                  <th class="" scope="col">Strategy</th>
+                  <th class="" scope="col">Instance</th>
+                  <th class="grid-side-col" scope="col">Market</th>
+                  <th class="" scope="col">Account</th>
+                  <th class="grid-date-col" scope="col">StartedAt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (instances.length == 0) { %>
+                <tr><td colspan="5">No grids currently running</td></tr>
+              <% } else { %>
+                <% instances.forEach(instance => { %>
+                  <tr>
+                    <td><%= instance.strategy.strategy_name %></td>
+                    <td><a href="/strategy-instance/<%= instance.id %>"><%= instance.id %></a></td>
+                    <td><%= instance.strategy.symbol %></td>
+                    <td><%= instance.strategy.account.account_name %></td>
+                    <td><%= instance.started_at.toISOString() %></td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-12 all-events-container">
+          <h5>Last Events:</h5>
+          <table id="last-events" class="table table-striped table-sm" class="table table-striped table-bordered table-sm grid-bot-table" cellspacing="0">
+            <thead>
+              <tr>
+                <th class="grid-date-col" scope="col">Date</th>
+                <th class="" scope="col">Strategy</th>
+                <th class="" scope="col">Instance</th>
+                <th class="grid-event-col" scope="col">Event</th>
+                <th class="grid-desc-col" scope="col">Description</th>
+                <th class="grid-desc-col" scope="col">Params</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (events.length == 0) { %>
+                <tr><td colspan="6">No Events found</td></tr>
+              <% } else { %>
+                <% events.forEach(event => { %>
+                  <tr>
+                    <td><%= event.createdAt.toISOString() %></td>
+                    <td><%= event.strategy_instance.strategy.strategy_name %></td>
+                    <td><a href="/strategy-instance/<%= event.strategy_instance.id %>"><%= event.strategy_instance.id %></a></td>
+                    <td><%= event.event %></td>
+                    <td><%= event.message %></td>
+                    <td><%= event.params ? JSON.stringify(event.params) : '' %></td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 all-balance-container">
+      <h5>Balances:</h5>
+      <table id="balance-list" class="table table-striped table-sm" class="table table-striped table-bordered table-sm grid-bot-table" cellspacing="0">
+        <thead>
+        <tr>
+            <th class="" scope="col">Account</th>
+            <th class="grid-side-col" scope="col">Coin</th>
+            <th class="grid-qty-col" scope="col">Free</th>
+            <th class="grid-qty-col" scope="col">Total</th>
+        </tr>
+        </thead>
+        <tbody>         
+          <% accounts.forEach(account => { %>
+            <% if (account.wallet_balance) { %>
+              <% Object.entries(account.wallet_balance).forEach(entry => { %>
+                <% if (!['free', 'used', 'info', 'total'].includes(entry[0])) { %>
+                  <tr>
+                    <td><a href="/account/<%= account.id %>"><%= account.account_name %></a></td>
+                    <td><%= entry[0] %></td>
+                    <td><%= entry[1].free %></td>
+                    <td><%= entry[1].total %></td>
+                  </tr>                 
+                <% } %>
+              <% }) %>
+            <% } %>
+          <% }) %>
+        </tbody>
+      </table>
     </div>
   </div>
+
 </div>
+
