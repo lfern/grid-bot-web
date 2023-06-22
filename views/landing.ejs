@@ -39,6 +39,7 @@
                 <th class="grid-date-col" scope="col">Date</th>
                 <th class="" scope="col">Strategy</th>
                 <th class="" scope="col">Instance</th>
+                <th class="grid-event-col" scope="col">Level</th>
                 <th class="grid-event-col" scope="col">Event</th>
                 <th class="grid-desc-col" scope="col">Description</th>
                 <th class="grid-desc-col" scope="col">Params</th>
@@ -53,9 +54,22 @@
                     <td><%= event.createdAt.toISOString() %></td>
                     <td><%= event.strategy_instance.strategy.strategy_name %></td>
                     <td><a href="/strategy-instance/<%= event.strategy_instance.id %>"><%= event.strategy_instance.id %></a></td>
+                    <td>
+                      <% if (event.level == 0) { %>
+                        info
+                      <% } else if (event.level == 1) { %>
+                        critical
+                      <% } else if (event.level == 2) {%>
+                         error
+                      <% } else if (event.level == 3) {%>
+                         warning
+                      <% } else { %>
+                        <%= event.level %>
+                      <% } %>
+                    </td>
                     <td><%= event.event %></td>
                     <td><%= event.message %></td>
-                    <td><%= event.params ? JSON.stringify(event.params) : '' %></td>
+                    <td class="wrap-anyware"><%= event.params ? JSON.stringify(event.params) : '' %></td>
                   </tr>
                 <% }) %>
               <% } %>
