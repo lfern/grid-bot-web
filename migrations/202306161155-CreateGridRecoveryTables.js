@@ -33,7 +33,7 @@ module.exports = {
                     type: Sequelize.INTEGER,
                     references: {
                         model: {
-                            tableName: 'strategy_instance_grid'
+                            tableName: 'strategy_instance_grids'
                         },
                         key: 'id'
                     }
@@ -119,6 +119,33 @@ module.exports = {
         return queryInterface.sequelize.transaction(async transaction => {
             await queryInterface.dropTable('strategy_instance_recovery_grid_orders', {transaction});
             await queryInterface.dropTable('strategy_instance_recovery_grids', {transaction});
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_recovery_grid_orders_status";',
+                {transaction}
+            );
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_recovery_grids_side";',
+                {transaction}
+            );
+            /*
+            queryInterface.sequelize.query(`
+                DELETE 
+                FROM
+                    pg_enum
+                WHERE
+                    enumlabel = '...' AND
+                    enumtypid = (
+                        SELECT
+                            oid
+                        FROM
+                            pg_type
+                        WHERE
+                            typname = 'enum_strategy_instance_recovery_grid_orders_status'
+                    )
+            `);
+            */
         });
 
     }

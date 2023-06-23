@@ -272,6 +272,21 @@ module.exports = {
             await queryInterface.dropTable('strategy_instance_trades', {transaction});
             await queryInterface.dropTable('strategy_instance_orders', {transaction});
             await queryInterface.dropTable('strategy_instance_events', {transaction});
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_orders_order_type";',
+                {transaction}
+            );
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_orders_side";',
+                {transaction}
+            );
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_orders_status";',
+                {transaction}
+            );
         });
     }
 }

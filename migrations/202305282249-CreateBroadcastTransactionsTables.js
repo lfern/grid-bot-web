@@ -190,6 +190,11 @@ module.exports = {
             );
             await queryInterface.dropTable('broadcast_transactions', {transaction});
             await queryInterface.dropTable('account_addresses', {transaction});
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_broadcast_transactions_status";',
+                {transaction}
+            );
         });
 
     }

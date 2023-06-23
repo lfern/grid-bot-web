@@ -79,6 +79,11 @@ module.exports = {
             await queryInterface.removeColumn('broadcast_transactions', 'deposit', {transaction});
             await queryInterface.removeColumn('broadcast_transactions', 'deposited_at', {transaction});
             await queryInterface.removeColumn('broadcast_transactions', 'deposit_id', {transaction});
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_broadcast_transactions_deposit_status";',
+                {transaction}
+            );
         });
     }
 }

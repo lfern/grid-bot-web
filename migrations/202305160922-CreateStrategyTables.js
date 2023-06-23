@@ -265,6 +265,16 @@ module.exports = {
             await queryInterface.dropTable('strategy_instances', {transaction});
             await queryInterface.dropTable('strategies', {transaction});
             await queryInterface.dropTable('strategy_types', {transaction});
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategies_step_type";',
+                {transaction}
+            );
+
+            await queryInterface.sequelize.query(
+                'DROP TYPE "enum_strategy_instance_grids_side";',
+                {transaction}
+            );
         });
     }
 }
