@@ -16,25 +16,28 @@ const validateCreateAccountFields = function(errors, req){
 exports.validateAccount = function(errors, req) {
     return new Promise(function(resolve, reject){
         validateCreateAccountFields(errors, req);
-        return models.Exchange.findOne({
-            where: {
-                id: req.body.exchange
-            }
-        }).then( u => {
-            if (u === null) {
+        Promise.all([
+            models.Exchange.findOne({
+                where: {
+                    id: req.body.exchange
+                }
+            }),
+            models.ExchangeMarket.findOne({where: {
+                exchange_id: req.body.exchange,
+                account_type_id: req.body.account_type,
+                paper: req.body.paper !== undefined
+            }}),
+        ]).then(result => {
+            let exchange = result[0];
+            let accountType = result[1];
+            if (exchange === null) {
                 errors["exchange"] = "Exchange is not valid now.";
             }
 
-            return models.AccountType.findOne({
-                where: {
-                    id: req.body.account_type
-                }
-            });
-        }).then ( u => {
-            if (u === null) {
+            if (accountType === null) {
                 errors["account_type"] = "Account type is not valid.";
             }
- 
+
             resolve(errors);
         });
     });
