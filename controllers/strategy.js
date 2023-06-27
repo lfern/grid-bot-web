@@ -222,45 +222,36 @@ exports.show_qties = function(req, res, next) {
 }
 
 exports.submit_update_qty = function(req, res, next) {
-    let errors = {};
-    return validateStrategyQties(errors, req).then(errors =>{
-        if (!isEmpty(errors)){
-            rerender_create(errors, req, res, next);
-        } else {
-            return models.sequelize.transaction(async (transaction) => {
-                let fields = Object.keys(req.body);
-                for(let i=0; i < fields.length; i++) {
-                    if (fields[i].startsWith('qty-buy-')) {
-                        let id = parseInt(fields[i].replace('qty-buy-', ''));
-                        await models.StrategyInstanceQuantity.update({
-                            buy_order_qty: req.body[fields[i]],
-                        }, {
-                            where: {
-                                strategy_id: strategy_id,
-                                id_buy: id,    
-                            },
-                            transaction
-                        });
-                    } else if (fields[i].startsWith('qty-sell-')) {
-                        let id = parseInt(fields[i].replace('qty-sell-', ''));
-                        await models.StrategyInstanceQuantity.update({
-                            sell_order_qty: req.body[fields[i]],
-                        }, {
-                            where: {
-                                strategy_id: strategy_id,
-                                id_buy: id,    
-                            },
-                            transaction
-                        });
-                    }
-
-                }
-
-            }).then(result => {
-                res.redirect('/strategies');
-            });
-
+    return models.sequelize.transaction(async (transaction) => {
+        let fields = Object.keys(req.body);
+        for(let i=0; i < fields.length; i++) {
+            if (fields[i].startsWith('qty-buy-')) {
+                let id = parseInt(fields[i].replace('qty-buy-', ''));
+                await models.StrategyInstanceQuantity.update({
+                    buy_order_qty: req.body[fields[i]],
+                }, {
+                    where: {
+                        strategy_id: req.params.strategy_id,
+                        id_buy: id,    
+                    },
+                    transaction
+                });
+            } else if (fields[i].startsWith('qty-sell-')) {
+                let id = parseInt(fields[i].replace('qty-sell-', ''));
+                await models.StrategyInstanceQuantity.update({
+                    sell_order_qty: req.body[fields[i]],
+                }, {
+                    where: {
+                        strategy_id: req.params.strategy_id,
+                        id_buy: id,    
+                    },
+                    transaction
+                });
+            }
         }
+
+    }).then(result => {
+        res.redirect('/strategy/'+req.params.strategy_id+'/quantities');
     }).catch(ex => {
         return next(createError(500, ex));
     });
