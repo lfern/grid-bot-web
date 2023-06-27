@@ -54,6 +54,7 @@ router.post('/strategies/create', isLoggedIn, strategy.submit_strategy);
 router.post('/strategy/:strategy_id/delete', isLoggedIn, strategy.delete_strategy);
 router.post('/strategy/:strategy_id/delete/json', isLoggedIn, strategy.delete_strategy_json);
 router.get('/strategy/:strategy_id', isLoggedIn, strategy.show_strategy);
+router.get('/strategy/:strategy_id/update_qty', isLoggedIn, strategy.update.qty);
 // Strategy instances
 router.get('/strategy/:strategy_id/instances', isLoggedIn, strategy.show_strategy_instances);
 router.post('/strategy/:strategy_id/instance/create', isLoggedIn, strategy.submit_instance);
