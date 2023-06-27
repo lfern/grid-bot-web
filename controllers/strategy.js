@@ -60,19 +60,35 @@ exports.submit_strategy = function(req, res, next) {
         if (!isEmpty(errors)){
             rerender_create(errors, req, res, next);
         } else {
-            return models.Strategy.create({
-                strategy_type_id: req.body.strategy_type,
-                strategy_name: req.body.name,
-                account_id: req.body.account,
-                symbol: req.body.symbol,
-                initial_position: req.body.initial_position,
-                order_qty: req.body.order_qty,
-                buy_orders: req.body.buy_orders,
-                sell_orders: req.body.sell_orders,
-                active_buys: req.body.active_buys,
-                active_sells: req.body.active_sells,
-                step: req.body.step,
-                step_type: req.body.step_type
+            return models.sequelize.transaction(async (transaction) => {
+                let strategy = await models.Strategy.create({
+                    strategy_type_id: req.body.strategy_type,
+                    strategy_name: req.body.name,
+                    account_id: req.body.account,
+                    symbol: req.body.symbol,
+                    initial_position: req.body.initial_position,
+                    order_qty: req.body.order_qty,
+                    buy_orders: req.body.buy_orders,
+                    sell_orders: req.body.sell_orders,
+                    active_buys: req.body.active_buys,
+                    active_sells: req.body.active_sells,
+                    step: req.body.step,
+                    step_type: req.body.step_type
+                }, {
+                    transaction
+                });
+
+                for(let i=1; i <= strategy.sell_orders + strategy.buy_orders + 1; i++) {
+                    await models.StrategyQuantity.create({
+                        strategy_id: strategy.id,
+                        id_buy: i,
+                        buy_order_qty: strategy.order_qty,
+                        sell_order_qty: strategy.order_qty,
+                    }, {
+                        transaction
+                    });
+                }
+
             }).then(result => {
                 res.redirect('/strategies');
             });
@@ -83,10 +99,16 @@ exports.submit_strategy = function(req, res, next) {
 }
 
 exports.delete_strategy = function(req, res, next) {
-    return models.Strategy.destroy({
+    return models.StrategyQuantity.destroy({
         where:{
-            id: req.params.strategy_id
+            strategy_id: req.params.strategy_id
         }
+    }).then (result => {
+        return models.Strategy.destroy({
+            where:{
+                id: req.params.strategy_id
+            }
+        });
     }).then(result => {
         res.redirect('/strategies');
     }).catch(ex => {
@@ -95,10 +117,16 @@ exports.delete_strategy = function(req, res, next) {
 }
 
 exports.delete_strategy_json = function(req, res, next) {
-    return models.Strategy.destroy({
+    return models.StrategyQuantity.destroy({
         where:{
-            id: req.params.strategy_id
+            strategy_id: req.params.strategy_id
         }
+    }).then (result => {
+        return models.Strategy.destroy({
+            where:{
+            id: req.params.strategy_id
+            }
+        });
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
@@ -171,6 +199,75 @@ exports.submit_instance = function(req, res, next) {
         running: true
     }).then(result => {
         res.redirect('/strategy-instance/'+result.id);
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}
+
+exports.show_qties = function(req, res, next) {
+    return Promise.all([
+        models.Strategy.findOne({
+            where: {id: req.params.strategy_id},
+            include: [
+                models.Strategy.StrategyType, {
+                    association: models.Strategy.Account,
+                    include: [
+                        models.Account.AccountType,
+                        models.Account.Exchange
+                    ]
+                },
+            ]
+        }),
+        models.StrategyQuantity.findAll({
+            where: { strategy_id: req.params.strategy_id}
+        }),
+    ]).then(result => {
+        if (!result[0]) {
+            return next(createError(404, "Page not found"));
+        }
+
+        res.render('strategy/quantities', {
+            strategy: result[0],
+            quantities: result[1],
+            user: req.user,
+        });
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+    
+}
+
+exports.submit_update_qty = function(req, res, next) {
+    return models.sequelize.transaction(async (transaction) => {
+        let fields = Object.keys(req.body);
+        for(let i=0; i < fields.length; i++) {
+            if (fields[i].startsWith('qty-buy-')) {
+                let id = parseInt(fields[i].replace('qty-buy-', ''));
+                await models.StrategyQuantity.update({
+                    buy_order_qty: req.body[fields[i]],
+                }, {
+                    where: {
+                        strategy_id: req.params.strategy_id,
+                        id_buy: id,    
+                    },
+                    transaction
+                });
+            } else if (fields[i].startsWith('qty-sell-')) {
+                let id = parseInt(fields[i].replace('qty-sell-', ''));
+                await models.StrategyQuantity.update({
+                    sell_order_qty: req.body[fields[i]],
+                }, {
+                    where: {
+                        strategy_id: req.params.strategy_id,
+                        id_buy: id,    
+                    },
+                    transaction
+                });
+            }
+        }
+
+    }).then(result => {
+        res.redirect('/strategy/'+req.params.strategy_id+'/quantities');
     }).catch(ex => {
         return next(createError(500, ex));
     });

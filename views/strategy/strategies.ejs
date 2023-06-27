@@ -29,6 +29,7 @@
               <td><span><%= strategy.account.valid ? 'yes' : 'no'%></span></td>
               <td>
                 <a href="/strategy/<%= strategy.id%>">Details</a>
+                <a href="/strategy/<%= strategy.id%>/quantities">Quantities</a>
                 <a href="/strategy/<%= strategy.id%>/instances">Instances</a>
               </td>
               <td><button class="btn btn-primary" onclick="deleteStrategy('<%= strategy.id%>')">Delete</button></td>
