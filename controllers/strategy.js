@@ -60,6 +60,35 @@ exports.submit_strategy = function(req, res, next) {
         if (!isEmpty(errors)){
             rerender_create(errors, req, res, next);
         } else {
+            return models.sequelize.transaction(async (transaction) => {
+                let strategy = await models.Strategy.create({
+                    strategy_type_id: req.body.strategy_type,
+                    strategy_name: req.body.name,
+                    account_id: req.body.account,
+                    symbol: req.body.symbol,
+                    initial_position: req.body.initial_position,
+                    order_qty: req.body.order_qty,
+                    buy_orders: req.body.buy_orders,
+                    sell_orders: req.body.sell_orders,
+                    active_buys: req.body.active_buys,
+                    active_sells: req.body.active_sells,
+                    step: req.body.step,
+                    step_type: req.body.step_type
+                });
+
+                for(let i=1; i <= req.body.sell_orders + req.body.buy_orders + 1; i++) {
+                    await models.StrategyInstanceQuantity.create({
+                        strategy_id: strategy_id,
+                        id_buy: i,
+                        buy_order_qty: req.body.order_qty,
+                        sell_order_qty: req.body.order_qty,
+                    });
+                }
+
+            }).then(result => {
+                res.redirect('/strategies');
+            });
+
             return models.Strategy.create({
                 strategy_type_id: req.body.strategy_type,
                 strategy_name: req.body.name,
@@ -74,6 +103,9 @@ exports.submit_strategy = function(req, res, next) {
                 step: req.body.step,
                 step_type: req.body.step_type
             }).then(result => {
+
+
+
                 res.redirect('/strategies');
             });
         }
