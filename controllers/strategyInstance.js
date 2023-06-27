@@ -295,8 +295,25 @@ let removeInstance = function(instanceId) {
             transaction
         });
 
+
         await models.StrategyInstanceEvent.destroy({
             where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        await models.StrategyInstanceRecoveryGridOrder.destroy({
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        toBeDeleted = await models.StrategyInstanceGrid.findAll({
+            attributes:['id'],
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        await models.StrategyInstanceRecoveryGrid.destroy({
+            where:{strategy_instance_grid_id:toBeDeleted.map(function(d){ return d.id})},
             transaction
         });
 
