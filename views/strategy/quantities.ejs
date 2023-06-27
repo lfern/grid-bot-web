@@ -12,7 +12,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">id buy</th>
                     <th scope="col">Buy quantity</th>
                     <th scope="col">Sell quantity</th>
                 </tr>
@@ -21,6 +21,9 @@
                 <% for( let i = 0; i < locals.quantities.length; i++ ) { %>
                     <% let quantity = quantities[i]; %>
                     <tr>
+                    <td>
+                        <%= quantity.id_buy %>
+                    </td>
                     <td>
                         <input type="text" name="qty-buy-<%= quantity.id_buy %>" value="<%= quantity.buy_order_qty %>" size="30" >
                     </td>

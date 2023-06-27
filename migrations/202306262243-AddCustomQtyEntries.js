@@ -14,10 +14,10 @@ module.exports = {
         return queryInterface.sequelize.transaction(async transaction => {
             await queryInterface.createTable('strategy_quantities', {
                 id: {
+                    type: Sequelize.INTEGER,
                     allowNull: false,
                     primaryKey: true,
-                    type: Sequelize.UUID,
-                    defaultValue: Sequelize.UUIDV4
+                    autoIncrement: true
                 },
                 createdAt: {
                     allowNull: false,
@@ -29,7 +29,7 @@ module.exports = {
                 },
                 strategy_id: {
                     allowNull: false,
-                    type: Sequelize.INTEGER,
+                    type: Sequelize.UUID,
                     references: {
                         model: {
                             tableName: 'strategies'

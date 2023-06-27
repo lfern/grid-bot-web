@@ -74,14 +74,18 @@ exports.submit_strategy = function(req, res, next) {
                     active_sells: req.body.active_sells,
                     step: req.body.step,
                     step_type: req.body.step_type
+                }, {
+                    transaction
                 });
 
-                for(let i=1; i <= req.body.sell_orders + req.body.buy_orders + 1; i++) {
+                for(let i=1; i <= strategy.sell_orders + strategy.buy_orders + 1; i++) {
                     await models.StrategyQuantity.create({
                         strategy_id: strategy.id,
                         id_buy: i,
-                        buy_order_qty: req.body.order_qty,
-                        sell_order_qty: req.body.order_qty,
+                        buy_order_qty: strategy.order_qty,
+                        sell_order_qty: strategy.order_qty,
+                    }, {
+                        transaction
                     });
                 }
 
@@ -95,10 +99,16 @@ exports.submit_strategy = function(req, res, next) {
 }
 
 exports.delete_strategy = function(req, res, next) {
-    return models.Strategy.destroy({
+    return models.StrategyQuantity.destroy({
         where:{
-            id: req.params.strategy_id
+            strategy_id: req.params.strategy_id
         }
+    }).then (result => {
+        return models.Strategy.destroy({
+            where:{
+                id: req.params.strategy_id
+            }
+        });
     }).then(result => {
         res.redirect('/strategies');
     }).catch(ex => {
@@ -107,10 +117,16 @@ exports.delete_strategy = function(req, res, next) {
 }
 
 exports.delete_strategy_json = function(req, res, next) {
-    return models.Strategy.destroy({
+    return models.StrategyQuantity.destroy({
         where:{
-            id: req.params.strategy_id
+            strategy_id: req.params.strategy_id
         }
+    }).then (result => {
+        return models.Strategy.destroy({
+            where:{
+            id: req.params.strategy_id
+            }
+        });
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
@@ -227,7 +243,7 @@ exports.submit_update_qty = function(req, res, next) {
         for(let i=0; i < fields.length; i++) {
             if (fields[i].startsWith('qty-buy-')) {
                 let id = parseInt(fields[i].replace('qty-buy-', ''));
-                await models.StrategyInstanceQuantity.update({
+                await models.StrategyQuantity.update({
                     buy_order_qty: req.body[fields[i]],
                 }, {
                     where: {
@@ -238,7 +254,7 @@ exports.submit_update_qty = function(req, res, next) {
                 });
             } else if (fields[i].startsWith('qty-sell-')) {
                 let id = parseInt(fields[i].replace('qty-sell-', ''));
-                await models.StrategyInstanceQuantity.update({
+                await models.StrategyQuantity.update({
                     sell_order_qty: req.body[fields[i]],
                 }, {
                     where: {
