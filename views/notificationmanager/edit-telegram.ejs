@@ -23,6 +23,7 @@
                         <option value="3" <%=formData.level == 3?'selected':''%>>critical</option>
                         <option value="2" <%=formData.level == 2?'selected':''%>>error</option>
                         <option value="1" <%=formData.level == 1?'selected':''%>>warning</option>
+                        <option value="0" <%=formData.level == 0?'selected':''%>>info</option>
                   </select>
                     <% if (locals.errors && locals.errors.level) { %>
                         <p class="small text-danger"><%= errors.level %></p>

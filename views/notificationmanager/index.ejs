@@ -21,12 +21,14 @@
                 <td><span><%= telegramId.description %></span></td>
                 <td><span><%= telegramId.chat_id %></span></td>
                 <td><span>
-                  <% if (telegramId.level == 1) { %>
+                  <% if (telegramId.level == 3) { %>
                    critical
                   <% } else if (telegramId.level == 2) {%>
                     error
-                  <% } else if (telegramId.level == 3) {%>
+                  <% } else if (telegramId.level == 1) {%>
                     warning
+                  <% } else if (telegramId.level == 0) {%>
+                    info
                   <% } %>
                 <td><span><%= telegramId.is_valid ? 'yes' : 'no'%></span></td>
                 <td>

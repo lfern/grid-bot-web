@@ -9,7 +9,7 @@ const validateCreateTelegramFields = function(errors, req){
         errors["description"] = "Please provide a valid description.";
     }
     if (!validator.isInt(req.body.level, {
-        min: 1,
+        min: 0,
         max: 3
     })) {
         errors['level'] = "Please provide a valid level";
