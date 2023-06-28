@@ -82,15 +82,15 @@ exports.get_instance_grid_json = function(req, res, next) {
             let response = [];
             gridData.forEach(data => {
                 response.push({
-                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
+                    price: exchange.priceToPrecision2(instance.strategy.symbol, data.price),
                     buy_order_id: data.buy_order_id,
-                    buy_order_qty: exchange.amountToPrecision(instance.strategy.symbol, data.buy_order_qty),
-                    buy_order_cost: exchange.priceToPrecision(instance.strategy.symbol, data.buy_order_cost),
+                    buy_order_qty: exchange.amountToPrecision2(instance.strategy.symbol, data.buy_order_qty),
+                    buy_order_cost: exchange.priceToPrecision2(instance.strategy.symbol, data.buy_order_cost),
                     sell_order_id: data.sell_order_id,
-                    sell_order_qty: exchange.amountToPrecision(instance.strategy.symbol, data.sell_order_qty),
-                    sell_order_cost: exchange.priceToPrecision(instance.strategy.symbol, data.sell_order_cost),
-                    position_before_order: data.position_before_order ? exchange.amountToPrecision(instance.strategy.symbol, data.position_before_order): null,
-                    order_qty: data.order_qty ? exchange.amountToPrecision(instance.strategy.symbol, data.order_qty) : null,
+                    sell_order_qty: exchange.amountToPrecision2(instance.strategy.symbol, data.sell_order_qty),
+                    sell_order_cost: exchange.priceToPrecision2(instance.strategy.symbol, data.sell_order_cost),
+                    position_before_order: data.position_before_order ? exchange.amountToPrecision2(instance.strategy.symbol, data.position_before_order): null,
+                    order_qty: data.order_qty ? exchange.amountToPrecision2(instance.strategy.symbol, data.order_qty) : null,
                     side: data.side,
                     active: data.active,
                     exchange_order_id: data.exchange_order_id,
@@ -149,7 +149,7 @@ exports.get_instance_orders_json = function(req, res, next) {
             if (exchange == null) {
                 return next(createError(404, "Markets not found"));
             }
-            gridData.forEach(data => {
+            gridData.forEach(data => {console.log(data.cost);
                 response.push({
                     id: data.id,
                     exchange_order_id: data.exchange_order_id,
@@ -159,12 +159,12 @@ exports.get_instance_orders_json = function(req, res, next) {
                     timestamp: data.creation_timestamp,
                     datetime: data.creation_datetime,
                     status: data.status,
-                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
-                    amount: exchange.amountToPrecision(instance.strategy.symbol, data.amount),
-                    cost: data.cost ? exchange.priceToPrecision(instance.strategy.symbol, data.cost):null,
-                    average: data.average ? exchange.priceToPrecision(instance.strategy.symbol, data.average):null,
-                    filled: data.filled ? exchange.amountToPrecision(instance.strategy.symbol, data.filled):null,
-                    remaining: data.remaining ? exchange.amountToPrecision(instance.strategy.symbol, data.remaining):null,
+                    price: exchange.priceToPrecision2(instance.strategy.symbol, data.price),
+                    amount: exchange.amountToPrecision2(instance.strategy.symbol, data.amount),
+                    cost: data.cost ? exchange.priceToPrecision2(instance.strategy.symbol, data.cost):null,
+                    average: data.average ? exchange.priceToPrecision2(instance.strategy.symbol, data.average):null,
+                    filled: data.filled ? exchange.amountToPrecision2(instance.strategy.symbol, data.filled):null,
+                    remaining: data.remaining ? exchange.amountToPrecision2(instance.strategy.symbol, data.remaining):null,
                 });
             });
             res.json(response);
@@ -224,10 +224,10 @@ exports.get_instance_trades_json = function(req, res, next) {
                     timestamp: data.timestamp,
                     datetime: data.datetime,
                     side: data.strategy_instance_order.side,
-                    price: exchange.priceToPrecision(instance.strategy.symbol, data.price),
-                    amount: data.amount ? exchange.amountToPrecision(instance.strategy.symbol, data.amount):null,
-                    cost: data.cost ? exchange.priceToPrecision(instance.strategy.symbol, data.cost):null,
-                    fee_cost: data.fee_cost?exchange.priceToPrecision(instance.strategy.symbol, data.fee_cost):null,
+                    price: exchange.priceToPrecision2(instance.strategy.symbol, data.price),
+                    amount: data.amount ? exchange.amountToPrecision2(instance.strategy.symbol, data.amount):null,
+                    cost: data.cost ? exchange.priceToPrecision2(instance.strategy.symbol, data.cost):null,
+                    fee_cost: data.fee_cost?exchange.priceToPrecision2(instance.strategy.symbol, data.fee_cost):null,
                     fee_coin: data.fee_coin,
                 });
             });
