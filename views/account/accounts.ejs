@@ -30,7 +30,7 @@
                   <a href="/account/<%= account.id%>/addresses">Addresses</a>
                   <a href="/account/<%= account.id%>/broadcast-transactions">Broadcast</a>
                 </td>
-                <td><button class="btn btn-primary" onclick="deleteAccount('<%= account.id%>')">Delete</button></td>
+                <td><button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteAccount" data-parameter="<%= account.id%>">Delete</button></td>
               </tr>
             <% } %>    
           </tbody>
@@ -40,3 +40,4 @@
   </div>
   <%- contentFor('scripts') %>
   <script src="/javascripts/accounts.js"></script>
+  <%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this account?"}) %>

@@ -33,7 +33,7 @@
                   <td>
                     <a href="/strategy-instance/<%= instance.id%>">Details</a>
                   </td>
-                  <td><button class="btn btn-primary" onclick="deleteInstance('<%= instance.id%>')">Delete</button></td>
+                  <td><button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteInstance" data-parameter="<%= instance.id%>">Delete</button></td>
                 </tr>
               <% } %>    
             </tbody>
@@ -43,3 +43,4 @@
 </div>
 <%- contentFor('scripts') %>
 <script src="/javascripts/instances.js"></script>
+<%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this instance?"}) %>

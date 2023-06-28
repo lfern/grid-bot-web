@@ -35,7 +35,7 @@
                   <a href="/notificationmanager/telegram/<%= telegramId.id%>">Edit</a>
                 </td>
                 <td>
-                  <button class="btn btn-primary" onclick="deleteTelegram('<%= telegramId.id%>')">Delete</button>
+                  <button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteTelegram" data-parameter="<%= telegramId.id%>">Delete</button>
                   <button class="btn btn-primary" onclick="checkTelegram('<%= telegramId.id%>')">Send test message</button>
                 </td>
               </tr>
@@ -47,3 +47,4 @@
   </div>
   <%- contentFor('scripts') %>
   <script src="/javascripts/notification-manager.js"></script>
+  <%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this chat id?"}) %>

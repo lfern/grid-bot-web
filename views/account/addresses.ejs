@@ -18,7 +18,7 @@
               <tr id="<%= address.id%>">
                 <td><span><%= address.address %></span></td>
                 <td><span><%= address.confidential ? 'yes' : 'no' %></span></td>
-                <td><button class="btn btn-primary" onclick="deleteAddress('<%= address.id%>')">Delete</button></td>
+                <td><button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteAddress" data-parameter="<%= address.id%>">Delete</button></td>
               </tr>
             <% } %>    
           </tbody>
@@ -28,3 +28,4 @@
   </div>
   <%- contentFor('scripts') %>
   <script src="/javascripts/account-addresses.js"></script>
+  <%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this address?"}) %>

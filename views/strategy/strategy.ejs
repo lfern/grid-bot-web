@@ -64,10 +64,12 @@
             <div class="form-row">
                 <div class="col-md-3">
                     <form action="/strategy/<%=strategy.id%>/delete" method="post">
-                        <button class="btn btn-danger" type="submit">Delete</button>
+                        <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-delete">Delete</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<%- contentFor('scripts') %>
+<%- include('../partials/confirm-submit', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this strategy?"}) %>

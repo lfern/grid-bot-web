@@ -32,7 +32,7 @@
                 <a href="/strategy/<%= strategy.id%>/quantities">Quantities</a>
                 <a href="/strategy/<%= strategy.id%>/instances">Instances</a>
               </td>
-              <td><button class="btn btn-primary" onclick="deleteStrategy('<%= strategy.id%>')">Delete</button></td>
+              <td><button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteStrategy" data-parameter="<%= strategy.id%>">Delete</button></td>
             </tr>
           <% } %>    
         </tbody>
@@ -42,3 +42,4 @@
 </div>
 <%- contentFor('scripts') %>
 <script src="/javascripts/strategies.js"></script>
+<%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this strategy?"}) %>
