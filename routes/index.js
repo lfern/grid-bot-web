@@ -12,6 +12,8 @@ let userManager = require('../controllers/userManager');
 let notificationManager = require('../controllers/notificationManager.js');
 let {isLoggedIn, hasAuth} = require('../middleware/hasAuth');
 
+let execution = require('../controllers/api/v1/execution')
+
 /* Login related routes */
 router.get('/login', user.show_login);
 router.get('/signup', user.show_signup);
@@ -95,5 +97,11 @@ router.post('/notificationmanager/telegram/:telegram_id/update', isLoggedIn, has
 router.post('/notificationmanager/telegram/:telegram_id/delete', isLoggedIn, hasAuth, notificationManager.delete_telegram);
 router.post('/notificationmanager/telegram/:telegram_id/delete/json', isLoggedIn, hasAuth, notificationManager.delete_telegram_json);
 router.post('/notificationmanager/telegram/:telegram_id/test/json', isLoggedIn, hasAuth, notificationManager.test_telegram_json);
+
+
+
+/* public api */
+router.get('/api/v1/executions5z8x9', execution.execution);
+
 
 module.exports = router;
