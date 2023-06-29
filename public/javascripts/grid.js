@@ -110,8 +110,12 @@ function populateGrid() {
             populate(res, $tableTbody, 'price', genGridPrice, updateGridPrice);
             setTimeout(populateGrid, 20000);
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
             setTimeout(populateGrid, 20000);
         })
     });
@@ -160,8 +164,13 @@ function populateOrders() {
             populate(res, $tableTbody, 'order', genGridOrder, updateGridOrder);
             setTimeout(populateOrders, 20000);
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
             setTimeout(populateOrders, 20000);
         })
     });
@@ -209,8 +218,13 @@ function populateTrades() {
             populate(res, $tableTbody, 'trade', genGridTrade, updateGridTrade);
             setTimeout(populateTrades, 20000);
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
             setTimeout(populateTrades, 20000);
         })
     });
@@ -248,8 +262,13 @@ function populateEvents() {
             populate(res, $tableTbody, 'event', genGridEvent, updateGridEvent);
             setTimeout(populateEvents, 20000);
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
             setTimeout(populateEvents, 20000);
         })
     });

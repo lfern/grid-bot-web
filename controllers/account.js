@@ -2,7 +2,7 @@ const models = require('../models');
 const {validateAccount, validateAddress} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
-const {getExchange, getExchangeMarkets} = require('../utils/exchange');
+const {getExchangeMarkets} = require('../utils/exchange');
 const { BaseExchange } = require('grid-bot/src/crypto/exchanges/BaseExchange');
 
 exports.show_accounts = function(req, res, next) {
@@ -124,7 +124,8 @@ exports.delete_account_json = function(req, res, next) {
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
-        return next(createError(500, ex));
+        console.error(ex);
+        res.status(500).send({error: ex.message});
     });
 }
 
@@ -232,7 +233,8 @@ exports.delete_address_json = function(req, res, next) {
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
-        return next(createError(500, ex));
+        console.error(ex);
+        res.status(500).send({error: ex.message});
     });
 }
 
@@ -240,7 +242,7 @@ exports.get_balances_json = function(req, res, next) {
     return models.Account.findOne({where: {id: req.params.account_id}})
     .then(account => {
         if (account == null) {
-            return next(createError(404, "Account does not exist"));
+            return res.status(404).send({error: "Account does not exist"});
         }
 
         res.send({
@@ -250,7 +252,8 @@ exports.get_balances_json = function(req, res, next) {
             mainBalanceUpdatedAt: account.main_balance_updated_at ? account.main_balance_updated_at.toISOString() : null,
         });
     }).catch (ex => {
-        return next(createError, 500, ex);
+        console.error(ex);
+        return res.status(500).send({error: ex.message});
     })
 }
 
@@ -264,8 +267,7 @@ exports.transfer_json = async function(req, res, next) {
         });
 
         if (account == null) {
-            res.status(404).send({ error: "Account does not exist" });
-            return next(new Error("Account does not exist"))
+            return res.status(404).send({ error: "Account does not exist" });
         }
         let exchange = await getExchangeMarkets(
             account.exchange.exchange_name,
@@ -278,8 +280,7 @@ exports.transfer_json = async function(req, res, next) {
         // exchange.loadMarkets(true);
         
         if (exchange == null) {
-            res.status(404).send({ error: "Exchange does not exist" });
-            return next(new Error("Exchange does not exist"))
+            return res.status(404).send({ error: "Exchange does not exist" });
         }
         await exchange.transfer(
                 req.body.coin,
@@ -290,7 +291,6 @@ exports.transfer_json = async function(req, res, next) {
 
         res.send({msg: "Success"});
     } catch (ex) {
-        res.status(500).send({ error: ex.message });
-        return next(ex);
+        return res.status(500).send({ error: ex.message });
     }
 }

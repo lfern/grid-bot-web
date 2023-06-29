@@ -9,8 +9,13 @@ function deleteInstance(instanceId) {
             console.log("Result:", res);
             $("#"+instanceId).remove();
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
         })
     })
 }

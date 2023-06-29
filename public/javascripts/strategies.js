@@ -9,8 +9,13 @@ function deleteStrategy(strategyId) {
             console.log("Result:", res);
             $("#"+strategyId).remove();
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
+            console.log("Error:", jqXHR);
         })
     })
 }

@@ -34,8 +34,13 @@ function updateExchanges() {
                 updateAccounts(res[0].id);
             }
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
         })
     });
 }
@@ -64,8 +69,13 @@ function updateAccounts(exchangeId) {
                 updateSymbols(res[0].id, res[0].paper);
             }
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
         })
     });
 }
@@ -94,8 +104,13 @@ function updateSymbols(accountId) {
                 $symbol.removeAttr('disabled');
             }
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
         })
     });
 }

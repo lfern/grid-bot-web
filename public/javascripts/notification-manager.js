@@ -27,6 +27,11 @@ function checkTelegram(id) {
         }),
         error: ((jqXHR, textStatus, errorThrown) => {
             console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+
             alert(jqXHR.responseText);
         })
     })

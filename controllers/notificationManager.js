@@ -126,7 +126,8 @@ exports.delete_telegram_json = function(req, res, next) {
     }).then(result => {
         res.send({msg: "Success"});
     }).catch(ex => {
-        return next(createError(500, ex));
+        console.error(ex);
+        res.status(500).send({error: ex.message});
     });
 }
 
@@ -146,7 +147,8 @@ exports.test_telegram_json = function(req, res, next) {
         });
         
     }).catch(ex => {
-        return next(createError(500, ex));
+        console.error(ex);
+        res.status(500).send({error: ex.message});
     });
 }
 

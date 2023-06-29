@@ -9,8 +9,12 @@ function deleteAddress(addressId) {
             console.log("Result:", res);
             $("#"+addressId).remove();
         }),
-        error: ((error) => {
-            console.log("Error:", error);
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
         })
     })
 }

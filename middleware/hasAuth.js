@@ -4,7 +4,12 @@ exports.isLoggedIn = function(req, res, next){
     if (req.user) {
         return next();
     } else {
-        res.redirect('/login');
+        if (req.xhr) {
+            res.status(401).send("Unauthorized");
+        } else {
+            res.redirect('/login');
+        }
+        
         // return next(createError(404, "Page does not exist"));
     }
 }
