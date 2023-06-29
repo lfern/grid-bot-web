@@ -12,7 +12,7 @@ exports.execution = function(req, res, next) {
                     models.Account.AccountType,
                     models.Account.Exchange
                 ]
-            }],
+            }, models.StrategyInstanceTrade.StrategyInstanceOrder],
             order: [
                 ['createdAt', 'DESC']
             ],
@@ -27,24 +27,39 @@ exports.execution = function(req, res, next) {
         res.write(stringify([["TotalRecords:", result[1]]]));
 
         let columns = [
-            'symbol', 'id', 'exchange_trade_id', 'timestamp', 'datetime',
-            'price','amount','cost','fee_cost','fee_coin'
+            'exchange','account',
+            'symbol', 'exchange_trade_id',
+            'side', 'order_id',
+            'timestamp', 'datetime',
+            'price','amount','cost',
+            'fee_cost','fee_coin',
+            'taker_or_maker', 'order_price',
+            'order_amount', 'internal_order_id',
+            'internal_order_id_matched'
         ];
 
-        res.write(stringify([['exchange'].concat(columns)]));
+        res.write(stringify([['exchange', 'account'].concat(columns)]));
         result[0].forEach(x => {
-            console.log(x.id)
-            let record = [
-                x.account.exchange.exchange_name,
-            ];
-            columns.forEach(k => record.push(x[k]))
-            res.write(stringify([record]));
+            res.write(stringify([
+                [
+                    x.account.exchange.exchange_desc, x.account.account_name,
+                    x.symbol, x.exchange_trade_id,
+                    x.strategy_instance_order.side, x.strategy_instance_order.exchange_order_id,
+                    x.timestamp, x.datetime,
+                    x.price, x.amount, x.cost,
+                    x.fee_cost, x.fee_coin,
+                    x.taker_or_maker, x.strategy_instance_order.price,
+                    x.strategy_instance_order.amount,x.strategy_instance_order.id,
+                    x.strategy_instance_order.matched_order_id
+                ]
+            ]));
         })
 
         res.end();
     }).catch(ex => {
         console.error(ex);
-        res.status(500).send({error: ex.message});
+        res.write(ex.message);
+        res.end();
     })
 
 }
