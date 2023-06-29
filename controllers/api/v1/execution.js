@@ -38,7 +38,7 @@ exports.execution = function(req, res, next) {
             'internal_order_id_matched'
         ];
 
-        res.write(stringify([['exchange', 'account'].concat(columns)]));
+        res.write(stringify([columns]));
         result[0].forEach(x => {
             res.write(stringify([
                 [
