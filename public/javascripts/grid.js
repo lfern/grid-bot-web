@@ -75,7 +75,9 @@ function genGridPrice(elem) {
     .append($('<td>').text(elem.side))
     .append($('<td>').text(elem.active))
     .append($('<td>').text(genGridGridOrder(elem)))
-    .append($('<td>').text(elem.exchange_order_id));
+    .append($('<td>').text(elem.exchange_order_id))
+    .append($('<td>').text(elem.matching_order_id))
+    .append($('<td>').text(elem.order_id));
 }
 
 function updateGridPrice(elem, $tr) {
@@ -93,6 +95,8 @@ function updateGridPrice(elem, $tr) {
     $tds.eq(10).text(elem.active)
     $tds.eq(11).text(genGridGridOrder(elem))
     $tds.eq(12).text(elem.exchange_order_id);
+    $tds.eq(13).text(elem.matching_order_id);
+    $tds.eq(14).text(elem.order_id);
 }
 
 function populateGrid() {
@@ -132,7 +136,9 @@ function genGridOrder(elem) {
     .append($('<td>').text(elem.datetime))
     .append($('<td>').text(elem.filled))
     .append($('<td>').text(elem.average))
-    .append($('<td>').text(elem.exchange_order_id));
+    .append($('<td>').text(elem.exchange_order_id))
+    .append($('<td>').text(elem.id))
+    .append($('<td>').text(elem.matching_order_id));
 }
 
 
@@ -147,6 +153,8 @@ function updateGridOrder(elem, $tr) {
     $tds.eq(6).text(elem.filled)
     $tds.eq(7).text(elem.average)
     $tds.eq(8).text(elem.exchange_order_id);
+    $tds.eq(9).text(elem.id);
+    $tds.eq(10).text(elem.matching_order_id);
 }
 
 function populateOrders() {
@@ -186,6 +194,7 @@ function genGridTrade(elem) {
     .append($('<td>').text(elem.fee_cost))
     .append($('<td>').text(elem.fee_coin))
     .append($('<td>').text(elem.datetime))
+    .append($('<td>').text(elem.taker_or_maker))
     .append($('<td>').text(elem.exchange_order_id))
     .append($('<td>').text(elem.exchange_trade_id));
 }
@@ -197,10 +206,11 @@ function updateGridTrade(elem, $tr) {
     $tds.eq(2).text(elem.cost)
     $tds.eq(3).text(elem.side)
     $tds.eq(4).text(elem.fee_cost)
-    $tds.eq(4).text(elem.fee_coin)
-    $tds.eq(5).text(elem.datetime)
-    $tds.eq(6).text(elem.exchange_order_id)
-    $tds.eq(7).text(elem.exchange_trade_id);
+    $tds.eq(5).text(elem.fee_coin)
+    $tds.eq(6).text(elem.datetime)
+    $tds.eq(7).text(elem.taker_or_maker)
+    $tds.eq(8).text(elem.exchange_order_id)
+    $tds.eq(9).text(elem.exchange_trade_id);
 }
 
 function populateTrades() {

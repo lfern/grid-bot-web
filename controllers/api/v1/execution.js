@@ -50,7 +50,7 @@ exports.execution = function(req, res, next) {
                     x.fee_cost, x.fee_coin,
                     x.taker_or_maker, x.strategy_instance_order.price,
                     x.strategy_instance_order.amount,x.strategy_instance_order.id,
-                    x.strategy_instance_order.matched_order_id
+                    x.strategy_instance_order.matching_order_id
                 ]
             ]));
         })

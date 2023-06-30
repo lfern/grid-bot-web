@@ -94,6 +94,8 @@ exports.get_instance_grid_json = function(req, res, next) {
                     side: data.side,
                     active: data.active,
                     exchange_order_id: data.exchange_order_id,
+                    order_id: data.order_id,
+                    matching_order_id: data.matching_order_id,
                 });
             });
             res.json(response);
@@ -166,6 +168,7 @@ exports.get_instance_orders_json = function(req, res, next) {
                     average: data.average ? exchange.priceToPrecision2(instance.strategy.symbol, data.average):null,
                     filled: data.filled ? exchange.amountToPrecision2(instance.strategy.symbol, data.filled):null,
                     remaining: data.remaining ? exchange.amountToPrecision2(instance.strategy.symbol, data.remaining):null,
+                    matching_order_id: data.matching_order_id
                 });
             });
             res.json(response);
@@ -224,12 +227,14 @@ exports.get_instance_trades_json = function(req, res, next) {
                     exchange_trade_id: data.exchange_trade_id,
                     timestamp: data.timestamp,
                     datetime: data.datetime,
-                    side: data.strategy_instance_order.side,
+                    side: data.side,
                     price: exchange.priceToPrecision2(instance.strategy.symbol, data.price),
                     amount: data.amount ? exchange.amountToPrecision2(instance.strategy.symbol, data.amount):null,
                     cost: data.cost ? exchange.priceToPrecision2(instance.strategy.symbol, data.cost):null,
                     fee_cost: data.fee_cost?exchange.priceToPrecision2(instance.strategy.symbol, data.fee_cost):null,
                     fee_coin: data.fee_coin,
+                    taker_or_maker: data.taker_or_maker,
+
                 });
             });
             res.json(response);
@@ -280,7 +285,24 @@ exports.stop_instance = function(req, res, next) {
 let removeInstance = function(instanceId) {
     // Todo add delete flag to do async removal
     return db.sequelize.transaction(async (transaction) => {
-        let toBeDeleted = await models.StrategyInstanceOrder.findAll({
+        await models.StrategyInstanceRecoveryGridOrder.destroy({
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        let toBeDeleted = await models.StrategyInstanceGrid.findAll({
+            attributes:['id'],
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
+        await models.StrategyInstanceRecoveryGrid.destroy({
+            where:{strategy_instance_grid_id:toBeDeleted.map(function(d){ return d.id})},
+            transaction
+        });
+
+
+        toBeDeleted = await models.StrategyInstanceOrder.findAll({
             attributes:['id'],
             where: {strategy_instance_id: instanceId},
             transaction
@@ -293,6 +315,11 @@ let removeInstance = function(instanceId) {
             });
         }
 
+        await models.StrategyInstanceGrid.destroy({
+            where: {strategy_instance_id: instanceId},
+            transaction
+        });
+
         await models.StrategyInstanceOrder.destroy({
             where: {strategy_instance_id: instanceId},
             transaction
@@ -300,27 +327,6 @@ let removeInstance = function(instanceId) {
 
 
         await models.StrategyInstanceEvent.destroy({
-            where: {strategy_instance_id: instanceId},
-            transaction
-        });
-
-        await models.StrategyInstanceRecoveryGridOrder.destroy({
-            where: {strategy_instance_id: instanceId},
-            transaction
-        });
-
-        toBeDeleted = await models.StrategyInstanceGrid.findAll({
-            attributes:['id'],
-            where: {strategy_instance_id: instanceId},
-            transaction
-        });
-
-        await models.StrategyInstanceRecoveryGrid.destroy({
-            where:{strategy_instance_grid_id:toBeDeleted.map(function(d){ return d.id})},
-            transaction
-        });
-
-        await models.StrategyInstanceGrid.destroy({
             where: {strategy_instance_id: instanceId},
             transaction
         });
