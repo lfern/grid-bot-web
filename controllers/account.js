@@ -1,5 +1,5 @@
 const models = require('../models');
-const {validateAccount, validateAddress} = require('../validators/account');
+const {validateAccount, validateAddress, validateAccountUpdate} = require('../validators/account');
 const { isEmpty } = require('lodash');
 let createError = require('http-errors');
 const {getExchangeMarkets} = require('../utils/exchange');
@@ -70,7 +70,8 @@ exports.submit_account = function(req, res, next) {
                 valid: true,
                 exchange_id: req.body.exchange,
                 account_type_id: req.body.account_type,
-                account_name: req.body.name
+                account_name: req.body.name,
+                holder: req.body.holder,
             }).then(result => {
                 res.redirect('/accounts');
             });
@@ -129,7 +130,7 @@ exports.delete_account_json = function(req, res, next) {
     });
 }
 
-exports.show_account = function(req, res, next) {
+rerender_show_account = function(errors, req, res, next) {
     return models.Account.findOne({
         where:{
             id: req.params.account_id
@@ -152,6 +153,7 @@ exports.show_account = function(req, res, next) {
     
             res.render('account/account', {
                 account: account,
+                formData: errors.length > 0 ? req.body : null,
                 user: req.user,
                 wallets: exchange.getWalletNames(),
                 currencies: exchange.currencies
@@ -161,7 +163,31 @@ exports.show_account = function(req, res, next) {
     }).catch(ex => {
         return next(createError(500, ex));
     });
+
 }
+
+exports.show_account = function(req, res, next) {
+    rerender_show_account([], req, res, next);
+}
+
+exports.account_update = function(req, res, next) {
+    let errors = {};
+    return validateAccountUpdate(errors, req).then(errors =>{
+        if (!isEmpty(errors)){
+            rerender_show_account(errors, req, res, next);
+        } else {
+            return models.Account.update({
+                account_name: req.body.name,
+                holder: req.body.holder,
+            }, {where: {id: req.params.account_id}}).then(result => {
+                res.redirect('/accounts');
+            });
+        }
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}
+
 
 exports.show_addresses = function(req, res, next) {
     Promise.all([

@@ -66,3 +66,17 @@ exports.validateAddress = function(errors, req) {
     });
     
 }
+
+const validateCreateAccountUpdateFields = function(errors, req){
+    if (validator.isEmpty(req.body.name)){
+        errors["name"] = "Please provide a valid name.";
+    }
+}
+
+exports.validateAccountUpdate = function(errors, req) {
+    return new Promise(function(resolve, reject){
+        validateCreateAccountUpdateFields(errors, req);
+        resolve(errors);
+    });
+    
+}

@@ -2,9 +2,20 @@
     <div class="row align-items-center">
         <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
             <h1>Account</h1>
+            <form action="/account/<%=account.id%>/update" method="post">
             <div class="form-row">
                 <label class="col-sm-2 col-form-label">Name:</label>
-                <span class="form-control col-sm-10"><%= account.account_name %></span>
+                <input placeholder="Please enter account label" class="form-control" type="text" name="name" required=true value="<%= locals.formData != null ? formData.name : account.account_name%>">
+                <% if (locals.errors && locals.errors.name) { %>
+                 <p class="small text-danger"><%= errors.name %></p>
+                <% } %>
+            </div>
+            <div class="form-row">
+                <label class="col-sm-2 col-form-label">Holder:</label>
+                <input placeholder="Please enter account label" class="form-control" type="text" name="holder" required=true value="<%= locals.formData != null ? formData.holder : account.holder%>">
+                <% if (locals.errors && locals.errors.holder) { %>
+                 <p class="small text-danger"><%= errors.holder %></p>
+                <% } %>
             </div>
             <div class="form-row">
                 <label class="col-sm-2 col-form-label">Exchange:</label>
@@ -30,7 +41,9 @@
                 <label class="col-sm-2 col-form-label">Valid:</label>
                 <span class="form-control col-sm-10"><%= account.valid?"yes":"no" %></span>
             </div>
-            <div class="form-row">
+            <button class="btn btn-danger" type="submit" >Update</button>
+            </form>
+            <div class="form-row mt-1">
                 <div class="col-md-3">
                     <form action="/account/<%=account.id%>/delete" method="post">
                         <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-delete">Delete</button>

@@ -32,6 +32,7 @@ router.post('/accounts/create', isLoggedIn, account.submit_account);
 router.post('/account/:account_id/delete', isLoggedIn, account.delete_account);
 router.post('/account/:account_id/delete/json', isLoggedIn, account.delete_account_json);
 router.get('/account/:account_id', isLoggedIn, account.show_account);
+router.post('/account/:account_id/update', isLoggedIn, account.account_update);
 // Account addresses
 router.get('/account/:account_id/addresses', isLoggedIn, account.show_addresses);
 router.get('/account/:account_id/addresses/create', isLoggedIn, account.show_create_address)

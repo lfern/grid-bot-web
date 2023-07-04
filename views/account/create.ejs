@@ -10,6 +10,12 @@
                      <p class="small text-danger"><%= errors.name %></p>
                     <% } %>
 
+                    <label for="holder" class="small mb-1 mt-3">Holder:</label>
+                    <input placeholder="Please enter account holder" class="form-control" type="text" name="holder" required=true value="<%= formData.name%>">
+                    <% if (locals.errors && locals.errors.holder) { %>
+                     <p class="small text-danger"><%= errors.holder %></p>
+                    <% } %>
+
                     <label for="exchange" class="small mb-1 mt-3">Exchange:</label>
                     <select class="form-control" name="exchange">
                         <% exchanges.forEach(exchange => { %>
