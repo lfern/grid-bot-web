@@ -11,6 +11,7 @@ module.exports = {
     "host": process.env.DEV_POSTGRES_HOSTNAME,
     "port": process.env.DEV_POSTGRES_PORT,
     "dialect": "postgres",
+    "minifyAliases": true,
     logging: process.env.LOG_QUERIES ? (msg) => logger.info(msg) : false
   },
   "test": {
@@ -20,6 +21,7 @@ module.exports = {
     "host": process.env.TEST_POSTGRES_HOSTNAME,
     "port": process.env.TEST_POSTGRES_PORT,
     "dialect": "postgres",
+    "minifyAliases": true,
     logging: false
   },
   "production": {
@@ -29,6 +31,7 @@ module.exports = {
     "host": process.env.POSTGRES_HOSTNAME,
     "port": process.env.POSTGRES_PORT,
     "dialect": "postgres",
+    "minifyAliases": true,
     logging: false
   }
 }

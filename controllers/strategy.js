@@ -217,7 +217,8 @@ exports.show_qties = function(req, res, next) {
                         models.Account.Exchange
                     ]
                 },
-            ]
+            ],
+            order: [['id_buy','ASC']]
         }),
         models.StrategyQuantity.findAll({
             where: { strategy_id: req.params.strategy_id}
