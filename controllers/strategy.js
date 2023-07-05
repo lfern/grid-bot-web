@@ -218,10 +218,10 @@ exports.show_qties = function(req, res, next) {
                     ]
                 },
             ],
-            order: [['id_buy','ASC']]
         }),
         models.StrategyQuantity.findAll({
-            where: { strategy_id: req.params.strategy_id}
+            where: { strategy_id: req.params.strategy_id},
+            order: [['id_buy','ASC']]
         }),
     ]).then(result => {
         if (!result[0]) {
