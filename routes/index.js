@@ -54,6 +54,9 @@ router.post('/account-broadcast-transaction/:transaction_id/send', isLoggedIn, a
 router.get('/strategies', isLoggedIn, strategy.show_strategies);
 router.get('/strategies/create', isLoggedIn, strategy.show_create);
 router.post('/strategies/create', isLoggedIn, strategy.submit_strategy);
+router.post('/strategies/import', isLoggedIn, strategy.import_strategy);
+router.get('/strategies/import/:id', isLoggedIn, strategy.show_import);
+router.post('/strategies/import/:id', isLoggedIn, strategy.show_import);
 router.post('/strategy/:strategy_id/delete', isLoggedIn, strategy.delete_strategy);
 router.post('/strategy/:strategy_id/delete/json', isLoggedIn, strategy.delete_strategy_json);
 router.get('/strategy/:strategy_id', isLoggedIn, strategy.show_strategy);
@@ -61,6 +64,7 @@ router.get('/strategy/:strategy_id/quantities', isLoggedIn, strategy.show_qties)
 router.post('/strategy/:strategy_id/quantities', isLoggedIn, strategy.submit_update_qty);
 // Strategy instances
 router.get('/strategy/:strategy_id/instances', isLoggedIn, strategy.show_strategy_instances);
+//router.get('/strategy/:strategy_id/instance/create', isLoggedIn, strategy.create);
 router.post('/strategy/:strategy_id/instance/create', isLoggedIn, strategy.submit_instance);
 
 /* Strategy instance */

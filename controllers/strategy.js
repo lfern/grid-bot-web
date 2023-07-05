@@ -1,8 +1,15 @@
 const models = require('../models');
-const {validateStrategy} = require('../validators/strategy');
-const { isEmpty } = require('lodash');
+const {validateStrategy, validateImportStrategy} = require('../validators/strategy');
+const { isEmpty, isArray } = require('lodash');
 let createError = require('http-errors');
+const formidable = require('formidable');
+const cache = require('memory-cache');
+const crypto = require('crypto');
+const CsvGridService = require('../services/CsvGridService');
+const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
 
+/** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
+/** @typedef {import('../services/CsvGridService').GridCacheData} GridCacheData */
 
 exports.show_strategies = function(req, res, next) {
     return models.Strategy.findAll({
@@ -96,6 +103,100 @@ exports.submit_strategy = function(req, res, next) {
     }).catch(ex => {
         return next(createError(500, ex));
     });
+}
+
+exports.import_strategy = function(req, res, next) {
+    const form = new formidable.IncomingForm({});
+
+    let errors = {};
+    form.parse(req, function (err, fields, files) {
+        if (err) {
+            errors['file'] = err;
+            return rerender_create(errors, req, res, next);
+        }
+        let f = {};
+        Object.entries(fields).forEach(x => {
+            f[x[0]] = Array.isArray(x[1]) ? x[1][0] : x[1];
+        });
+
+        return validateImportStrategy(errors, {body: f}, files).then(result => {
+            if (!isEmpty(result.errors)) {
+                rerender_create(result.errors, req, res, next)
+            } else {
+                let data = result.validatedData;
+
+                let key = crypto.randomUUID();
+                cache.put(key, {orig: data, current: null}, 15*60*1000);
+                res.redirect('/strategies/import/' + key);
+            }
+        }).catch(ex => {
+            return next(createError(500, ex));
+        });
+    });
+}
+
+exports.show_import = function(req, res, next) {
+    /** @type {GridCacheData} */
+    let data = cache.get(req.params.id);
+    if (data == null) {
+        return next(createError(404, "Import not found"));
+    }
+
+    cache.put(req.params.id, data, 60*60*1000);
+
+    Promise.all([
+        models.StrategyType.findOne({where:{id: data.orig.strategyType}}),
+        models.Account.findOne({
+            where:{id: data.orig.accountId},
+            include:[models.Account.AccountType,models.Account.Exchange]
+        })
+    ]).then(result => {
+        let strategyType = result[0];
+        let account = result[1];
+        if (strategyType == null) {
+            return next(createError(404, 'StrategyType has been removed'));
+        }
+
+        if (account == null) {
+            return next(creteError(404, 'Account has been removed'));
+        }
+
+        return exchangeInstanceFromAccount(account).then(
+            exchange => {
+                return new Promise((resolve, reject) => {
+                    if (req.body.price != undefined && req.body.price != '') {
+                        resolve(parseFloat(req.body.price));
+                    } else {
+                        exchange.fetchCurrentPrice(data.orig.symbol).then(price => {
+                            if (price == null) {
+                                reject(new Error("Could not get current price from exchange"));
+                            }
+                            resolve(price);
+                        }).catch(ex => {
+                            reject(ex);
+                        });
+                    }
+                }).then (price => {
+                    data.grid = CsvGridService.recalculateForPrice(data.orig, price, exchange);
+                    cache.put(req.params.id, data, 60*60*1000);   
+                    console.log(data.grid);         
+                    res.render('strategy/show_import', {
+                        title: 'Import',
+                        grid: data.grid,
+                        user: req.user,
+                        layout: './layouts/grid2',
+                        account: account,
+                        id: req.params.id
+                    });
+                });
+            }
+        );
+    
+    }).catch(ex => {
+        return next(createError(505, ex));
+    })
+
+
 }
 
 exports.delete_strategy = function(req, res, next) {
