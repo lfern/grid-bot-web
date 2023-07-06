@@ -249,11 +249,13 @@ module.exports = {
                     type: Sequelize.STRING
                 }
             },
+            // alter table strategy_instance_trades ADD CONSTRAINT strategy_instance_trades_account_id_symbol_exchange_trade_i_key UNIQUE (account_id, symbol, exchange_trade_id);
+            // alter table strategy_instance_trades drop constraint strategy_instance_trades_account_id_symbol_strategy_instanc_key ;
             {
                 uniqueKeys: {
                   unique_trade: {
                       customIndex: true,
-                      fields: ['account_id', 'symbol', 'strategy_instance_order_id']
+                      fields: ['account_id', 'symbol', 'exchange_trade_id']
                   }
                 },
                 transaction
