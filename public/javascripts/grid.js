@@ -285,3 +285,22 @@ function populateEvents() {
 
 }
 
+function sendInstanceSendOrderEvent(instanceId) {
+    $.ajax({
+        cache: false,
+        url:'/strategy-instance/' + instanceId + '/sendevent/json',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type:'POST',
+        success: ((res) => {
+        }),
+        error: ((jqXHR, textStatus, errorThrown) => {
+            console.log("Error:", jqXHR);
+            if (jqXHR.status == 401) {
+                window.location.replace('/login');
+                return;
+            }
+            alert("Error sending message");
+        })
+    });
+}

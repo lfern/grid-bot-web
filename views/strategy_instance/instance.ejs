@@ -22,6 +22,8 @@
         <% } %>
 
         <% if (instance.running && instance.stop_requested_at == null) { %>
+          <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modal-send-event" data-callback="sendInstanceSendOrderEvent" data-parameter="<%= instance.id%>">Try send pending orders</button>
+
           <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/stop" method="post">
             <button class="btn btn-danger btn-sm" type="submit">Stop</button>
           </form>             
@@ -121,3 +123,4 @@
 </div>
 <%- contentFor('scripts') %>
 <script src="/javascripts/grid.js"></script>
+<%- include('../partials/confirm-callback', {id:"modal-send-event", okbutton:"Send", msg:"Do you want to send order event for this instance?"}) %>

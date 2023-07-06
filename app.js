@@ -16,9 +16,11 @@ var flash = require('connect-flash');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const {logger, captureConsoleLog} = require("./utils/logger");
-
+const services = require('./services');
 
 captureConsoleLog();
+
+services.init();
 
 require('./passport_setup')(passport);
 var app = express();

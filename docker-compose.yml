@@ -27,6 +27,9 @@ services:
       - NODE_ENV=${NODE_ENV:-}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_BOT_URL=${TELEGRAM_BOT_URL:-https://t.me/GridBotTestBot}
+      - REDIS_SERVER=${REDIS_SERVER:-127.0.0.1}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     volumes:
       - .:/usr/src/app
       - /dev/null:/usr/src/app/.env

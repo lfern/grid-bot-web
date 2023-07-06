@@ -77,7 +77,7 @@ router.get('/strategy-instance/:instance_id/events/json', isLoggedIn, strategyIn
 router.post('/strategy-instance/:instance_id/stop', isLoggedIn, strategyInstance.stop_instance);
 router.post('/strategy-instance/:instance_id/delete', isLoggedIn, strategyInstance.delete_instance);
 router.post('/strategy-instance/:instance_id/delete/json', isLoggedIn, strategyInstance.delete_instance_json);
-
+router.post('/strategy-instance/:instance_id/sendevent/json', isLoggedIn, strategyInstance.sendevent_json);
 /* Exchange related routes */
 router.get('/exchanges/json', isLoggedIn, exchange.get_exchanges_json);
 router.get('/exchange/:exchange_id/accounts/json', isLoggedIn, exchange.get_accounts_json);

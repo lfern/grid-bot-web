@@ -2,6 +2,7 @@ const models = require('../models');
 const db = require('../models/index');
 let createError = require('http-errors');
 let {getExchangeMarketsDbData} = require('../utils/exchange');
+const OrderSenderEventService = require('grid-bot/src/services/OrderSenderEventService');
 
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
@@ -353,4 +354,9 @@ exports.delete_instance_json = function(req, res, next) {
         console.error(ex);
         res.status(500).send({error: ex.message});
     });
+}
+
+exports.sendevent_json = function(req, res, next) {
+    OrderSenderEventService.send(parseInt(req.params.instance_id));
+    res.send({msg: "Success"});
 }
