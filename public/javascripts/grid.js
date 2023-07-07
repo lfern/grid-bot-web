@@ -72,6 +72,7 @@ function genGridPrice(elem) {
     .append($('<td>').text(elem.sell_order_cost))
     .append($('<td>').text(elem.position_before_order))
     .append($('<td>').text(elem.order_qty))
+    .append($('<td>').text(elem.filled))
     .append($('<td>').text(elem.side))
     .append($('<td>').text(elem.active))
     .append($('<td>').text(genGridGridOrder(elem)))
@@ -91,12 +92,13 @@ function updateGridPrice(elem, $tr) {
     $tds.eq(6).text(elem.sell_order_cost)
     $tds.eq(7).text(elem.position_before_order)
     $tds.eq(8).text(elem.order_qty)
-    $tds.eq(9).text(elem.side)
-    $tds.eq(10).text(elem.active)
-    $tds.eq(11).text(genGridGridOrder(elem))
-    $tds.eq(12).text(elem.exchange_order_id);
-    $tds.eq(13).text(elem.matching_order_id);
-    $tds.eq(14).text(elem.order_id);
+    $tds.eq(9).text(elem.filled)
+    $tds.eq(10).text(elem.side)
+    $tds.eq(11).text(elem.active)
+    $tds.eq(12).text(genGridGridOrder(elem))
+    $tds.eq(13).text(elem.exchange_order_id);
+    $tds.eq(14).text(elem.matching_order_id);
+    $tds.eq(15).text(elem.order_id);
 }
 
 function populateGrid() {
@@ -136,6 +138,8 @@ function genGridOrder(elem) {
     .append($('<td>').text(elem.datetime))
     .append($('<td>').text(elem.filled))
     .append($('<td>').text(elem.average))
+    .append($('<td>').text(elem.trades_filled))
+    .append($('<td>').text(elem.trades_ok?'ok':''))
     .append($('<td>').text(elem.exchange_order_id))
     .append($('<td>').text(elem.id))
     .append($('<td>').text(elem.matching_order_id));
@@ -152,9 +156,11 @@ function updateGridOrder(elem, $tr) {
     $tds.eq(5).text(elem.datetime)
     $tds.eq(6).text(elem.filled)
     $tds.eq(7).text(elem.average)
-    $tds.eq(8).text(elem.exchange_order_id);
-    $tds.eq(9).text(elem.id);
-    $tds.eq(10).text(elem.matching_order_id);
+    $tds.eq(8).text(elem.trades_filled)
+    $tds.eq(9).text(elem.trades_ok?'ok':'')
+    $tds.eq(10).text(elem.exchange_order_id);
+    $tds.eq(11).text(elem.id);
+    $tds.eq(12).text(elem.matching_order_id);
 }
 
 function populateOrders() {

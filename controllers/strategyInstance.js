@@ -92,6 +92,7 @@ exports.get_instance_grid_json = function(req, res, next) {
                     sell_order_cost: exchange.priceToPrecision2(instance.strategy.symbol, data.sell_order_cost),
                     position_before_order: data.position_before_order ? exchange.amountToPrecision2(instance.strategy.symbol, data.position_before_order): null,
                     order_qty: data.order_qty ? exchange.amountToPrecision2(instance.strategy.symbol, data.order_qty) : null,
+                    filled: data.filled ? exchange.amountToPrecision2(instance.strategy.symbol, data.filled) : null,
                     side: data.side,
                     active: data.active,
                     exchange_order_id: data.exchange_order_id,
@@ -153,7 +154,7 @@ exports.get_instance_orders_json = function(req, res, next) {
             if (exchange == null) {
                 return next(createError(404, "Markets not found"));
             }
-            gridData.forEach(data => {console.log(data.cost);
+            gridData.forEach(data => {
                 response.push({
                     id: data.id,
                     exchange_order_id: data.exchange_order_id,
@@ -168,6 +169,8 @@ exports.get_instance_orders_json = function(req, res, next) {
                     cost: data.cost ? exchange.priceToPrecision2(instance.strategy.symbol, data.cost):null,
                     average: data.average ? exchange.priceToPrecision2(instance.strategy.symbol, data.average):null,
                     filled: data.filled ? exchange.amountToPrecision2(instance.strategy.symbol, data.filled):null,
+                    trades_filled: data.trades_filled ? exchange.amountToPrecision2(instance.strategy.symbol, data.trades_filled):null,
+                    trades_ok: data.trades_ok,
                     remaining: data.remaining ? exchange.amountToPrecision2(instance.strategy.symbol, data.remaining):null,
                     matching_order_id: data.matching_order_id
                 });
