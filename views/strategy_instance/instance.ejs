@@ -27,6 +27,10 @@
           <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/stop" method="post">
             <button class="btn btn-danger btn-sm" type="submit">Stop</button>
           </form>             
+        <% } else if (!instance.running) { %>
+          <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/recover" method="post">
+            <button class="btn btn-danger btn-sm" type="submit">Start Recovery</button>
+          </form>                
         <% } %>
       </h5>
       <table id="grid" data-instance="<%= instance.id %>" class="table table-striped table-bordered table-sm grid-bot-table" cellspacing="0">

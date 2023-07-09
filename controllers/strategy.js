@@ -126,7 +126,7 @@ exports.import_strategy = function(req, res, next) {
                 let data = result.validatedData;
 
                 let key = crypto.randomUUID();
-                cache.put(key, {orig: data, current: null}, 15*60*1000);
+                cache.put('import-'+key, {orig: data, current: null}, 15*60*1000);
                 res.redirect('/strategies/import/' + key);
             }
         }).catch(ex => {
@@ -137,12 +137,12 @@ exports.import_strategy = function(req, res, next) {
 
 exports.show_import = function(req, res, next) {
     /** @type {GridCacheData} */
-    let data = cache.get(req.params.id);
+    let data = cache.get('import-'+req.params.id);
     if (data == null) {
         return next(createError(404, "Import not found"));
     }
 
-    cache.put(req.params.id, data, 60*60*1000);
+    cache.put('import-'+req.params.id, data, 60*60*1000);
 
     Promise.all([
         models.StrategyType.findOne({where:{id: data.orig.strategyType}}),
@@ -178,7 +178,7 @@ exports.show_import = function(req, res, next) {
                     }
                 }).then (price => {
                     data.grid = CsvGridService.recalculateForPrice(data.orig, price, exchange);
-                    cache.put(req.params.id, data, 60*60*1000);   
+                    cache.put('import-'+req.params.id, data, 60*60*1000);   
                     console.log(data.grid);         
                     res.render('strategy/show_import', {
                         title: 'Import',

@@ -1,9 +1,20 @@
 const { default: BigNumber } = require('bignumber.js');
 const { parse } = require('csv-parse');
 const fs = require('fs');
-const { clone } = require('lodash');
+const models = require('../models');
 
 /** @typedef {import('grid-bot/src/crypto/exchanges/BaseExchange').BaseExchange} BaseExchange */
+
+/**
+ * @typedef {Object} ImportGridEntryDup
+ * @property {number} orderQty
+ * @property {number} filled
+ * @property {string|undefined} side
+ * @property {boolean} active
+ * @property {number} order_id
+ * @property {number} matching_order_id
+ * 
+ */
 
 /**
  * @typedef {Object} ImportGridEntry
@@ -12,21 +23,27 @@ const { clone } = require('lodash');
  * @property {numner} cost
  * @property {number} positionBeforeExecution
  * @property {number} orderQty
- * @property {number} userOrderQty
+ * @property {number} filled
  * @property {string|undefined} side
- * @property {string|undefined} userSide
  * @property {boolean} active
+ * @property {number} order_id
+ * @property {number} matching_order_id
+ * @property {number} lastOrderQty
+ * @property {number} lastFilled
+ * @property {string|undefined} lastSide
+ * @property {ImportGridEntryDup[]} dups
  */
 
 /**
  * @typedef {Object} ImportGrid
+ * @property {number|undefined} instanceId
  * @property {string} strategyName
  * @property {string} strategyType
  * @property {string} accountId
  * @property {string} symbol
  * @property {number} activeBuys
  * @property {number} activeSells
- * @property {number} initialPrice
+ * @property {number} price
  * @property {number} initialPosition
  * @property {CsvGridEntry[]} grid
  */
@@ -48,18 +65,25 @@ const parseCsv = function(csvFile, symbol, exchange) {
         fs.createReadStream(csvFile)
             .pipe(parse({delimiter: ','}))
             .on('data', function(csvrow) {
-                /** @type CsvGridEntry */
+                /** @type ImportGridEntry */
                 let gridEntry = {
                     price: csvrow[0] != null ? exchange.priceToPrecision2(symbol, parseFloat(csvrow[0])) : null,
                     qty: csvrow[1] != null ? exchange.amountToPrecision2(symbol, parseFloat(csvrow[1])) : null,
                     cost: 0,
                     positionBeforeExecution: null,
+                    filled: 0,
                     orderQty: null,
-                    userOrderQty: csvrow[2] != null ? exchange.amountToPrecision2(symbol, parseFloat(csvrow[3])) : null,
                     side: null,
-                    userSide: csvrow[3] != null ? (csvrow[4].toLowerCase() == 'buy'?'buy':'sell') : null,
-                    active: null, 
+                    active: null,
+                    order_id: null,
+                    matching_order_id: null,
+                    lastOrderQty: csvrow[2] != null ? exchange.amountToPrecision2(symbol, parseFloat(csvrow[3])) : null,
+                    lastSide: csvrow[3] != null ? (csvrow[4].toLowerCase() == 'buy'?'buy':'sell') : null,
+                    lastFilled: 0,
+                    dups: [] 
                 };
+                grid.orderQty = grid.lastOrderQty;
+                grid.side = grid.lastSide;
                 gridEntry.cost = exchange.priceToPrecision2(symbol, new BigNumber(gridEntry.price).multipliedBy(gridEntry.qty).toFixed());
                 gridEntries.push(gridEntry);
             }).on('end',function() {
@@ -70,6 +94,79 @@ const parseCsv = function(csvFile, symbol, exchange) {
     });
 }
 
+const parseFromInstance = async function(instance, exchange) {
+
+    let gridRecords = await models.StrategyInstanceGrid.findAll({
+        where:{ strategy_instance_id: instance.id},
+        include: [
+            models.StrategyInstanceGrid.StrategyInstanceRecoveryGrid
+        ],
+        order: [
+            ['buy_order_id', 'ASC']
+        ]
+    });
+
+    let symbol = instance.strategy.symbol;
+
+    /** @type {ImportGrid} */
+    let grid = {
+        instanceId: instance.id,
+        strategyName: instance.strategy.strategy_name,
+        strategyType: instance.strategy.strategy_type.strategy_type,
+        accountId: instance.strategy.account_id,
+        symbol: symbol,
+        activeBuys: instance.strategy.active_buys,
+        activeSells: instance.strategy.active_sells,
+        price: null,
+        initialPosition: instance.strategy.initial_position,
+        grid: [],
+    };
+
+    for(let i=0;i<gridRecords.length;i++) {    
+        let rec = gridRecords[i];
+        /** @type {ImportGridEntry} */
+        let gridEntry = {
+            price: exchange.priceToPrecision2(symbol, rec.price),
+            // we only handle buy_order_qty and should be the same that sell_order_qty
+            qty: exchange.amountToPrecision2(symbol, rec.buy_order_qty),
+            cost: exchange.priceToPrecision2(symbol, rec.buy_order_cost),
+            positionBeforeExecution: rec.position_before_order ? exchange.amountToPrecision2(symbol, rec.position_before_order): null,
+            orderQty: rec.order_qty ? exchange.amountToPrecision2(symbol, rec.order_qty): null,
+            filled: rec.filled ? exchange.amountToPrecision2(symbol, rec.filled) : null,
+            side: rec.side,
+            active: rec.active,
+            order_id: rec.order_id,
+            matching_order_id: rec.matching_order_id,
+            lastOrderQty: null,
+            lastSide: null,
+            lastFilled: null,
+            dups: [] 
+        };
+
+        gridEntry.lastOrderQty = gridEntry.orderQty;
+        gridEntry.lastSide = gridEntry.side;
+        gridEntry.lastFilled = gridEntry.filled;
+        
+        for(let j=0;j<rec.recovery_grids.length;j++) {
+            let recDup = rec.recovery_grids[j];
+            /** @type {ImportGridEntryDup} */
+            let dup = {
+                orderQty: recDup.orer_qty ? exchange.amountToPrecision2(symbol, recDup.order_qty) : null,
+                filled: recDup.filled ? exchange.amountToPrecision2(symbol, recDup.filled) : null,
+                side: recDup.side,
+                active: recDup.active,
+                order_id: recDup.order_id,
+                matching_order_id: recDup.matching_order_id,
+            };
+            gridEntry.dups.push(dup);
+        }
+
+        grid.grid.push(gridEntry);
+    }
+
+    return grid;
+}
+
 /**
  * 
  * @param {ImportGrid} grid 
@@ -78,12 +175,13 @@ const parseCsv = function(csvFile, symbol, exchange) {
 const cloneGrid = function(grid) {
     /** @type {ImportGrid} */
     let cloned = {
+        instanceId: grid.instanceId,
         accountId: grid.accountId,
         activeBuys: grid.activeBuys,
         activeSells: grid.activeSells,
         grid: [],
         initialPosition: grid.initialPosition,
-        initialPrice: grid.initialPrice,
+        price: grid.price,
         strategyName: grid.strategyName,
         symbol: grid.symbol,
     };
@@ -100,9 +198,26 @@ const cloneGrid = function(grid) {
             price: entry.price,
             qty: entry.qty,
             side: entry.side,
-            userOrderQty: entry.userOrderQty,
-            userSide: entry.userSide
+            order_id: entry.order_id,
+            matching_order_id: entry.matching_order_id,
+            lastOrderQty: entry.lastOrderQty,
+            lastSide: entry.lastSide,
+            lastFilled: entry.lastFilled,
+            dups: []
         };
+        for(let j=0;j<entry.dups.length;j++) {
+            /** @type {ImportGridEntryDup} */
+            let dup = entry.dups[j];
+            /** @type {ImportGridEntryDup} */
+            let dupEntry = {
+                active: dup.active,
+                filled: dup.filled,
+                orderQty: dup.orderQty,
+                side: dup.side,
+            }
+            clonedEntry.dups.push(dupEntry);
+        }
+
         cloned.grid.push(clonedEntry);
     }
 
@@ -148,35 +263,63 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
         }
     );
 
-    cloned.initialPrice = newPrice;
+    cloned.price = newPrice;
     // ir generando ordenes a crear por niveles desde ese nivel 0
     let currentPosition = new BigNumber(grid.initialPosition);
-    for(let i=index-1, activeSells=cloned.activeSells;i>0 && activeSells>0; i--, activeSells--) {
+    for(let i=index-1, activeSells=cloned.activeSells;i>0; i--, activeSells--) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
-        entry.active = false;
-        entry.orderQty = exchange.amountToPrecision2(grid.symbol, entry.qty);
-        entry.side = 'sell';
-        entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
-        entry.active = true;
-        currentPosition = currentPosition.minus(entry.orderQty);
+        if (activeSells > 0) {
+            if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+                // create matched order
+                entry.orderQty = entry.lastOrderQty;
+                entry.filled = entry.lastFilled;
+            } else {
+                entry.orderQty = exchange.amountToPrecision2(grid.symbol, entry.qty);
+            }
+            entry.side = 'sell';
+            entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
+            entry.active = true;
+            entry.filled = 0;
+            currentPosition = currentPosition.minus(entry.orderQty);
+        } else {
+            entry.orderQty = null;
+            entry.side = null;
+            entry.positionBeforeExecution = null;
+            entry.active = null;
+            entry.filled = null;
+        }
     }
 
     currentPosition = new BigNumber(grid.initialPosition);
-    for(let i=index+1, activeBuys=cloned.activeBuys;i<cloned.grid.length && activeBuys > 0;i++, activeBuys--) {
+    for(let i=index+1, activeBuys=cloned.activeBuys;i<cloned.grid.length;i++, activeBuys--) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
-        entry.active = false;
-        entry.orderQty = exchange.amountToPrecision2(grid.symbol, entry.qty);
-        entry.side = 'buy';
-        entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
-        entry.active = true;
-        currentPosition = currentPosition.plus(entry.orderQty);
+        if (activeBuys > 0) {
+            if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+                // create matched order
+                entry.orderQty = entry.lastOrderQty;
+                entry.filled = entry.lastFilled;
+            } else {
+                entry.orderQty = exchange.amountToPrecision2(grid.symbol, entry.qty);
+            }
+            entry.side = 'buy';
+            entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
+            entry.active = true;
+            entry.filled = 0;
+            currentPosition = currentPosition.plus(entry.orderQty);
+        } else {
+            entry.orderQty = null;
+            entry.side = null;
+            entry.positionBeforeExecution = null;
+            entry.active = null;
+            entry.filled = null;
+        }
     }
 
     return cloned;
 }
 
 module.exports = {
-    parseCsv, checkValidity, recalculateForPrice, cloneGrid
+    parseCsv, checkValidity, recalculateForPrice, cloneGrid,parseFromInstance
 }

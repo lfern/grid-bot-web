@@ -13,11 +13,11 @@
           <%= account.account_type.account_type_name %>
           <%= account.paper?"(paper)":"" %>
         </h5>
-        <h4>Current price <%= grid.initialPrice %>
-            <form action="/strategies/import/<%= id %>" method="post" class="form-inline float-right">
+        <h4>
+            <form action="/strategy-instance/<%= instance.id %>/recover/<%= id %>" method="post" class="form-inline float-right">
                 <div class="form-group mx-sm-3 mb-2">
                     <label for="price" class="small mb-1 mt-3 sr-only">Price:</label>
-                    <input type="text" class="form-control" name="price" placeholder="">
+                    <input type="text" class="form-control" name="price" placeholder="" value="<%= grid.price %>">
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Change price</button>
             </form>
@@ -37,6 +37,9 @@
               <th class="grid-active-col" scope="col">Active</th>
               <th class="grid-side-col" scope="col">Order Id</th>
               <th class="grid-side-col" scope="col">Match Id</th>
+              <th class="grid-qty-col" scope="col">LastOrderQty</th>
+              <th class="grid-qty-col" scope="col">LastFilled</th>
+              <th class="grid-side-col" scope="col">LastSide</th>
             </tr>
           </thead>
           <tbody>
@@ -55,6 +58,9 @@
                     <td><%= element.active %></td>
                     <td><%= element.order_id %></td>
                     <td><%= element.matching_order_id %></td>
+                    <td><%= element.lastOrderQty %></td>
+                    <td><%= element.lastFilled %></td>
+                    <td><%= element.lastSide %></td>
                 </tr>
                 <% element.dups.forEach((dup) => { %>
                   <tr class="<%= classColor %>">

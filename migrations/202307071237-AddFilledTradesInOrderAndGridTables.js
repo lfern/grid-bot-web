@@ -35,6 +35,11 @@ module.exports = {
                 type: Sequelize.DECIMAL(30, 15),
             }, {transaction});
 
+            await queryInterface.addColumn('strategy_instance_recovery_grids', 'filled', {
+                allowNull: true,
+                type: Sequelize.DECIMAL(30, 15),
+            }, {transaction});
+
         });
     },
     
@@ -54,6 +59,7 @@ module.exports = {
 
             await queryInterface.removeColumn('strategy_instance_orders', 'trades_ok', {transaction});
             await queryInterface.removeColumn('strategy_instance_orders', 'trades_filled', {transaction});
+            await queryInterface.removeColumn('strategy_instance_recovery_grids', 'filled', {transaction});
             await queryInterface.removeColumn('strategy_instance_grids', 'filled', {transaction});
 
         });

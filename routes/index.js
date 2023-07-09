@@ -78,6 +78,10 @@ router.post('/strategy-instance/:instance_id/stop', isLoggedIn, strategyInstance
 router.post('/strategy-instance/:instance_id/delete', isLoggedIn, strategyInstance.delete_instance);
 router.post('/strategy-instance/:instance_id/delete/json', isLoggedIn, strategyInstance.delete_instance_json);
 router.post('/strategy-instance/:instance_id/sendevent/json', isLoggedIn, strategyInstance.sendevent_json);
+router.post('/strategy-instance/:instance_id/recover', isLoggedIn, strategyInstance.start_recovery);
+router.get('/strategy-instance/:instance_id/recover/:id', isLoggedIn, strategyInstance.show_recovery);
+router.post('/strategy-instance/:instance_id/recover/:id', isLoggedIn, strategyInstance.show_recovery);
+
 /* Exchange related routes */
 router.get('/exchanges/json', isLoggedIn, exchange.get_exchanges_json);
 router.get('/exchange/:exchange_id/accounts/json', isLoggedIn, exchange.get_accounts_json);

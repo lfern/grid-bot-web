@@ -3,6 +3,10 @@ const db = require('../models/index');
 let createError = require('http-errors');
 let {getExchangeMarketsDbData} = require('../utils/exchange');
 const OrderSenderEventService = require('grid-bot/src/services/OrderSenderEventService');
+const cache = require('memory-cache');
+const crypto = require('crypto');
+const CsvGridService = require('../services/CsvGridService');
+const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
 
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
@@ -362,4 +366,95 @@ exports.delete_instance_json = function(req, res, next) {
 exports.sendevent_json = function(req, res, next) {
     OrderSenderEventService.send(parseInt(req.params.instance_id));
     res.send({msg: "Success"});
+}
+
+exports.start_recovery = function(req, res, next) {
+
+    models.StrategyInstance.findOne({
+        where:{id: req.params.instance_id},
+        include: [{
+            association: models.StrategyInstance.Strategy,
+            include: [
+                models.Strategy.Account,
+                models.Strategy.StrategyType
+            ]
+        }]
+    }).then (instance => {
+        if (instance == null || instance.running) {
+            return next(createError(404, 'Instance has been removed or is running'));
+        }
+
+        return exchangeInstanceFromAccount(instance.strategy.account, true).then(exchange => {
+            return CsvGridService.parseFromInstance(instance, exchange).then(data => {
+                let key = crypto.randomUUID();
+                cache.put('recovery-'+key, data, 15*60*1000);
+                res.redirect("/strategy-instance/"+instance.id+"/recover/"+key);
+            });
+        })
+
+    }).catch(ex => {
+        return next(createError(500, ex));
+    });
+}
+
+exports.show_recovery = function(req, res, next) {
+    /** @type {GridCacheData} */
+    let data = cache.get('recovery-'+req.params.id);
+    if (data == null) {
+        return next(createError(404, "Recovery not found"));
+    }
+
+    cache.put('recovery-'+req.params.id, data, 60*60*1000);
+
+    models.StrategyInstance.findOne({
+        where:{id: req.params.instance_id},
+        include: [{
+            association: models.StrategyInstance.Strategy,
+            include: [{
+                association: models.Strategy.Account,
+                include: [
+                    models.Account.AccountType,
+                    models.Account.Exchange
+                ]
+            }]
+        }]
+    }).then (instance => {
+        if (instance == null || instance.running) {
+            return next(createError(404, 'Instance has been removed or is running'));
+        }
+
+        return exchangeInstanceFromAccount(instance.strategy.account, true).then( exchange => {
+            return new Promise((resolve, reject) => {
+                if (req.body.price != undefined && req.body.price != '') {
+                    resolve(parseFloat(req.body.price));
+                } else {
+                    exchange.fetchCurrentPrice(data.symbol).then(price => {
+                        if (price == null) {
+                            reject(new Error("Could not get current price from exchange"));
+                        }
+                        resolve(price);
+                    }).catch(ex => {
+                        reject(ex);
+                    });
+                }
+            }).then (price => {
+                data = CsvGridService.recalculateForPrice(data, price, exchange);
+                cache.put('recovery-'+req.params.id, data, 60*60*1000);   
+                res.render('strategy_instance/show_recovery', {
+                    title: '',
+                    grid: data,
+                    user: req.user,
+                    layout: './layouts/grid2',
+                    account: instance.strategy.account,
+                    instance: instance,
+                    id: req.params.id
+                });
+            });
+        });
+
+    }).catch(ex => {
+        return next(createError(505, ex));
+    })
+
+
 }
