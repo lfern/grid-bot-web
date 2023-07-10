@@ -7,6 +7,7 @@ const cache = require('memory-cache');
 const crypto = require('crypto');
 const CsvGridService = require('../services/CsvGridService');
 const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
+const { validateRefreshRecovery } = require('../validators/strategyInstance');
 
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
@@ -422,8 +423,14 @@ exports.show_recovery = function(req, res, next) {
         if (instance == null || instance.running) {
             return next(createError(404, 'Instance has been removed or is running'));
         }
+        let errors = {};
+        return Promise.all([
+            exchangeInstanceFromAccount(instance.strategy.account, true),
+            validateRefreshRecovery(errors, req, data)
+        ]).then( result => {
+            let exchange = result[0];
+            let {errors, validatedData} = result[1];
 
-        return exchangeInstanceFromAccount(instance.strategy.account, true).then( exchange => {
             return new Promise((resolve, reject) => {
                 if (req.body.price != undefined && req.body.price != '') {
                     resolve(parseFloat(req.body.price));
@@ -438,6 +445,23 @@ exports.show_recovery = function(req, res, next) {
                     });
                 }
             }).then (price => {
+                if (Object.keys(errors).length == 0) {
+                    // try to modify the grid
+                    console.log(validatedData);
+                    for(let i=0;i<validatedData.prices.length;i++) {
+                        let price = validatedData.prices[i];
+                        if (price.newPrice.isNaN()) {
+                            CsvGridService.removePriceEntry(data, price.priceTag);
+                        } else {
+                            let gridEntry = CsvGridService.getPriceEntry(data, price.priceTag);
+                            if (gridEntry != null) {
+                                if (gridEntry)
+                                gridEntry.price = price.newPrice
+                            }    
+                        }
+                    }
+                }
+        
                 data = CsvGridService.recalculateForPrice(data, price, exchange);
                 cache.put('recovery-'+req.params.id, data, 60*60*1000);   
                 res.render('strategy_instance/show_recovery', {
@@ -447,7 +471,9 @@ exports.show_recovery = function(req, res, next) {
                     layout: './layouts/grid2',
                     account: instance.strategy.account,
                     instance: instance,
-                    id: req.params.id
+                    id: req.params.id,
+                    errors: errors,
+                    formData: Object.keys(errors).length > 0 ? req.body : undefined,
                 });
             });
         });

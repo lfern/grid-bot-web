@@ -45,7 +45,7 @@ const models = require('../models');
  * @property {number} activeSells
  * @property {number} price
  * @property {number} initialPosition
- * @property {CsvGridEntry[]} grid
+ * @property {ImportGridEntry[]} grid
  */
 
 /**
@@ -328,6 +328,34 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
     return cloned;
 }
 
+/**
+ * 
+ * @param {ImportGrid} data 
+ * @param {string} price 
+ */
+const getPriceEntry = function (data, price) {
+    for(let i=0;i<data.grid.length;i++) {
+        let entry = data.grid[i];
+        if (entry.price == price) {
+            return entry;
+        }
+    }
+
+    return null;
+}
+
+const removePriceEntry = function (data, price) {
+    for(let i=0;i<data.grid.length;i++) {
+        let entry = data.grid[i];
+        if (entry.price == price) {
+            data.grid.splice(i, 1);
+            break;
+        }
+    }
+
+}
+
 module.exports = {
-    parseCsv, checkValidity, recalculateForPrice, cloneGrid,parseFromInstance
+    parseCsv, checkValidity, recalculateForPrice, cloneGrid,parseFromInstance, getPriceEntry,
+    removePriceEntry
 }

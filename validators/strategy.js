@@ -1,6 +1,5 @@
 let models = require('../models');
 let validator = require('validator');
-let { parse } = require('csv-parse/sync');
 let CsvGridService = require('../services/CsvGridService');
 const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
 /** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
