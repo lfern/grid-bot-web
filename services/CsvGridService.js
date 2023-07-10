@@ -28,10 +28,12 @@ const models = require('../models');
  * @property {boolean} active
  * @property {number} order_id
  * @property {number} matching_order_id
+ * @property {number} lastQty
  * @property {number} lastOrderQty
  * @property {number} lastFilled
  * @property {string|undefined} lastSide
- * @property {number} userQty
+ * @property {number} newOrderQty
+ * @property {number} newQty
  * @property {ImportGridEntryDup[]} dups
  */
 
@@ -78,12 +80,15 @@ const parseCsv = function(csvFile, symbol, exchange) {
                     active: null,
                     order_id: null,
                     matching_order_id: null,
+                    lastQty: null,
                     lastOrderQty: csvrow[2] != null ? exchange.amountToPrecision2(symbol, parseFloat(csvrow[3])) : null,
                     lastSide: csvrow[3] != null ? (csvrow[4].toLowerCase() == 'buy'?'buy':'sell') : null,
                     lastFilled: 0,
-                    userQty: null,
+                    newOrderQty: null,
+                    newQty: null,
                     dups: [] 
                 };
+                grid.lastQty = grid.qty;
                 grid.orderQty = grid.lastOrderQty;
                 grid.side = grid.lastSide;
                 gridEntry.cost = exchange.priceToPrecision2(symbol, new BigNumber(gridEntry.price).multipliedBy(gridEntry.qty).toFixed());
@@ -139,13 +144,16 @@ const parseFromInstance = async function(instance, exchange) {
             active: rec.active,
             order_id: rec.order_id,
             matching_order_id: rec.matching_order_id,
+            lastQty: null,
             lastOrderQty: null,
             lastSide: null,
             lastFilled: null,
-            userQty: null,
+            newOrderQty: null,
+            newQty: null,
             dups: [] 
         };
 
+        gridEntry.lastQty = gridEntry.qty;
         gridEntry.lastOrderQty = gridEntry.orderQty;
         gridEntry.lastSide = gridEntry.side;
         gridEntry.lastFilled = gridEntry.filled;
@@ -203,10 +211,12 @@ const cloneGrid = function(grid) {
             side: entry.side,
             order_id: entry.order_id,
             matching_order_id: entry.matching_order_id,
+            lastQty: entry.lastQty,
             lastOrderQty: entry.lastOrderQty,
             lastSide: entry.lastSide,
             lastFilled: entry.lastFilled,
-            userQty: entry.userQty,
+            newOrderQty: entry.newOrderQty,
+            newQty: entry.newQty,
             dups: []
         };
         for(let j=0;j<entry.dups.length;j++) {
@@ -276,14 +286,23 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
     entry.active = null;
     entry.filled = null;
 
+
+    for (let i=0; i<cloned.grid.length;i++) {
+        /** @type {ImportGridEntry} */
+        let entry = cloned.grid[i];
+        console.log(entry)
+        entry.qty = exchange.amountToPrecision2(grid.symbol, entry.newQty != null ? entry.newQty : entry.lastQty);
+        entry.cost = exchange.priceToPrecision2(grid.symbol, new BigNumber(entry.price).multipliedBy(entry.qty).toFixed());
+    }
+
     // ir generando ordenes a crear por niveles desde ese nivel 0
     let currentPosition = new BigNumber(grid.initialPosition);
     for(let i=index-1, activeSells=cloned.activeSells;i>=0; i--, activeSells--) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
         if (activeSells > 0) {
-            if (entry.userQty != null) {
-                entry.orderQty = entry.userQty;
+            if (entry.newOrderQty != null) {
+                entry.orderQty = entry.newOrderQty;
                 entry.filled = 0;
             } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
                 // create matched order
@@ -311,8 +330,8 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
         if (activeBuys > 0) {
-            if (entry.userQty != null) {
-                entry.orderQty = entry.userQty;
+            if (entry.newOrderQty != null) {
+                entry.orderQty = entry.newOrderQty;
                 entry.filled = 0;
             } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
                 // create matched order
@@ -365,7 +384,62 @@ const removePriceEntry = function (data, price) {
 
 }
 
+/**
+ * 
+ * @param {ImportGrid} data 
+ * @param {int} rows 
+ */
+const addPrices = function (data, rows, up = false) {
+    for(let i=0;i<rows;i++) {
+        /** @type {ImportGridEntry} */
+        let newEntry;
+        if (data.grid.length == 0) {
+            newEntry = {
+                active: null,
+                cost: null,
+                dups: [],
+                filled: null,
+                lastFilled: null,
+                lastOrderQty: null,
+                lastQty: 1,
+                lastSide: null,
+                matching_order_id: null,
+                newOrderQty: null,
+                newQty: null,
+                order_id: null,
+                orderQty: null,
+                positionBeforeExecution: null,
+                price: 1,
+                qty: null,
+                side: null,
+            };
+        } else {
+            let other = data.grid[up ? 0 : data.grid.length-1];
+            newEntry = {
+                active: null,
+                cost: null,
+                dups: [],
+                filled: null,
+                lastFilled: null,
+                lastOrderQty: null,
+                lastQty: other.lastQty,
+                lastSide: null,
+                matching_order_id: null,
+                newOrderQty: null,
+                newQty: null,
+                order_id: null,
+                orderQty: null,
+                positionBeforeExecution: null,
+                price: up ? new BigNumber(other.price).plus(1): new BigNumber(other.price).minus(1),
+                qty: null,
+                side: null,
+            }
+        }
+        up ? data.grid.unshift(newEntry) : data.grid.push(newEntry);
+    }
+}
+
 module.exports = {
     parseCsv, checkValidity, recalculateForPrice, cloneGrid,parseFromInstance, getPriceEntry,
-    removePriceEntry
+    removePriceEntry, addPrices
 }

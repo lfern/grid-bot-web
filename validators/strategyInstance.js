@@ -56,7 +56,8 @@ const validateRefreshRecoveryFields = function(errors, req, data){
                     priceTag: priceTag,
                     priceField: fields[i],
                     newPrice: null,
-                    userQty: null,
+                    orderQty: null,
+                    qty: null,
                 });
             }
         }
@@ -72,11 +73,18 @@ const validateRefreshRecoveryFields = function(errors, req, data){
         let price = ret.prices[i];
         let newPriceValue = req.body[price.priceField];
         let qtyField = 'qty-'+price.priceTag;
-        let userQty = req.body[qtyField] && req.body[qtyField] != '' ? new BigNumber(req.body[qtyField]) : null;
+        let qty = req.body[qtyField] && req.body[qtyField] != '' ? new BigNumber(req.body[qtyField]) : null;
+        let orderQtyField = 'orderqty-'+price.priceTag;
+        let orderQty = req.body[orderQtyField] && req.body[orderQtyField] != '' ? new BigNumber(req.body[orderQtyField]) : null;
         price.newPrice = new BigNumber(newPriceValue);
-        price.userQty = userQty;
+        price.orderQty = orderQty;
+        price.qty = qty;
 
-        if (userQty != null && userQty.isNaN()) {
+        if (orderQty != null && orderQty.isNaN()) {
+            errors[orderQtyField] = 'Invalid Quantity';
+        }
+
+        if (qty != null && qty.isNaN()) {
             errors[qtyField] = 'Invalid Quantity';
         }
 

@@ -432,7 +432,12 @@ exports.show_recovery = async function(req, res, next) {
 
         if (req.body.submit_reset !== undefined) {
             data = await CsvGridService.parseFromInstance(instance, exchange);
-        } else if (req.body.submit_update !== undefined) {
+        } else if (req.body.submit_update !== undefined || 
+            req.body.submit_up_5 !== undefined ||
+            req.body.submit_up_1 !== undefined ||
+            req.body.submit_down_5 !== undefined ||
+            req.body.submit_down_1 !== undefined
+            ) {
             let result = await validateRefreshRecovery(errors, req, data);
             errors = result.errors;
             let validatedData = result.validatedData;
@@ -453,14 +458,34 @@ exports.show_recovery = async function(req, res, next) {
                     }
     
                     if (gridEntry != null) {
-                        if (price.userQty == null) {
-                            gridEntry.userQty = null;
-                        } else if (!price.userQty.isNaN()) {
-                            gridEntry.userQty = exchange.amountToPrecision2(data.symbol, price.userQty.toFixed());
+                        if (price.orderQty == null) {
+                            gridEntry.newOrderQty = null;
+                        } else if (!price.orderQty.isNaN()) {
+                            gridEntry.newOrderQty = exchange.amountToPrecision2(data.symbol, price.orderQty.toFixed());
                         } else {
-                            gridEntry.userQty = null;
+                            gridEntry.newOrderQty = null;
+                        }
+
+                        if (price.qty == null) {
+                            gridEntry.newQty = null;
+                        } else if (!price.qty.isNaN()) {
+                            gridEntry.newQty = exchange.amountToPrecision2(data.symbol, price.qty.toFixed());
+                        } else {
+                            gridEntry.newQty = null;
                         }
                     }
+                }
+                if (req.body.submit_up_5 !== undefined) {
+                    CsvGridService.addPrices(data, 5, true);
+                }
+                if (req.body.submit_up_1 !== undefined) {
+                    CsvGridService.addPrices(data, 1, true);
+                }
+                if (req.body.submit_down_5 !== undefined) {
+                    CsvGridService.addPrices(data, 5, false);
+                }
+                if (req.body.submit_down_1 !== undefined) {
+                    CsvGridService.addPrices(data, 1, false);
                 }
             }
         }
