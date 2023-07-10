@@ -430,15 +430,16 @@ exports.show_recovery = async function(req, res, next) {
 
         let exchange = await exchangeInstanceFromAccount(instance.strategy.account, true);
 
-        if (req.body.submit_update == undefined) {
+        if (req.body.submit_reset !== undefined) {
             data = await CsvGridService.parseFromInstance(instance, exchange);
-            cache.put('recovery-'+req.params.id, data, 60*60*1000);
-        } else {
-            cache.put('recovery-'+req.params.id, data, 60*60*1000);
+        } else if (req.body.submit_update !== undefined) {
             let result = await validateRefreshRecovery(errors, req, data);
             errors = result.errors;
             let validatedData = result.validatedData;
             if (Object.keys(errors).length == 0) {
+                data.initialPosition = validatedData.initial_position;
+                data.activeSells = validatedData.active_sells;
+                data.activeBuys = validatedData.active_buys;
                 // try to modify the grid
                 for(let i=0;i<validatedData.prices.length;i++) {
                     let price = validatedData.prices[i];
@@ -465,10 +466,14 @@ exports.show_recovery = async function(req, res, next) {
         }
     
 
-        let price;
-        if (req.body.price != undefined && req.body.price != '') {
+        let price = null;
+        if (req.body.price == undefined) {
+            price = data.price;
+        } else if (req.body.price != '') {
             price = parseFloat(req.body.price);
-        } else {
+        }
+        
+        if (price == null) {
             price = await exchange.fetchCurrentPrice(data.symbol);
             if (price == null) {
                 throw new Error("Could not get current price from exchange");

@@ -11,8 +11,38 @@ const { default: BigNumber } = require('bignumber.js');
  * @param {ImportGrid} data 
  */
 const validateRefreshRecoveryFields = function(errors, req, data){
+    let ret = {
+        prices: [],
+        initial_position: null,
+        active_sells: null,
+        active_buys: null,
+    };
+
+    if (!validator.isFloat(req.body.initial_position)){
+        errors["initial_position"] = "Please provide a valid initial position.";
+    } else {
+        ret.initial_position = parseFloat(req.body.initial_position);
+    }
+
+    if (!validator.isInt(req.body.active_buys, {
+        min: 1
+    })){
+        errors["active_buys"] = "Please provide a valid active buys (min 1).";
+    } else {
+        ret.active_buys = parseInt(req.body.active_buys);
+    }
+
+    if (!validator.isInt(req.body.active_sells, {
+        min: 1
+    })){
+        errors["active_sells"] = "Please provide a valid active sells (min 1).";
+    } else {
+        ret.active_sells = parseInt(req.body.active_sells);
+    }
+
+
     // extract prices from field names
-    let prices = [];
+    ret.prices = [];
     let fields = Object.keys(req.body);
     for(let i=0; i < fields.length; i++) {
         if (fields[i].startsWith('price-')) {
@@ -21,7 +51,7 @@ const validateRefreshRecoveryFields = function(errors, req, data){
             if (price.isNaN()) {
                 errors[fields[i]] = 'Invalid price in field name???';
             } else {
-                prices.push({
+                ret.prices.push({
                     price: price,
                     priceTag: priceTag,
                     priceField: fields[i],
@@ -32,14 +62,14 @@ const validateRefreshRecoveryFields = function(errors, req, data){
         }
     }
 
-    if (prices.length == 0) {
-        return {prices: []};
+    if (ret.prices.length == 0) {
+        return ret;
     }
 
-    prices = prices.sort((a, b) => (a.price > b.price) ? -1 : ((a.price < b.price) ? 1 : 0));
-    let lastPrice = new BigNumber(req.body[prices[0].priceField]).plus(1);
-    for(let i=0;i<prices.length;i++) {
-        let price = prices[i];
+    ret.prices = ret.prices.sort((a, b) => (a.price > b.price) ? -1 : ((a.price < b.price) ? 1 : 0));
+    let lastPrice = new BigNumber(req.body[ret.prices[0].priceField]).plus(1);
+    for(let i=0;i<ret.prices.length;i++) {
+        let price = ret.prices[i];
         let newPriceValue = req.body[price.priceField];
         let qtyField = 'qty-'+price.priceTag;
         let userQty = req.body[qtyField] && req.body[qtyField] != '' ? new BigNumber(req.body[qtyField]) : null;
@@ -68,9 +98,7 @@ const validateRefreshRecoveryFields = function(errors, req, data){
         lastPrice = price.newPrice;
     }
 
-    return {
-        prices
-    };
+    return ret;
 
 }
 /**
@@ -85,6 +113,8 @@ exports.validateRefreshRecovery = function(errors, req, data) {
         let validatedData = null;
         try {
             validatedData = validateRefreshRecoveryFields(errors, req, data);console.log(validatedData)
+        } catch(ex) {
+            console.error(ex);
         } finally {
             resolve({
                 errors,

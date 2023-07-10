@@ -21,9 +21,10 @@
         var modal = document.getElementById('<%= id %>')
         var save = document.querySelector('#<%= id %> button.save')
         var form = null;
+        var button = null;
         $(modal).on('show.bs.modal', function (event) {
             // Button that triggered the modal
-            var button = event.relatedTarget
+            button = event.relatedTarget
             // Extract info from data-bs-* attributes
             var recipient = button.getAttribute('data-bs-cssselector')
             if (recipient == null) {
@@ -35,6 +36,12 @@
         })
         save.addEventListener('click', function(event){
             if (form != null) {
+                if (button != null) {
+                    $("<input />").attr("type", "hidden")
+                        .attr("name", button.getAttribute('name'))
+                        .attr("value", "")
+                        .appendTo($(form));
+                }
                 form.submit();
             }
         })

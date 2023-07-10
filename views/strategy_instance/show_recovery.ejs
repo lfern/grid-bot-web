@@ -27,7 +27,33 @@
             <div class="row">
               <label for="price" class="col-sm-1 col-form-label">Price</label>
               <div class="col-sm-2">
-                <input type="price"  name="price" value="<%= grid.price %>">
+                <input type="text" name="price" value="<%= locals.formData && locals.formData.price ? locals.formData.price : grid.price %>">
+                <% if (locals.errors && locals.errors.price) { %>
+                  <p class="small text-danger"><%= errors.price %></p>
+                 <% } %>
+              </div>
+              <label for="initial_position" class="col-sm-1 col-form-label">Initial position</label>
+              <div class="col-sm-2">
+                <input type="text" name="initial_position" value="<%= locals.formData && locals.formData.initial_position ? locals.formData.initial_position : grid.initialPosition %>">
+                <% if (locals.errors && locals.errors.initial_position) { %>
+                  <p class="small text-danger"><%= errors.initial_position %></p>
+                 <% } %>
+              </div>
+            </div>
+            <div class="row">
+              <label for="active_sells" class="col-sm-1 col-form-label">Active Sells</label>
+              <div class="col-sm-2">
+                <input type="text" name="active_sells" value="<%= locals.formData && locals.formData.active_sells ? locals.formData.active_sells : grid.activeSells %>">
+                <% if (locals.errors && locals.errors.active_sells) { %>
+                  <p class="small text-danger"><%= errors.active_sells %></p>
+                 <% } %>
+              </div>
+              <label for="active_buys" class="col-sm-1 col-form-label">Active Buys</label>
+              <div class="col-sm-2">
+                <input type="text" name="active_buys" value="<%= locals.formData && locals.formData.active_buys ? locals.formData.active_buys : grid.activeBuys %>">
+                <% if (locals.errors && locals.errors.active_buys) { %>
+                  <p class="small text-danger"><%= errors.active_buys %></p>
+                 <% } %>
               </div>
             </div>
             <button type="submit" name="submit_update" class="btn btn-primary mb-2">Update data</button>

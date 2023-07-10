@@ -120,7 +120,7 @@ const parseFromInstance = async function(instance, exchange) {
         activeBuys: instance.strategy.active_buys,
         activeSells: instance.strategy.active_sells,
         price: null,
-        initialPosition: instance.strategy.initial_position,
+        initialPosition: exchange.amountToPrecision2(symbol, instance.strategy.initial_position),
         grid: [],
     };
 
