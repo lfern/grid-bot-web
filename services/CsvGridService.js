@@ -274,7 +274,7 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
 
     // ir generando ordenes a crear por niveles desde ese nivel 0
     let currentPosition = new BigNumber(grid.initialPosition);
-    for(let i=index-1, activeSells=cloned.activeSells;i>0; i--, activeSells--) {
+    for(let i=index-1, activeSells=cloned.activeSells;i>=0; i--, activeSells--) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
         if (activeSells > 0) {
