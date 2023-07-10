@@ -30,12 +30,15 @@
                 <input type="price"  name="price" value="<%= grid.price %>">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-2">Update data</button>
+            <button type="submit" name="submit_update" class="btn btn-primary mb-2">Update data</button>
+            <button type="button" name="submit_reset" class="btn btn-primary mb-2" data-toggle="modal" data-target="#modal-reset">ResetRecovery</button>
+            <p class="small text-danger">(*) Empty price to remove row price</p>
           </div>
           <table id="grid" class="table table-striped table-bordered table-sm grid-bot-table" cellspacing="0">
             <thead style="position: sticky;top: 0">
               <tr>
-                <th class="grid-price-col" scope="col">Price</th>
+                <th class="grid-price-col" scope="col">Price(*)</th>
+                <th class="grid-qty-col" scope="col">User qty</th>
                 <th class="grid-idbuy-col" scope="col">IdBuy</th>
                 <th class="grid-qty-col" scope="col">Qty</th>
                 <th class="grid-qty-col" scope="col">Size</th>
@@ -58,7 +61,16 @@
                   <tr class="<%= classColor %>">
                       <td>
                         <% let field = "price-"+element.price %>
-                        <input type="text" name="price-<%= element.price %>" value="<%= locals.formData && locals.formData[field] ? locals.formData[field] : element.price %>">
+                        <input type="text" name="<%= field %>" value="<%= locals.formData && locals.formData[field] ? locals.formData[field] : element.price %>">
+                        <% if (locals.errors && locals.errors[field]) { %>
+                          <span data-toggle="tooltip" data-placement="right" title="<%= errors[field] %>">
+                            <span style="pointer-events: none;" class="small text-danger">?</span>
+                          </span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% field = "qty-"+element.price %>
+                        <input type="text" name="<%= field %>" value="<%= locals.formData && locals.formData[field] ? locals.formData[field] : element.userQty %>">
                         <% if (locals.errors && locals.errors[field]) { %>
                           <span data-toggle="tooltip" data-placement="right" title="<%= errors[field] %>">
                             <span style="pointer-events: none;" class="small text-danger">?</span>
@@ -106,3 +118,4 @@
     $('[data-toggle="tooltip"]').tooltip();
   });
 </script>
+<%- include('../partials/confirm-submit', {id:"modal-reset", okbutton:"Reset", msg:"Do you want to reset recovery?"}) %>

@@ -24,8 +24,9 @@ const validateRefreshRecoveryFields = function(errors, req, data){
                 prices.push({
                     price: price,
                     priceTag: priceTag,
-                    field: fields[i],
+                    priceField: fields[i],
                     newPrice: null,
+                    userQty: null,
                 });
             }
         }
@@ -36,12 +37,19 @@ const validateRefreshRecoveryFields = function(errors, req, data){
     }
 
     prices = prices.sort((a, b) => (a.price > b.price) ? -1 : ((a.price < b.price) ? 1 : 0));
-    let lastPrice = new BigNumber(req.body[prices[0].field]).plus(1);
+    let lastPrice = new BigNumber(req.body[prices[0].priceField]).plus(1);
     for(let i=0;i<prices.length;i++) {
         let price = prices[i];
-        let newPriceValue = req.body[price.field];
+        let newPriceValue = req.body[price.priceField];
+        let qtyField = 'qty-'+price.priceTag;
+        let userQty = req.body[qtyField] && req.body[qtyField] != '' ? new BigNumber(req.body[qtyField]) : null;
         price.newPrice = new BigNumber(newPriceValue);
-        console.log(newPriceValue);console.log(price.newPrice);
+        price.userQty = userQty;
+
+        if (userQty != null && userQty.isNaN()) {
+            errors[qtyField] = 'Invalid Quantity';
+        }
+
         if (newPriceValue == '') {
             // check if we could remove this price
             continue;

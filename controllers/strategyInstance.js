@@ -9,6 +9,8 @@ const CsvGridService = require('../services/CsvGridService');
 const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
 const { validateRefreshRecovery } = require('../validators/strategyInstance');
 
+/** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
+
 exports.show_instance = function(req, res, next) {
     return models.StrategyInstance.findOne({
         where:{
@@ -398,89 +400,95 @@ exports.start_recovery = function(req, res, next) {
     });
 }
 
-exports.show_recovery = function(req, res, next) {
-    /** @type {GridCacheData} */
+exports.show_recovery = async function(req, res, next) {
+    let errors = {};
+    /** @type {ImportGrid} */
     let data = cache.get('recovery-'+req.params.id);
     if (data == null) {
         return next(createError(404, "Recovery not found"));
     }
 
-    cache.put('recovery-'+req.params.id, data, 60*60*1000);
 
-    models.StrategyInstance.findOne({
-        where:{id: req.params.instance_id},
-        include: [{
-            association: models.StrategyInstance.Strategy,
+    try {
+        let instance = await models.StrategyInstance.findOne({
+            where:{id: req.params.instance_id},
             include: [{
-                association: models.Strategy.Account,
-                include: [
-                    models.Account.AccountType,
-                    models.Account.Exchange
-                ]
+                association: models.StrategyInstance.Strategy,
+                include: [{
+                    association: models.Strategy.Account,
+                    include: [
+                        models.Account.AccountType,
+                        models.Account.Exchange
+                    ]
+                }, models.Strategy.StrategyType]
             }]
-        }]
-    }).then (instance => {
+        });
+                
         if (instance == null || instance.running) {
             return next(createError(404, 'Instance has been removed or is running'));
         }
-        let errors = {};
-        return Promise.all([
-            exchangeInstanceFromAccount(instance.strategy.account, true),
-            validateRefreshRecovery(errors, req, data)
-        ]).then( result => {
-            let exchange = result[0];
-            let {errors, validatedData} = result[1];
 
-            return new Promise((resolve, reject) => {
-                if (req.body.price != undefined && req.body.price != '') {
-                    resolve(parseFloat(req.body.price));
-                } else {
-                    exchange.fetchCurrentPrice(data.symbol).then(price => {
-                        if (price == null) {
-                            reject(new Error("Could not get current price from exchange"));
-                        }
-                        resolve(price);
-                    }).catch(ex => {
-                        reject(ex);
-                    });
-                }
-            }).then (price => {
-                if (Object.keys(errors).length == 0) {
-                    // try to modify the grid
-                    console.log(validatedData);
-                    for(let i=0;i<validatedData.prices.length;i++) {
-                        let price = validatedData.prices[i];
-                        if (price.newPrice.isNaN()) {
-                            CsvGridService.removePriceEntry(data, price.priceTag);
+        let exchange = await exchangeInstanceFromAccount(instance.strategy.account, true);
+
+        if (req.body.submit_update == undefined) {
+            data = await CsvGridService.parseFromInstance(instance, exchange);
+            cache.put('recovery-'+req.params.id, data, 60*60*1000);
+        } else {
+            cache.put('recovery-'+req.params.id, data, 60*60*1000);
+            let result = await validateRefreshRecovery(errors, req, data);
+            errors = result.errors;
+            let validatedData = result.validatedData;
+            if (Object.keys(errors).length == 0) {
+                // try to modify the grid
+                for(let i=0;i<validatedData.prices.length;i++) {
+                    let price = validatedData.prices[i];
+                    let gridEntry = CsvGridService.getPriceEntry(data, price.priceTag);
+                    if (price.newPrice.isNaN()) {
+                        CsvGridService.removePriceEntry(data, price.priceTag);
+                    } else {
+                        if (gridEntry != null) {
+                            gridEntry.price = exchange.priceToPrecision2(data.symbol, price.newPrice.toFixed());
+                        }    
+                    }
+    
+                    if (gridEntry != null) {
+                        if (price.userQty == null) {
+                            gridEntry.userQty = null;
+                        } else if (!price.userQty.isNaN()) {
+                            gridEntry.userQty = exchange.amountToPrecision2(data.symbol, price.userQty.toFixed());
                         } else {
-                            let gridEntry = CsvGridService.getPriceEntry(data, price.priceTag);
-                            if (gridEntry != null) {
-                                if (gridEntry)
-                                gridEntry.price = price.newPrice
-                            }    
+                            gridEntry.userQty = null;
                         }
                     }
                 }
-        
-                data = CsvGridService.recalculateForPrice(data, price, exchange);
-                cache.put('recovery-'+req.params.id, data, 60*60*1000);   
-                res.render('strategy_instance/show_recovery', {
-                    title: '',
-                    grid: data,
-                    user: req.user,
-                    layout: './layouts/grid2',
-                    account: instance.strategy.account,
-                    instance: instance,
-                    id: req.params.id,
-                    errors: errors,
-                    formData: Object.keys(errors).length > 0 ? req.body : undefined,
-                });
-            });
+            }
+        }
+    
+
+        let price;
+        if (req.body.price != undefined && req.body.price != '') {
+            price = parseFloat(req.body.price);
+        } else {
+            price = await exchange.fetchCurrentPrice(data.symbol);
+            if (price == null) {
+                throw new Error("Could not get current price from exchange");
+            }
+        }
+         
+        data = CsvGridService.recalculateForPrice(data, price, exchange);
+        cache.put('recovery-'+req.params.id, data, 60*60*1000);   
+        res.render('strategy_instance/show_recovery', {
+            title: '',
+            grid: data,
+            user: req.user,
+            layout: './layouts/grid2',
+            account: instance.strategy.account,
+            instance: instance,
+            id: req.params.id,
+            errors: errors,
+            formData: Object.keys(errors).length > 0 ? req.body : undefined,
         });
-
-    }).catch(ex => {
+    } catch (ex) {
         return next(createError(505, ex));
-    })
-
-
+    }
 }

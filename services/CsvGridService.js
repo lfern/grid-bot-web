@@ -31,6 +31,7 @@ const models = require('../models');
  * @property {number} lastOrderQty
  * @property {number} lastFilled
  * @property {string|undefined} lastSide
+ * @property {number} userQty
  * @property {ImportGridEntryDup[]} dups
  */
 
@@ -80,6 +81,7 @@ const parseCsv = function(csvFile, symbol, exchange) {
                     lastOrderQty: csvrow[2] != null ? exchange.amountToPrecision2(symbol, parseFloat(csvrow[3])) : null,
                     lastSide: csvrow[3] != null ? (csvrow[4].toLowerCase() == 'buy'?'buy':'sell') : null,
                     lastFilled: 0,
+                    userQty: null,
                     dups: [] 
                 };
                 grid.orderQty = grid.lastOrderQty;
@@ -140,6 +142,7 @@ const parseFromInstance = async function(instance, exchange) {
             lastOrderQty: null,
             lastSide: null,
             lastFilled: null,
+            userQty: null,
             dups: [] 
         };
 
@@ -203,6 +206,7 @@ const cloneGrid = function(grid) {
             lastOrderQty: entry.lastOrderQty,
             lastSide: entry.lastSide,
             lastFilled: entry.lastFilled,
+            userQty: entry.userQty,
             dups: []
         };
         for(let j=0;j<entry.dups.length;j++) {
@@ -278,7 +282,10 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
         if (activeSells > 0) {
-            if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+            if (entry.userQty != null) {
+                entry.orderQty = entry.userQty;
+                entry.filled = 0;
+            } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
                 // create matched order
                 entry.orderQty = entry.lastOrderQty;
                 entry.filled = entry.lastFilled;
@@ -304,7 +311,10 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
         if (activeBuys > 0) {
-            if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+            if (entry.userQty != null) {
+                entry.orderQty = entry.userQty;
+                entry.filled = 0;
+            } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
                 // create matched order
                 entry.orderQty = entry.lastOrderQty;
                 entry.filled = entry.lastFilled;
