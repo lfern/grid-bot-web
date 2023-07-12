@@ -14,7 +14,12 @@
           (not started
         <% } %>
         <% if (instance.stopped_at) { %>
-          - <%= instance.stopped_at.toISOString() %>)
+            <% if (instance.is_syncing) { %>
+            - <%= instance.stopped_at.toISOString() %>) syncing...
+            <% } else { %>  
+            - <%= instance.stopped_at.toISOString() %>)
+            <% } %>
+
         <% } else if (instance.running && instance.stop_requested_at != null) { %>
           - stopping...)
         <% } else { %>
@@ -27,7 +32,7 @@
           <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/stop" method="post">
             <button class="btn btn-danger btn-sm" type="submit">Stop</button>
           </form>             
-        <% } else if (!instance.running) { %>
+        <% } else if (!instance.running && !instance.is_syncing ) { %>
           <form class="form-inline float-right" action="/strategy-instance/<%= instance.id %>/recover" method="post">
             <button class="btn btn-danger btn-sm" type="submit">Start Recovery</button>
           </form>                
