@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const CsvGridService = require('../services/CsvGridService');
 const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
 const { validateRefreshRecovery } = require('../validators/strategyInstance');
+const { default: BigNumber } = require('bignumber.js');
 
 /** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
 
@@ -521,4 +522,79 @@ exports.show_recovery = async function(req, res, next) {
     } catch (ex) {
         return next(createError(505, ex));
     }
+}
+
+exports.commit_recovery = async function(req, res, next) {
+    /** @type {ImportGrid} */
+    let data = cache.get('recovery-'+req.params.id);
+    if (data == null) {
+        return next(createError(404, "Recovery not found"));
+    }
+
+    models.sequelize.transaction(async (transaction) => {
+        let instance = await models.StrategyInstance.findOne({where:{id: req.params.instance_id}});
+        if (instance == null) {
+            return next(createError(404, "Instance not found"));    
+        }
+
+        if (instance.id != data.instanceId) {
+            return next(createError(404, "This recovery ("+ data.instanceId +") doesn't belong to the instance "+instance.id));
+        }
+
+        await models.Strategy.update({
+            active_buys: data.activeBuys,
+            active_sells: data.activeSells,
+            initial_position: data.initialPosition,
+        },{
+            where: {id: instance.strategy_id},
+            transaction
+        });
+
+        await models.StrategyInstanceGrid.destroy({
+            where: {strategy_instance_id: instance.id},
+            transaction
+        });
+
+        for(let i=0;i<data.grid.length;i++) {
+            let entry = data.grid[i];
+            await models.StrategyInstanceGrid.create({
+                strategy_instance_id: instance.id,
+                price: entry.price,
+                buy_order_id: i+1,
+                buy_order_qty: entry.qty,
+                buy_order_cost: entry.cost,
+                sell_order_id: i+2,
+                sell_order_qty: entry.qty,
+                sell_order_cost: entry.cost,
+                position_before_order: entry.positionBeforeExecution,
+                order_qty: entry.orderQty,
+                side: entry.side,
+                active: entry.active,
+                exchange_order_id: null,
+                order_id: null,
+                matching_order_id: entry.matching_order_id,
+                filled: entry.matching_order_id != null ? entry.filled : null,
+            }, {
+                transaction
+            });
+        }
+
+        await models.StrategyInstance.update({
+            running: true,
+            stopped_at: null,
+            stop_requested_at: null,
+            is_dirty: false,
+            dirty_at: null,
+        }, {
+            where:{id: instance.id},
+            transaction
+        })
+
+    }).then(result => {
+        OrderSenderEventService.send(parseInt(req.params.instance_id));
+        res.redirect('/strategy-instance/'+req.params.instance_id);
+    }).catch(ex => {
+        console.error(ex);
+        return next(createError(505, ex));
+    });
 }

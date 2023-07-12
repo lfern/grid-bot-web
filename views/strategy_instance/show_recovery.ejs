@@ -15,6 +15,12 @@
         </h5>
 
 
+        <form class="form-inline float-sm-right" action="/strategy-instance/<%= instance.id %>/commit/<%= id %>" method="post">
+          <button type="button" name="submit_commit" class="btn btn-primary mb-2 btn-sm float-right" data-toggle="modal" data-target="#modal-commit">Start</button>
+          <button type="button" name="submit_commit" class="btn btn-primary mb-2 btn-sm float-right" style="display:none" data-toggle="modal" data-target="#modal-commit-dirty">Start</button>
+
+        </form>
+
         <form action="/strategy-instance/<%= instance.id %>/recover/<%= id %>" method="post">
           <div class="container-fluid">
             <% if (locals.errors && locals.errors[""]) { %>
@@ -158,6 +164,15 @@
 <script>
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
+    $("form :input").change(function() {
+      if (!$("#myform").data("changed")) {
+        $("form").data("changed",true);
+        $("button[data-target='#modal-commit']").hide();
+        $("button[data-target='#modal-commit-dirty']").show();
+      }
+    });
   });
 </script>
 <%- include('../partials/confirm-submit', {id:"modal-reset", okbutton:"Reset", msg:"Do you want to reset recovery?"}) %>
+<%- include('../partials/confirm-submit', {id:"modal-commit", okbutton:"Commit", msg:"Do you want to commit your changes and start instance?"}) %>
+<%- include('../partials/confirm-submit', {id:"modal-commit-dirty", okbutton:"Commit", msg:"You have modified some parameter (not sent to the server). Do you want to commit server changes and start instance?"}) %>

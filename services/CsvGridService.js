@@ -313,7 +313,7 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             }
             entry.side = 'sell';
             entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
-            entry.active = true;
+            entry.active = false;
             entry.filled = 0;
             currentPosition = currentPosition.minus(entry.orderQty);
         } else {
@@ -342,7 +342,7 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             }
             entry.side = 'buy';
             entry.positionBeforeExecution = exchange.amountToPrecision2(grid.symbol, currentPosition.toFixed());
-            entry.active = true;
+            entry.active = false;
             entry.filled = 0;
             currentPosition = currentPosition.plus(entry.orderQty);
         } else {

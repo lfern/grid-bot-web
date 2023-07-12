@@ -81,6 +81,7 @@ router.post('/strategy-instance/:instance_id/sendevent/json', isLoggedIn, strate
 router.post('/strategy-instance/:instance_id/recover', isLoggedIn, strategyInstance.start_recovery);
 router.get('/strategy-instance/:instance_id/recover/:id', isLoggedIn, strategyInstance.show_recovery);
 router.post('/strategy-instance/:instance_id/recover/:id', isLoggedIn, strategyInstance.show_recovery);
+router.post('/strategy-instance/:instance_id/commit/:id', isLoggedIn, strategyInstance.commit_recovery);
 
 /* Exchange related routes */
 router.get('/exchanges/json', isLoggedIn, exchange.get_exchanges_json);
