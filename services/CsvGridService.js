@@ -47,7 +47,10 @@ const models = require('../models');
  * @property {number} activeBuys
  * @property {number} activeSells
  * @property {number} price
+ * @property {number} currentPrice
+ * @property {number} currentPriceTimestamp
  * @property {number} initialPosition
+ * @property {number} lastPrice
  * @property {ImportGridEntry[]} grid
  */
 
@@ -124,11 +127,17 @@ const parseFromInstance = async function(instance, exchange) {
         symbol: symbol,
         activeBuys: instance.strategy.active_buys,
         activeSells: instance.strategy.active_sells,
+        currentPrice: null,
+        currentPriceTimestamp: null,
         price: null,
+        lastPrice: null,
         initialPosition: exchange.amountToPrecision2(symbol, instance.strategy.initial_position),
         grid: [],
     };
 
+    let lastSide = null;
+    let lastPrice = null;
+    let gridPrice = null;
     for(let i=0;i<gridRecords.length;i++) {    
         let rec = gridRecords[i];
         /** @type {ImportGridEntry} */
@@ -153,6 +162,23 @@ const parseFromInstance = async function(instance, exchange) {
             dups: [] 
         };
 
+        if (gridPrice == null) {
+            if (i == 1){
+                if (lastSide == null && gridEntry.side == 'buy') {
+                    gridPrice = lastPrice;
+                }
+            } else if (i == gridRecords.length - 1) {
+                if (lastSide == 'sell' && gridEntry.side == null) {
+                    gridPrice = gridEntry.price;
+                }
+            } else if (lastSide == 'sell' && gridEntry.side == null && gridRecords[i+1].side == 'buy') {
+                gridPrice = gridEntry.price;
+            }
+        }
+
+        lastSide = gridEntry.side;
+        lastPrice = gridEntry.price;
+
         gridEntry.lastQty = gridEntry.qty;
         gridEntry.lastOrderQty = gridEntry.orderQty;
         gridEntry.lastSide = gridEntry.side;
@@ -162,7 +188,7 @@ const parseFromInstance = async function(instance, exchange) {
             let recDup = rec.recovery_grids[j];
             /** @type {ImportGridEntryDup} */
             let dup = {
-                orderQty: recDup.orer_qty ? exchange.amountToPrecision2(symbol, recDup.order_qty) : null,
+                orderQty: recDup.order_qty ? exchange.amountToPrecision2(symbol, recDup.order_qty) : null,
                 filled: recDup.filled ? exchange.amountToPrecision2(symbol, recDup.filled) : null,
                 side: recDup.side,
                 active: recDup.active,
@@ -174,6 +200,9 @@ const parseFromInstance = async function(instance, exchange) {
 
         grid.grid.push(gridEntry);
     }
+
+    grid.price = gridPrice;
+    grid.lastPrice = gridPrice;
 
     return grid;
 }
@@ -192,7 +221,10 @@ const cloneGrid = function(grid) {
         activeSells: grid.activeSells,
         grid: [],
         initialPosition: grid.initialPosition,
+        currentPrice: grid.currentPrice,
+        currentPriceTimestamp: grid.currentPriceTimestamp,
         price: grid.price,
+        lastPrice: grid.lastPrice,
         strategyName: grid.strategyName,
         symbol: grid.symbol,
     };
@@ -290,7 +322,6 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
     for (let i=0; i<cloned.grid.length;i++) {
         /** @type {ImportGridEntry} */
         let entry = cloned.grid[i];
-        console.log(entry)
         entry.qty = exchange.amountToPrecision2(grid.symbol, entry.newQty != null ? entry.newQty : entry.lastQty);
         entry.cost = exchange.priceToPrecision2(grid.symbol, new BigNumber(entry.price).multipliedBy(entry.qty).toFixed());
     }
@@ -304,7 +335,7 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             if (entry.newOrderQty != null) {
                 entry.orderQty = entry.newOrderQty;
                 entry.filled = 0;
-            } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+            } else if (entry.lastOrderQty != null && entry.matching_order_id != null) {
                 // create matched order
                 entry.orderQty = entry.lastOrderQty;
                 entry.filled = entry.lastFilled;
@@ -317,7 +348,11 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             entry.filled = 0;
             currentPosition = currentPosition.minus(entry.orderQty);
         } else {
-            entry.orderQty = null;
+            if (entry.lastOrderQty != null && entry.matching_order_id != null) {
+                entry.orderQty = entry.lastOrderQty;
+            } else {
+                entry.orderQty = null;
+            }
             entry.side = null;
             entry.positionBeforeExecution = null;
             entry.active = null;
@@ -333,7 +368,7 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             if (entry.newOrderQty != null) {
                 entry.orderQty = entry.newOrderQty;
                 entry.filled = 0;
-            } else if (entry.lastOrderQty != null && entry.matching_order_id == null) {
+            } else if (entry.lastOrderQty != null && entry.matching_order_id != null) {
                 // create matched order
                 entry.orderQty = entry.lastOrderQty;
                 entry.filled = entry.lastFilled;
@@ -346,7 +381,11 @@ const recalculateForPrice = function(grid, newPrice, exchange) {
             entry.filled = 0;
             currentPosition = currentPosition.plus(entry.orderQty);
         } else {
-            entry.orderQty = null;
+            if (entry.lastOrderQty != null && entry.matching_order_id != null) {
+                entry.orderQty = entry.lastOrderQty;
+            } else {
+                entry.orderQty = null;
+            }
             entry.side = null;
             entry.positionBeforeExecution = null;
             entry.active = null;

@@ -491,19 +491,28 @@ exports.show_recovery = async function(req, res, next) {
             }
         }
     
+        data.currentPrice = await exchange.fetchCurrentPrice(data.symbol); 
+        data.currentPriceTimestamp = new Date().getTime();
 
         let price = null;
-        if (req.body.price == undefined) {
-            price = data.price;
-        } else if (req.body.price != '') {
-            price = parseFloat(req.body.price);
-        }
-        
-        if (price == null) {
-            price = await exchange.fetchCurrentPrice(data.symbol);
-            if (price == null) {
-                throw new Error("Could not get current price from exchange");
+        if (data.lastPrice != null) {
+            // if we could get last price
+            if (req.body.price != undefined && req.body.price != '' && new BigNumber(req.body.price).toFixed() != new BigNumber(data.lastPrice).toFixed()) {
+                errors['price'] = 'You could not change the price';
+                req.body.price = data.lastPrice;
             }
+            price = data.lastPrice;
+        } else if (req.body.price != undefined && req.body.price != '') {
+            // without grid price, if user provide a new price
+            price = parseFloat(req.body.price);
+        } else {
+            // else get current price
+            price = data.currentPrice;
+        }
+
+        if (data.currentPrice == null) {
+            // if we don't get a price, that means we couldn't get from exchange
+            throw new Error("Could not get current price from exchange");
         }
          
         data = CsvGridService.recalculateForPrice(data, price, exchange);
@@ -529,6 +538,13 @@ exports.commit_recovery = async function(req, res, next) {
     let data = cache.get('recovery-'+req.params.id);
     if (data == null) {
         return next(createError(404, "Recovery not found"));
+    }
+
+    for(let i=0;i<data.grid.length;i++) {
+        let entry = data.grid[i];
+        if (entry.orderQty == null && entry.matching_order_id != null) {
+            return next(createError(400, `Order qty is null when matching order is not for price ${entry.price}`));
+        }
     }
 
     models.sequelize.transaction(async (transaction) => {
@@ -589,6 +605,14 @@ exports.commit_recovery = async function(req, res, next) {
             where:{id: instance.id},
             transaction
         })
+        // TODO: use repository classes!!!!
+        await models.StrategyInstanceEvent.create({
+            strategy_instance_id: instance.id,
+            event: 'GridRecovered',
+            level: 3,
+            message: 'Grid recovered',
+            params: {},
+        });
 
     }).then(result => {
         OrderSenderEventService.send(parseInt(req.params.instance_id));

@@ -126,3 +126,32 @@ body.grid-body .navbar-brand {
   height: 300px;
   overflow: auto;
 }
+
+.grid-sell-entry-will-be-executed {
+  background-color: green !important;
+}
+
+.grid-buy-entry-will-be-executed {
+  background-color: red !important;
+
+}
+
+.current-price-top-border {
+  border-top: 3px solid black;
+}
+
+.current-price-bottom-border {
+  border-bottom: 3px solid black;
+
+}
+
+.tooltip-inner.one-line-tooltip {
+  white-space:nowrap;
+  max-width:none;
+}
+
+.tooltip-inner {
+  max-width: 350px;
+  /* If max-width does not work, try using width instead */
+  /*width: 350px;*/ 
+}

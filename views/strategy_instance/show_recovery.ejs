@@ -34,6 +34,9 @@
               <label for="price" class="col-sm-1 col-form-label">Price</label>
               <div class="col-sm-2">
                 <input type="text" name="price" value="<%= locals.formData && locals.formData.price ? locals.formData.price : grid.price %>">
+                <% if (grid.lastPrice == null) { %>
+                  <p class="small text-warning">We couldn't get the grid price automatically !!!</p>
+                <% } %>
                 <% if (locals.errors && locals.errors.price) { %>
                   <p class="small text-danger"><%= errors.price %></p>
                  <% } %>
@@ -92,9 +95,22 @@
               </tr>
             </thead>
             <tbody>
+              <% let currentPricePlaced = false; %>
               <% grid.grid.forEach((element, index) => { %>
-                  <% const classColor = element.side == 'buy' ? 'table-success' :(element.side ? 'table-danger' : '') %>
-                  <tr class="<%= classColor %>">
+                  <% 
+                    const classColor = element.side == 'buy' ? 'table-success' :(element.side ? 'table-danger' : '');
+                    let classBorder = '';
+                    if (!currentPricePlaced) {
+                      if (index == grid.grid.length-1) {
+                        classBorder = 'current-price-bottom-border';
+                        currentPricePlaced = true;
+                      } else if (grid.currentPrice >= element.price) {
+                        classBorder = 'current-price-top-border';
+                        currentPricePlaced = true;
+                      }
+                    }
+                  %>
+                  <tr class="<%= classColor %> <%= classBorder %>">
                       <td>
                         <% let field = "price-"+element.price %>
                         <input type="text" name="<%= field %>" value="<%= locals.formData && locals.formData[field] ? locals.formData[field] : element.price %>">
@@ -102,6 +118,11 @@
                           <span data-toggle="tooltip" data-placement="right" title="<%= errors[field] %>">
                             <span style="pointer-events: none;" class="small text-danger">?</span>
                           </span>
+                        <% } %>
+                        <% if (classBorder != '') { %>
+                          <span data-toggle="tooltip" data-placement="<%= classBorder == 'current-price-bottom-border'?'bottom':'top' %>" title="<%= grid.currentPrice %>&#160;at&#160;<%= new Date(grid.currentPriceTimestamp).toISOString().replaceAll('-', '\u2011') %>">
+                            <span style="pointer-events: none;" class="small">$$</span>
+                          </span>                         
                         <% } %>
                       </td>
                       <td>
@@ -129,7 +150,15 @@
                       </td>
                       <td><%= element.orderQty %></td>
                       <td><%= element.filled %></td>
-                      <td><%= element.side %></td>
+                      <%
+                        let classSide = '';
+                        if (element.side == 'sell' && grid.currentPrice >= element.price) {
+                          classSide = 'grid-sell-entry-will-be-executed';
+                        } else if (element.side == 'buy' && grid.currentPrice <= element.price) {
+                          classSide = 'grid-buy-entry-will-be-executed';
+                        }
+                      %>
+                      <td class="<%= classSide %>"><%= element.side %></td>                         
                       <td><%= element.active %></td>
                       <td><%= element.order_id %></td>
                       <td><%= element.matching_order_id %></td>
@@ -163,7 +192,7 @@
 <%- contentFor('scripts') %>
 <script>
   $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
     $("form :input").change(function() {
       if (!$("#myform").data("changed")) {
         $("form").data("changed",true);
