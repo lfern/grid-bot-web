@@ -515,6 +515,25 @@ exports.commit_recovery = async function(req, res, next) {
         }
     }
 
+    let instance = await models.StrategyInstance.findOne({
+        where:{id: req.params.instance_id},
+        include: [{
+            association: models.StrategyInstance.Strategy,
+            include: [{
+                association: models.Strategy.Account,
+                include: [
+                    models.Account.AccountType,
+                    models.Account.Exchange
+                ]
+            }, models.Strategy.StrategyType]
+        }]
+    });
+            
+    if (instance == null || instance.running) {
+        return next(createError(404, 'Instance has been removed or is running'));
+    }
+
+
     if (instance.id != data.instanceId) {
         return next(createError(404, "This recovery ("+ data.instanceId +") doesn't belong to the instance "+instance.id));
     }
