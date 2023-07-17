@@ -550,7 +550,7 @@ const dbUpdateOrCreateGrid = function (data, instanceId) {
     return models.sequelize.transaction(async (transaction) => {
         let instance;
         if (instanceId != null) {
-            instance = await models.StrategyInstance.findOne({where:{id: req.params.instance_id}});
+            instance = await models.StrategyInstance.findOne({where:{id: instanceId}});
             if (instance == null) {
                 return null;
             }
