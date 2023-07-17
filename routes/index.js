@@ -57,6 +57,7 @@ router.post('/strategies/create', isLoggedIn, strategy.submit_strategy);
 router.post('/strategies/import', isLoggedIn, strategy.import_strategy);
 router.get('/strategies/import/:id', isLoggedIn, strategy.show_import);
 router.post('/strategies/import/:id', isLoggedIn, strategy.show_import);
+router.post('/strategies/import/:id/commit', isLoggedIn, strategy.commit_import);
 router.post('/strategy/:strategy_id/delete', isLoggedIn, strategy.delete_strategy);
 router.post('/strategy/:strategy_id/delete/json', isLoggedIn, strategy.delete_strategy_json);
 router.get('/strategy/:strategy_id', isLoggedIn, strategy.show_strategy);

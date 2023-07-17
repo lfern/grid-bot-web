@@ -2,7 +2,7 @@
     <div class="row" style="padding-top: 36px;">
       <div class="col-md-12">
         <h5>
-          <% if (grid.instanceId == undefined) { %>
+          <% if (locals.instance == undefined) { %>
             Import Grid:            
           <% } else { %>
             Recover Grid: 
@@ -15,13 +15,13 @@
         </h5>
 
 
-        <form class="form-inline float-sm-right" action="/strategy-instance/<%= instance.id %>/commit/<%= id %>" method="post">
+        <form class="form-inline float-sm-right" action="<%= instance != undefined ? '/strategy-instance/'+instance.id+'/commit/'+id : '/strategies/import/'+id+'/commit'%>" method="post">
           <button type="button" name="submit_commit" class="btn btn-primary mb-2 btn-sm float-right" data-toggle="modal" data-target="#modal-commit">Start</button>
           <button type="button" name="submit_commit" class="btn btn-primary mb-2 btn-sm float-right" style="display:none" data-toggle="modal" data-target="#modal-commit-dirty">Start</button>
 
         </form>
 
-        <form action="/strategy-instance/<%= instance.id %>/recover/<%= id %>" method="post">
+        <form action="<%= instance != undefined ? '/strategy-instance/'+instance.id+'/recover/'+id : '/strategies/import/'+id %>" method="post">
           <div class="container-fluid">
             <% if (locals.errors && locals.errors[""]) { %>
               <p class="small text-danger"><%= errors[""] %></p>
@@ -34,7 +34,7 @@
               <label for="price" class="col-sm-1 col-form-label">Price</label>
               <div class="col-sm-2">
                 <input type="text" name="price" value="<%= locals.formData && locals.formData.price ? locals.formData.price : grid.price %>">
-                <% if (grid.lastPrice == null) { %>
+                <% if (instance != undefined && grid.lastPrice == null) { %>
                   <p class="small text-warning">We couldn't get the grid price automatically !!!</p>
                 <% } %>
                 <% if (locals.errors && locals.errors.price) { %>
@@ -66,7 +66,9 @@
               </div>
             </div>
             <button type="submit" name="submit_update" class="btn btn-primary mb-2 btn-sm">Update data</button>
-            <button type="button" name="submit_reset" class="btn btn-primary mb-2 btn-sm" data-toggle="modal" data-target="#modal-reset">ResetRecovery</button>
+            <% if (instance != undefined) { %>
+              <button type="button" name="submit_reset" class="btn btn-primary mb-2 btn-sm" data-toggle="modal" data-target="#modal-reset">ResetRecovery</button>             
+            <% } %>
             <p class="small text-danger">(*) Empty price to remove row price</p>
           </div>
           <button type="submit" name="submit_up_1" class="btn btn-primary mb-2 btn-sm">+1</button>

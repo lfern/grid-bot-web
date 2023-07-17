@@ -3,6 +3,8 @@ let validator = require('validator');
 const { default: BigNumber } = require('bignumber.js');
 
 /** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
+/** @typedef {import('../services/CsvGridService').GridUpdateData} GridUpdateData */
+/** @typedef {import('../services/CsvGridService').PriceUpdateEntry} PriceUpdateEntry */
 
 /**
  * 
@@ -11,6 +13,7 @@ const { default: BigNumber } = require('bignumber.js');
  * @param {ImportGrid} data 
  */
 const validateRefreshRecoveryFields = function(errors, req, data){
+    /** @type {GridUpdateData} */
     let ret = {
         prices: [],
         initial_position: null,
@@ -51,14 +54,16 @@ const validateRefreshRecoveryFields = function(errors, req, data){
             if (price.isNaN()) {
                 errors[fields[i]] = 'Invalid price in field name???';
             } else {
-                ret.prices.push({
+                /** @type {PriceUpdateEntry} */
+                let priceUpdateEntry = {
                     price: price,
                     priceTag: priceTag,
                     priceField: fields[i],
                     newPrice: null,
                     orderQty: null,
-                    qty: null,
-                });
+                    qty: null
+                };
+                ret.prices.push(priceUpdateEntry);
             }
         }
     }
@@ -120,7 +125,7 @@ exports.validateRefreshRecovery = function(errors, req, data) {
     return new Promise(function(resolve, reject){
         let validatedData = null;
         try {
-            validatedData = validateRefreshRecoveryFields(errors, req, data);console.log(validatedData)
+            validatedData = validateRefreshRecoveryFields(errors, req, data);
         } catch(ex) {
             console.error(ex);
         } finally {

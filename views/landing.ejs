@@ -24,7 +24,7 @@
                     <td><a href="/strategy-instance/<%= instance.id %>"><%= instance.id %></a></td>
                     <td><%= instance.strategy.symbol %></td>
                     <td><%= instance.strategy.account.account_name %></td>
-                    <td><%= instance.started_at.toISOString() %></td>
+                    <td><%= instance.started_at ? instance.started_at.toISOString() : '' %></td>
                   </tr>
                 <% }) %>
               <% } %>

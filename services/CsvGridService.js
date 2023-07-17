@@ -6,6 +6,24 @@ const models = require('../models');
 /** @typedef {import('grid-bot/src/crypto/exchanges/BaseExchange').BaseExchange} BaseExchange */
 
 /**
+ * @typedef {Object} PriceUpdateEntry
+ * @property {number} price,
+ * @property {string} priceTag
+ * @property {string} priceField
+ * @property {number} newPrice
+ * @property {number} orderQty
+ * @property {number} qty
+ */
+
+/**
+ * @typedef {Object} GridUpdateData
+ * @property {PriceUpdateEntry[]} prices
+ * @property {number} initial_position
+ * @property {number} active_sells
+ * @property {number} active_buys
+ */
+
+/**
  * @typedef {Object} ImportGridEntryDup
  * @property {number} orderQty
  * @property {number} filled
@@ -91,9 +109,9 @@ const parseCsv = function(csvFile, symbol, exchange) {
                     newQty: null,
                     dups: [] 
                 };
-                grid.lastQty = grid.qty;
-                grid.orderQty = grid.lastOrderQty;
-                grid.side = grid.lastSide;
+                gridEntry.lastQty = gridEntry.qty;
+                gridEntry.orderQty = gridEntry.lastOrderQty;
+                gridEntry.side = gridEntry.lastSide;
                 gridEntry.cost = exchange.priceToPrecision2(symbol, new BigNumber(gridEntry.price).multipliedBy(gridEntry.qty).toFixed());
                 gridEntries.push(gridEntry);
             }).on('end',function() {
@@ -227,6 +245,7 @@ const cloneGrid = function(grid) {
         lastPrice: grid.lastPrice,
         strategyName: grid.strategyName,
         symbol: grid.symbol,
+        strategyType: grid.strategyType,
     };
 
     for(let i=0;i<grid.grid.length;i++) {
@@ -478,7 +497,182 @@ const addPrices = function (data, rows, up = false) {
     }
 }
 
+/**
+ * 
+ * @param {ImportGrid} grid
+ * @param {BaseExchange} exchange
+ * @param {GridUpdateData} updateData 
+ */
+const updateGridData = function(exchange, data, updateData) {
+    data.initialPosition = updateData.initial_position;
+    data.activeSells = updateData.active_sells;
+    data.activeBuys = updateData.active_buys;
+    for(let i=0;i<updateData.prices.length;i++) {
+        let price = updateData.prices[i];
+        let gridEntry = getPriceEntry(data, price.priceTag);
+        if (price.newPrice.isNaN()) {
+            removePriceEntry(data, price.priceTag);
+        } else {
+            if (gridEntry != null) {
+                gridEntry.price = exchange.priceToPrecision2(data.symbol, price.newPrice.toFixed());
+            }    
+        }
+
+        if (gridEntry != null) {
+            if (price.orderQty == null) {
+                gridEntry.newOrderQty = null;
+            } else if (!price.orderQty.isNaN()) {
+                gridEntry.newOrderQty = exchange.amountToPrecision2(data.symbol, price.orderQty.toFixed());
+            } else {
+                gridEntry.newOrderQty = null;
+            }
+
+            if (price.qty == null) {
+                gridEntry.newQty = null;
+            } else if (!price.qty.isNaN()) {
+                gridEntry.newQty = exchange.amountToPrecision2(data.symbol, price.qty.toFixed());
+            } else {
+                gridEntry.newQty = null;
+            }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {ImportGrid} data 
+ * @param {number|null} instanceId 
+ * @returns 
+ */
+const dbUpdateOrCreateGrid = function (data, instanceId) {
+    console.log(data);
+    // TODO: use repository classes!!!!
+    return models.sequelize.transaction(async (transaction) => {
+        let instance;
+        if (instanceId != null) {
+            instance = await models.StrategyInstance.findOne({where:{id: req.params.instance_id}});
+            if (instance == null) {
+                return null;
+            }
+
+            await models.Strategy.update({
+                active_buys: data.activeBuys,
+                active_sells: data.activeSells,
+                initial_position: data.initialPosition,
+            },{
+                where: {id: instance.strategy_id},
+                transaction
+            });
+
+            await models.StrategyInstanceGrid.destroy({
+                where: {strategy_instance_id: instance.id},
+                transaction
+            });
+        } else {
+            let strategyType = await models.StrategyType.findOne({
+                where: {id: data.strategyType}
+            });
+
+            let account = await models.Account.findOne({
+                where: {id: data.accountId}
+            })
+
+            if (strategyType == null || account == null) {
+                return null;
+            }
+
+            let buyOrders = Math.floor(data.grid.length/2);
+            let strategy = await models.Strategy.create({
+                strategy_type_id: strategyType.id,
+                strategy_name: data.strategyName,
+                account_id: data.accountId,
+                symbol: data.symbol,
+                initial_position: data.initialPosition,
+                order_qty:  data.grid[0].qty,
+                buy_orders: buyOrders,
+                sell_orders: data.grid.length - buyOrders,
+                active_buys: data.activeBuys,
+                active_sells: data.activeSells,
+                step: data.grid[0].price - data.grid[1].price,
+                step_type: 'absolute',
+            });
+
+            instance = await models.StrategyInstance.create({
+                strategy_id: strategy.id,
+                running: false,
+                started_at: null,
+                stopped_at: null,
+                stop_requested_at: null,
+                is_dirty: false,
+                dirty_at: null,
+                nofunds: false,
+                nofunds_at: null,
+                nofunds_currency: null,
+                is_syncing: false,
+                syncing_at: null,
+            });
+        }
+
+        for(let i=0;i<data.grid.length;i++) {
+            let entry = data.grid[i];
+            await models.StrategyInstanceGrid.create({
+                strategy_instance_id: instance.id,
+                price: entry.price,
+                buy_order_id: i+1,
+                buy_order_qty: entry.qty,
+                buy_order_cost: entry.cost,
+                sell_order_id: i+2,
+                sell_order_qty: entry.qty,
+                sell_order_cost: entry.cost,
+                position_before_order: entry.positionBeforeExecution,
+                order_qty: entry.orderQty,
+                side: entry.side,
+                active: entry.active,
+                exchange_order_id: null,
+                order_id: null,
+                matching_order_id: entry.matching_order_id,
+                filled: entry.matching_order_id != null ? entry.filled : null,
+            }, {
+                transaction
+            });
+        }
+
+        await models.StrategyInstance.update({
+            running: true,
+            started_at: models.Sequelize.fn('NOW'),
+            stopped_at: null,
+            stop_requested_at: null,
+            is_dirty: false,
+            dirty_at: null,
+        }, {
+            where:{id: instance.id},
+            transaction
+        })
+
+        if (instanceId != null) {
+            await models.StrategyInstanceEvent.create({
+                strategy_instance_id: instance.id,
+                event: 'GridRecovered',
+                level: 3,
+                message: 'Grid recovered',
+                params: {},
+            });
+        } else {
+            await models.StrategyInstanceEvent.create({
+                strategy_instance_id: instance.id,
+                event: 'GridStarted',
+                level: 3,
+                message: 'Grid Started',
+                params: {},
+            });
+        }
+
+        return instance.id;
+
+    });
+}
+
 module.exports = {
     parseCsv, checkValidity, recalculateForPrice, cloneGrid,parseFromInstance, getPriceEntry,
-    removePriceEntry, addPrices
+    removePriceEntry, addPrices, updateGridData, dbUpdateOrCreateGrid
 }

@@ -409,7 +409,6 @@ exports.show_recovery = async function(req, res, next) {
         return next(createError(404, "Recovery not found"));
     }
 
-
     try {
         let instance = await models.StrategyInstance.findOne({
             where:{id: req.params.instance_id},
@@ -443,39 +442,8 @@ exports.show_recovery = async function(req, res, next) {
             errors = result.errors;
             let validatedData = result.validatedData;
             if (Object.keys(errors).length == 0) {
-                data.initialPosition = validatedData.initial_position;
-                data.activeSells = validatedData.active_sells;
-                data.activeBuys = validatedData.active_buys;
-                // try to modify the grid
-                for(let i=0;i<validatedData.prices.length;i++) {
-                    let price = validatedData.prices[i];
-                    let gridEntry = CsvGridService.getPriceEntry(data, price.priceTag);
-                    if (price.newPrice.isNaN()) {
-                        CsvGridService.removePriceEntry(data, price.priceTag);
-                    } else {
-                        if (gridEntry != null) {
-                            gridEntry.price = exchange.priceToPrecision2(data.symbol, price.newPrice.toFixed());
-                        }    
-                    }
-    
-                    if (gridEntry != null) {
-                        if (price.orderQty == null) {
-                            gridEntry.newOrderQty = null;
-                        } else if (!price.orderQty.isNaN()) {
-                            gridEntry.newOrderQty = exchange.amountToPrecision2(data.symbol, price.orderQty.toFixed());
-                        } else {
-                            gridEntry.newOrderQty = null;
-                        }
+                CsvGridService.updateGridData(exchange, data, validatedData);
 
-                        if (price.qty == null) {
-                            gridEntry.newQty = null;
-                        } else if (!price.qty.isNaN()) {
-                            gridEntry.newQty = exchange.amountToPrecision2(data.symbol, price.qty.toFixed());
-                        } else {
-                            gridEntry.newQty = null;
-                        }
-                    }
-                }
                 if (req.body.submit_up_5 !== undefined) {
                     CsvGridService.addPrices(data, 5, true);
                 }
@@ -547,74 +515,15 @@ exports.commit_recovery = async function(req, res, next) {
         }
     }
 
-    models.sequelize.transaction(async (transaction) => {
-        let instance = await models.StrategyInstance.findOne({where:{id: req.params.instance_id}});
-        if (instance == null) {
-            return next(createError(404, "Instance not found"));    
+    if (instance.id != data.instanceId) {
+        return next(createError(404, "This recovery ("+ data.instanceId +") doesn't belong to the instance "+instance.id));
+    }
+
+    CsvGridService.dbUpdateOrCreateGrid(data, instance.id).then(result => {
+        if (result == null) {
+            return next(createError(404, "Instance not found"));
         }
 
-        if (instance.id != data.instanceId) {
-            return next(createError(404, "This recovery ("+ data.instanceId +") doesn't belong to the instance "+instance.id));
-        }
-
-        await models.Strategy.update({
-            active_buys: data.activeBuys,
-            active_sells: data.activeSells,
-            initial_position: data.initialPosition,
-        },{
-            where: {id: instance.strategy_id},
-            transaction
-        });
-
-        await models.StrategyInstanceGrid.destroy({
-            where: {strategy_instance_id: instance.id},
-            transaction
-        });
-
-        for(let i=0;i<data.grid.length;i++) {
-            let entry = data.grid[i];
-            await models.StrategyInstanceGrid.create({
-                strategy_instance_id: instance.id,
-                price: entry.price,
-                buy_order_id: i+1,
-                buy_order_qty: entry.qty,
-                buy_order_cost: entry.cost,
-                sell_order_id: i+2,
-                sell_order_qty: entry.qty,
-                sell_order_cost: entry.cost,
-                position_before_order: entry.positionBeforeExecution,
-                order_qty: entry.orderQty,
-                side: entry.side,
-                active: entry.active,
-                exchange_order_id: null,
-                order_id: null,
-                matching_order_id: entry.matching_order_id,
-                filled: entry.matching_order_id != null ? entry.filled : null,
-            }, {
-                transaction
-            });
-        }
-
-        await models.StrategyInstance.update({
-            running: true,
-            stopped_at: null,
-            stop_requested_at: null,
-            is_dirty: false,
-            dirty_at: null,
-        }, {
-            where:{id: instance.id},
-            transaction
-        })
-        // TODO: use repository classes!!!!
-        await models.StrategyInstanceEvent.create({
-            strategy_instance_id: instance.id,
-            event: 'GridRecovered',
-            level: 3,
-            message: 'Grid recovered',
-            params: {},
-        });
-
-    }).then(result => {
         OrderSenderEventService.send(parseInt(req.params.instance_id));
         res.redirect('/strategy-instance/'+req.params.instance_id);
     }).catch(ex => {

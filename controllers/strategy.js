@@ -7,6 +7,8 @@ const cache = require('memory-cache');
 const crypto = require('crypto');
 const CsvGridService = require('../services/CsvGridService');
 const { exchangeInstanceFromAccount } = require('grid-bot/src/services/ExchangeMarket');
+const { validateRefreshRecovery } = require('../validators/strategyInstance');
+const OrderSenderEventService = require('grid-bot/src/services/OrderSenderEventService');
 
 /** @typedef {import('../services/CsvGridService').ImportGrid} ImportGrid */
 /** @typedef {import('../services/CsvGridService').GridCacheData} GridCacheData */
@@ -126,7 +128,7 @@ exports.import_strategy = function(req, res, next) {
                 let data = result.validatedData;
 
                 let key = crypto.randomUUID();
-                cache.put('import-'+key, {orig: data, current: null}, 15*60*1000);
+                cache.put('import-'+key, data, 15*60*1000);
                 res.redirect('/strategies/import/' + key);
             }
         }).catch(ex => {
@@ -135,68 +137,174 @@ exports.import_strategy = function(req, res, next) {
     });
 }
 
-exports.show_import = function(req, res, next) {
-    /** @type {GridCacheData} */
-    let data = cache.get('import-'+req.params.id);
-    if (data == null) {
-        return next(createError(404, "Import not found"));
-    }
+exports.show_import = async function(req, res, next) {
+    try {
+        let errors = {};
+        /** @type {GridCacheData} */
+        let data = cache.get('import-'+req.params.id);
+        if (data == null) {
+            return next(createError(404, "Import not found"));
+        }
 
-    cache.put('import-'+req.params.id, data, 60*60*1000);
+        cache.put('import-'+req.params.id, data, 60*60*1000);
 
-    Promise.all([
-        models.StrategyType.findOne({where:{id: data.orig.strategyType}}),
-        models.Account.findOne({
-            where:{id: data.orig.accountId},
-            include:[models.Account.AccountType,models.Account.Exchange]
-        })
-    ]).then(result => {
-        let strategyType = result[0];
-        let account = result[1];
+        console.log(data);
+
+        let strategyType = await models.StrategyType.findOne({where:{id: data.strategyType}});
         if (strategyType == null) {
             return next(createError(404, 'StrategyType has been removed'));
         }
+
+        let account = await models.Account.findOne({
+            where:{id: data.accountId},
+            include:[models.Account.AccountType,models.Account.Exchange]
+        });
 
         if (account == null) {
             return next(creteError(404, 'Account has been removed'));
         }
 
-        return exchangeInstanceFromAccount(account).then(
-            exchange => {
-                return new Promise((resolve, reject) => {
-                    if (req.body.price != undefined && req.body.price != '') {
-                        resolve(parseFloat(req.body.price));
-                    } else {
-                        exchange.fetchCurrentPrice(data.orig.symbol).then(price => {
-                            if (price == null) {
-                                reject(new Error("Could not get current price from exchange"));
-                            }
-                            resolve(price);
-                        }).catch(ex => {
-                            reject(ex);
-                        });
-                    }
-                }).then (price => {
-                    data.grid = CsvGridService.recalculateForPrice(data.orig, price, exchange);
-                    cache.put('import-'+req.params.id, data, 60*60*1000);   
-                    console.log(data.grid);         
-                    res.render('strategy/show_import', {
-                        title: 'Import',
-                        grid: data.grid,
-                        user: req.user,
-                        layout: './layouts/grid2',
-                        account: account,
-                        id: req.params.id
-                    });
-                });
+        let exchange = await exchangeInstanceFromAccount(account);
+
+        if (req.body.submit_update !== undefined || 
+            req.body.submit_up_5 !== undefined ||
+            req.body.submit_up_1 !== undefined ||
+            req.body.submit_down_5 !== undefined ||
+            req.body.submit_down_1 !== undefined
+            ) {
+            let result = await validateRefreshRecovery(errors, req, data);
+            errors = result.errors;
+            let validatedData = result.validatedData;
+            if (Object.keys(errors).length == 0) {
+                CsvGridService.updateGridData(exchange, data, validatedData);
+
+                if (req.body.submit_up_5 !== undefined) {
+                    CsvGridService.addPrices(data, 5, true);
+                }
+                if (req.body.submit_up_1 !== undefined) {
+                    CsvGridService.addPrices(data, 1, true);
+                }
+                if (req.body.submit_down_5 !== undefined) {
+                    CsvGridService.addPrices(data, 5, false);
+                }
+                if (req.body.submit_down_1 !== undefined) {
+                    CsvGridService.addPrices(data, 1, false);
+                }
             }
-        );
+        }
     
-    }).catch(ex => {
+        data.currentPrice = await exchange.fetchCurrentPrice(data.symbol); 
+        data.currentPriceTimestamp = new Date().getTime();
+
+        let price = null;
+        if (req.body.price != undefined && req.body.price != '') {
+            // without grid price, if user provide a new price
+            price = parseFloat(req.body.price);
+        } else {
+            // else get current price
+            price = data.currentPrice;
+        }
+
+        if (data.currentPrice == null) {
+            // if we don't get a price, that means we couldn't get from exchange
+            throw new Error("Could not get current price from exchange");
+        }
+         
+        data = CsvGridService.recalculateForPrice(data, price, exchange);
+        cache.put('import-'+req.params.id, data, 60*60*1000);   
+        res.render('strategy_instance/show_recovery', {
+            title: '',
+            grid: data,
+            user: req.user,
+            layout: './layouts/grid2',
+            account: account,
+            instance: undefined,
+            id: req.params.id,
+            errors: errors,
+            formData: Object.keys(errors).length > 0 ? req.body : undefined,
+        });
+    } catch(ex) {
         return next(createError(505, ex));
-    })
+    }
+}
+
+exports.commit_import = async function(req, res, next) {
+    /** @type {ImportGrid} */
+    let data = cache.get('import-'+req.params.id);
+    if (data == null) {
+        return next(createError(404, "Import not found"));
+    }
+
+    for(let i=0;i<data.grid.length;i++) {
+        let entry = data.grid[i];
+        if (entry.orderQty == null && entry.matching_order_id != null) {
+            return next(createError(400, `Order qty is null when matching order is not for price ${entry.price}`));
+        }
+    }
+
+    CsvGridService.dbUpdateOrCreateGrid(data, null).then(result => {
+        if (result == null) {
+            return next(createError(404, "Account or strategy type not found"));
+        }
+
+        OrderSenderEventService.send(result);
+        res.redirect('/strategy-instance/'+result);
+    }).catch(ex => {
+        console.error(ex);
+        return next(createError(505, ex));
+    });
+}
+
+exports.show_import2 = async function(req, res, next) {
+    try {
+        /** @type {GridCacheData} */
+        let data = cache.get('import-'+req.params.id);
+        if (data == null) {
+            return next(createError(404, "Import not found"));
+        }
+
+        cache.put('import-'+req.params.id, data, 60*60*1000);
+
+        let strategyType = await models.StrategyType.findOne({where:{id: data.orig.strategyType}});
+        if (strategyType == null) {
+            return next(createError(404, 'StrategyType has been removed'));
+        }
+
+        let account = await models.Account.findOne({
+            where:{id: data.orig.accountId},
+            include:[models.Account.AccountType,models.Account.Exchange]
+        });
+
+        if (account == null) {
+            return next(creteError(404, 'Account has been removed'));
+        }
+
+        let exchange = await exchangeInstanceFromAccount(account);
 
 
+        let price;
+        if (req.body.price != undefined && req.body.price != '') {
+            price = parseFloat(req.body.price);
+        } else {
+            let price = exchange.fetchCurrentPrice(data.orig.symbol);
+            if (price == null) {
+                reject(new Error("Could not get current price from exchange"));
+            }
+        }
+        
+        data.grid = CsvGridService.recalculateForPrice(data.orig, price, exchange);
+        cache.put('import-'+req.params.id, data, 60*60*1000);   
+        res.render('strategy/show_import', {
+            title: 'Import',
+            grid: data.grid,
+            user: req.user,
+            layout: './layouts/grid2',
+            account: account,
+            id: req.params.id
+        });
+    } catch(ex) {
+        return next(createError(505, ex));
+    }
 }
 
 exports.delete_strategy = function(req, res, next) {
