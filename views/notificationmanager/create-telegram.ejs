@@ -35,6 +35,7 @@
                          <option value="none" <%=formData.scope == null?'selected':''%>>none</option>
                          <option value="strategy" <%=formData.scope == 'strategy'?'selected':''%>>strategy</option>
                          <option value="other" <%=formData.scope == 'other'?'selected':''%>>other</option>
+                         <option value="strategy-other" <%=formData.scope == 'strategy-other'?'selected':''%>>strategy-other</option>
                     </select>
                     <% if (locals.errors && locals.errors.scope) { %>
                         <p class="small text-danger"><%= errors.scope %></p>

@@ -38,6 +38,8 @@
                    strategy
                   <% } else if (telegramId.scope == 'other') {%>
                     other
+                  <% } else if (telegramId.scope == 'strategy-other') {%>
+                    strategy-other
                   <% } else {%>
                   <% } %>
                 </span>
@@ -45,7 +47,7 @@
                 <td><span><%= telegramId.is_valid ? 'yes' : 'no'%></span></td>
                 <td>
                   <a href="/notificationmanager/telegram/<%= telegramId.id%>">Edit</a>
-                  <% if (telegramId.scope == 'strategy') { %>
+                  <% if (telegramId.scope == 'strategy' || telegramId.scope == 'strategy-other') { %>
                     <a href="/notificationmanager/telegram/<%= telegramId.id%>/strategies">Strategies</a>                   
                   <% } %>
                 </td>
