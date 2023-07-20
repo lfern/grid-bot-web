@@ -108,6 +108,10 @@ router.post('/notificationmanager/telegram/:telegram_id/update', isLoggedIn, has
 router.post('/notificationmanager/telegram/:telegram_id/delete', isLoggedIn, hasAuth, notificationManager.delete_telegram);
 router.post('/notificationmanager/telegram/:telegram_id/delete/json', isLoggedIn, hasAuth, notificationManager.delete_telegram_json);
 router.post('/notificationmanager/telegram/:telegram_id/test/json', isLoggedIn, hasAuth, notificationManager.test_telegram_json);
+router.get('/notificationmanager/telegram/:telegram_id/strategies', isLoggedIn, hasAuth, notificationManager.show_telegram_strategies);
+router.get('/notificationmanager/telegram/:telegram_id/strategy/add', isLoggedIn, hasAuth, notificationManager.show_add_telegram_strategy);
+router.post('/notificationmanager/telegram/:telegram_id/strategy/add', isLoggedIn, hasAuth, notificationManager.add_telegram_strategy);
+router.post('/notificationmanager/telegram/strategy/:telegram_strategy_id/delete/json', isLoggedIn, notificationManager.delete_telegram_strategy_json);
 
 
 

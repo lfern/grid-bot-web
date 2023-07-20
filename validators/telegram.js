@@ -14,6 +14,13 @@ const validateCreateTelegramFields = function(errors, req){
     })) {
         errors['level'] = "Please provide a valid level";
     }
+
+    if (validator.isEmpty(req.body.scope)){
+        errors["scope"] = "Please provide a valid scope.";
+    } else if (!['none', 'strategy', 'other'].includes(req.body.scope)){
+        errors["scope"] = "Please provide a valid scope.";
+    }
+
 }
 
 exports.validateTelegram = function(errors, req) {

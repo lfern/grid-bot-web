@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-12 order-md-1 text-center text-md-left pr-md-5">
+        <h1>Addresses for 
+          <a href="/notificationmanager/telegram/<%=telegram.id%>/strategy/add" class="btn btn-primary float-right">Add strategy</a>
+        </h1>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Strategy</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for( let i = 0; i < locals.telegramStrategies.length; i++ ) { %>
+              <% let telegramStrategy = telegramStrategies[i]; %>
+              <tr id="<%= telegramStrategy.id%>">
+                <td><span><%= telegramStrategy.strategy.id %></span></td>
+                <td><span><%= telegramStrategy.strategy.strategy_name %></span></td>
+                <td><button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteTelegramStrategy" data-parameter="<%= telegramStrategy.id%>">Delete</button></td>
+              </tr>
+            <% } %>    
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <%- contentFor('scripts') %>
+  <script src="/javascripts/telegram-strategies.js"></script>
+  <%- include('../partials/confirm-callback', {id:"modal-delete", okbutton:"Delete", msg:"Do you want to remove this strategy notifications to this channel?"}) %>

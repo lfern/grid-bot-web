@@ -10,6 +10,7 @@
               <th scope="col">Description</th>
               <th scope="col">Chat id</th>
               <th scope="col">Level</th>
+              <th scope="col">Scope</th>
               <th scope="col">Is valid</th>
               <th scope="col"></th>
             </tr>
@@ -30,9 +31,23 @@
                   <% } else if (telegramId.level == 0) {%>
                     info
                   <% } %>
+                </span>
+                </td>
+                <td><span>
+                  <% if (telegramId.scope == 'strategy') { %>
+                   strategy
+                  <% } else if (telegramId.scope == 'other') {%>
+                    other
+                  <% } else {%>
+                  <% } %>
+                </span>
+                </td>
                 <td><span><%= telegramId.is_valid ? 'yes' : 'no'%></span></td>
                 <td>
                   <a href="/notificationmanager/telegram/<%= telegramId.id%>">Edit</a>
+                  <% if (telegramId.scope == 'strategy') { %>
+                    <a href="/notificationmanager/telegram/<%= telegramId.id%>/strategies">Strategies</a>                   
+                  <% } %>
                 </td>
                 <td>
                   <button class="btn btn-primary" data-toggle="modal" data-target="#modal-delete" data-callback="deleteTelegram" data-parameter="<%= telegramId.id%>">Delete</button>

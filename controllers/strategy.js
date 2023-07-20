@@ -404,14 +404,25 @@ exports.show_strategy_instances = function(req, res, next) {
 }
 
 exports.submit_instance = function(req, res, next) {
-    models.StrategyInstance.create({
-        strategy_id: req.params.strategy_id,
-        running: true
-    }).then(result => {
-        res.redirect('/strategy-instance/'+result.id);
+
+    return models.Strategy.findOne({where: {id: req.params.strategy_id}}).then(strategy => {
+        if (strategy == null) {
+            return next(createError(404, "Strategy does not exist"));
+        }
+
+        return models.StrategyInstance.create({
+            strategy_id: req.params.strategy_id,
+            running: true,
+            initial_position: strategy.initial_position,
+            active_buys: strategy.active_buys,
+            active_sells: strategy.active_sells,
+        }).then(result => {
+            res.redirect('/strategy-instance/'+result.id);
+        })
     }).catch(ex => {
         return next(createError(500, ex));
     });
+
 }
 
 exports.show_qties = function(req, res, next) {

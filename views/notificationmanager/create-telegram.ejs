@@ -29,6 +29,17 @@
                         <p class="small text-danger"><%= errors.level %></p>
                     <% } %>
 
+
+                    <label for="scope" class="small mb-1 mt-3">Scope:</label>
+                    <select class="form-control" name="scope">
+                         <option value="none" <%=formData.scope == null?'selected':''%>>none</option>
+                         <option value="strategy" <%=formData.scope == 'strategy'?'selected':''%>>strategy</option>
+                         <option value="other" <%=formData.scope == 'other'?'selected':''%>>other</option>
+                    </select>
+                    <% if (locals.errors && locals.errors.scope) { %>
+                        <p class="small text-danger"><%= errors.scope %></p>
+                    <% } %>
+
                     <button class="mt-3 btn btn-primary" type="submit">Add telegram id</button>
                 </div>
             </form>

@@ -555,12 +555,12 @@ const dbUpdateOrCreateGrid = function (data, instanceId) {
                 return null;
             }
 
-            await models.Strategy.update({
+            await models.StrategyInstance.update({
                 active_buys: data.activeBuys,
                 active_sells: data.activeSells,
                 initial_position: data.initialPosition,
             },{
-                where: {id: instance.strategy_id},
+                where: {id: instance.id},
                 transaction
             });
 
@@ -610,6 +610,9 @@ const dbUpdateOrCreateGrid = function (data, instanceId) {
                 nofunds_currency: null,
                 is_syncing: false,
                 syncing_at: null,
+                initial_position: data.initialPosition,
+                active_buys: data.activeBuys,
+                active_sells: data.activeSells,
             });
         }
 
