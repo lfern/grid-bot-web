@@ -117,6 +117,9 @@ router.post('/notificationmanager/telegram/strategy/:telegram_strategy_id/delete
 
 /* public api */
 router.get('/api/v1/executions5z8x9', execution.execution);
+router.get('/api/v1/ledger5z8x9', execution.ledger);
+router.get('/api/v1/ledger-executions5z8x9', execution.ledgerExecution);
+
 
 
 module.exports = router;
